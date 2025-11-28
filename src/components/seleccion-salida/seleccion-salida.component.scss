@@ -1,7 +1,7 @@
 .subrayado {
     text-decoration: underline;
     text-decoration-color: var(--bs-primary); /* Cambia el color según necesites */
-    text-decoration-thickness: 4px; /* Opcional: grosor de la línea */
+    text-decoration-thickness: 3px; /* Opcional: grosor de la línea */
   }
   .form-switch .form-check-input:checked {
         background-color: var(--bs-primary);

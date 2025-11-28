@@ -633,8 +633,11 @@ export class DespachoService {
       .toLowerCase()
       .replace(/\s+/g, ' ');
 
+    // Ampliamos disparadores para encontrar mejor el inicio del segmento
     let inicio = [
       'por la suma reclamada',
+      'por la suma de $',
+      'por la suma de pesos ',
       'por la suma',
       'por las sumas',
       'pesos '
@@ -651,46 +654,51 @@ export class DespachoService {
     const originalCompact = original.replace(/\s+/g, ' ');
     const segmento = originalCompact.slice(inicio, Math.min(fin + 100, originalCompact.length));
 
-    // Número monetario directo
-    const numeroMatch = segmento.match(/\(\$ ?([\d\.,]+)\)/);
-    const numeroBruto = numeroMatch ? numeroMatch[1] : '';
+    // Número monetario: opción A (desencadenada por “por la suma de ...”)
+    const matchPrimero = segmento.match(/por\s+la\s+suma\s+de\s+\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)/i);
+    // Opción B: paréntesis o inline
+    const numeroMatchParen = segmento.match(/\(\s*\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)\s*(?:[.\-–]{0,2})\s*\)/);
+    const inlineMatch = segmento.match(/\b\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)\b/);
+
+    let numeroBruto = matchPrimero?.[1] || numeroMatchParen?.[1] || inlineMatch?.[1] || '';
 
     // Literal (para texto y posible conversión si no hay número)
     let literal = '';
-    const regexLiteralPrincipal = /PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(\$|\s+EN\s+CONCEPTO|\s+CON\s+MAS|\s+CON\s+MÁS|$)/i;
+    const regexLiteralPrincipal = /PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(|\s+EN\s+CONCEPTO|\s+CON\s+MAS|\s+CON\s+MÁS|$)/i;
     const mLiteral = segmento.match(regexLiteralPrincipal);
     if (mLiteral) {
       literal = mLiteral[1];
     } else {
-      const alt = /POR\s+LA\s+SUMA(?:\s+RECLAMADA)?\s+DE\s+PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(\$|\s+EN\s+CONCEPTO|$)/i.exec(segmento);
+      const alt = /POR\s+LA\s+SUMA(?:\s+RECLAMADA)?\s+DE\s+PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(|\s+EN\s+CONCEPTO|$)/i.exec(segmento);
       if (alt) literal = alt[1];
     }
     literal = this.limpiarLiteralCapital(literal);
 
-    // Fracción (para decidir si agregamos “CON X centavos” en texto, pero NO para numerizar)
-    const fraccionMatch = segmento.match(/CON\s+([0-9]{1,3}\/[0-9]{1,3})/i);
-    let sufijoCentavos = '';
-    if (fraccionMatch) {
-      const [numStr, denStr] = fraccionMatch[1].split('/');
-      const num = parseInt(numStr, 10);
-      const den = parseInt(denStr, 10);
-      if (den === 100 && num > 0) sufijoCentavos = ` CON ${this.numeroATexto(num)} centavos`;
-    }
-
-    // Construcción de texto capital (sin “CON 00/100” si es cero)
+    // Construcción del texto
     let montoCapitalTexto = 'MONTO CAPITAL';
+    // Si hay literal, úsalo
     if (literal) {
-      montoCapitalTexto = `PESOS ${literal}${sufijoCentavos}`;
-    } else if (!literal && numeroMatch) {
-      montoCapitalTexto = `PESOS (NUMERICO)${sufijoCentavos}`;
+      montoCapitalTexto = `PESOS ${literal}`;
+    } else if (numeroBruto) {
+      // Si no hay literal pero sí número, construir literal desde el número
+      const numEntero = parseInt(numeroBruto.replace(/[^\d]/g,''), 10);
+      const literalAuto = this.numeroATextoGrande(numEntero);
+      if (literalAuto) {
+        montoCapitalTexto = `PESOS ${literalAuto.toUpperCase()}`;
+      } else {
+        // fallback mínimo si la conversión fallara
+        montoCapitalTexto = `PESOS (NUMERICO)`;
+      }
     }
 
-    // Numerización: usar pipe
-    // 1) Si hay número explícito entre paréntesis -> pipe
-    // 2) Si no hay número pero sí literal -> intentar convertir literal (ej: "Treinta y Tres Mil ...")
+    // Numerización usando el pipe (normalizar miles y decimales)
     let montoCapitalNumerico = '';
     if (numeroBruto) {
-      montoCapitalNumerico = this.monedaPipe.transform(numeroBruto);
+      const normalizadoNumero = numeroBruto
+        .replace(/[^\d.,]/g,'')
+        .replace(/\.(?=\d{3}(\D|$))/g,'')   // quita puntos de miles
+        .replace(/,(\d{2})$/,'.$1');        // coma decimal -> punto
+      montoCapitalNumerico = this.monedaPipe.transform(normalizadoNumero);
     } else if (literal) {
       const posible = this.monedaPipe.transform(literal);
       if (posible) montoCapitalNumerico = posible;
