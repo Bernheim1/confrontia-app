@@ -1,53 +1,100 @@
-<div class="p-5 mb-4 bg-light rounded-3 border border-2 border-primary shadow scale-up-ver-top">
+<div *ngFor="let item of items; let i = index;">
+  <div class="p-5 mb-4 bg-light rounded-3 border border-2 border-primary shadow scale-up-ver-top position-relative">
+    <button *ngIf="masivo" type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Eliminar" (click)="deteleDespacho(i)"></button>
+    <div class="container-fluid">
+      <h1 class="display-5 fw-bold">Ingrese su <span class="subrayado">primer despacho</span></h1>
+      <p *ngIf="!masivo" class="col-md-8 fs-4">Ingresando su primer despacho aquí, podrá generar los distintos tipos de cédulas y mandamientos que necesite.</p>
+
+      <textarea [(ngModel)]="item.primerDespacho" class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
+
+      <!-- Responsive buttons -->
+      <div class="d-flex flex-column flex-sm-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3">
+        <!-- Dropdown -->
+      <div *ngIf="!masivo" class="dropdown mb-2 mb-md-0" style="min-width: 220px;">
+        <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" (click)="toggleDropdown()">
+          {{ textoSalida }}
+        </button>     
+
+        <ul class="dropdown-menu" [class.show]="dropdownOpen">
+
+          <!-- <li class="dropdown-submenu" 
+              (mouseenter)="openSubmenu('cedula')" 
+              (mouseleave)="closeSubmenu()">
+            <a class="dropdown-item">Cédula</a>
+            <ul class="dropdown-menu" [class.show]="submenuOpen === 'cedula'">
+              <li>
+                <a class="dropdown-item" (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
+                  Traslado de Demanda
+                </a>
+              </li>
+            </ul>
+          </li> -->
+
+          <li class="dropdown-submenu" 
+              (mouseenter)="openSubmenu('mandamiento')" 
+              (mouseleave)="closeSubmenu()">
+            <a class="dropdown-item">Mandamiento</a>
+            <ul class="dropdown-menu" [class.show]="submenuOpen === 'mandamiento'">
+              <li>
+                <a class="dropdown-item" (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
+                  Intimación de Pago
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+        <!-- Button -->
+        <button *ngIf="!masivo" class="btn btn-outline-primary" type="button" (click)="onSubmit()" style="min-width: 150px;">
+          Ingresar
+          <fa-icon [icon]="faArrowRight"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!masivo" class="p-2 mb-4 bg-secondary rounded-3 border border-2 border-secondary shadow scale-up-ver-top">
   <div class="container-fluid">
-    <h1 class="display-5 fw-bold">Ingrese su <span class="subrayado">primer despacho</span></h1>
-    <p class="col-md-8 fs-4">Ingresando su primer despacho aquí, podrá generar los distintos tipos de cédulas y mandamientos que necesite.</p>
+    <button
+      class="btn btn-outline-light btn-lg w-100 text-center agregar-ingreso-btn"
+      type="button"
+      (click)="addDespacho()">
+      + Agregar Ingreso   
+    </button>
+  </div>
+</div>
 
-    <textarea [(ngModel)]="primerDespacho" class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
-
-    <!-- Responsive buttons -->
-    <div class="d-flex flex-column flex-sm-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3">
-      <!-- Dropdown -->
-    <div class="dropdown mb-2 mb-md-0" style="min-width: 220px;">
-      <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" (click)="toggleDropdown()">
-        {{ textoSalida }}
-      </button>
-
-      <ul class="dropdown-menu" [class.show]="dropdownOpen">
-
-        <!-- <li class="dropdown-submenu" 
-            (mouseenter)="openSubmenu('cedula')" 
-            (mouseleave)="closeSubmenu()">
-          <a class="dropdown-item">Cédula</a>
-          <ul class="dropdown-menu" [class.show]="submenuOpen === 'cedula'">
-            <li>
-              <a class="dropdown-item" (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
-                Traslado de Demanda
-              </a>
-            </li>
-          </ul>
-        </li> -->
-
-        <li class="dropdown-submenu" 
-            (mouseenter)="openSubmenu('mandamiento')" 
-            (mouseleave)="closeSubmenu()">
-          <a class="dropdown-item">Mandamiento</a>
-          <ul class="dropdown-menu" [class.show]="submenuOpen === 'mandamiento'">
-            <li>
-              <a class="dropdown-item" (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
-                Intimación de Pago
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-
-      <!-- Button -->
-      <button class="btn btn-outline-primary" type="button" (click)="onSubmit()" style="min-width: 150px;">
-        Ingresar
-        <fa-icon [icon]="faArrowRight"></fa-icon>
-      </button>
-    </div>
+<div *ngIf="masivo" class="floating-container">
+  <button
+    class="floating-add-btn"
+    type="button"
+    aria-label="Agregar ingreso"
+    (click)="addDespacho()">
+    <span class="floating-add-icon">+</span>
+  </button>
+  
+  <div class="floating-actions">
+    <button 
+      class="btn btn-selector" 
+      [class.btn-primary]="tipoSalida === 1"
+      [class.btn-outline-primary]="tipoSalida !== 1"
+      type="button" 
+      (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
+      Cédula
+    </button>
+    
+    <button 
+      class="btn btn-selector" 
+      [class.btn-primary]="tipoSalida === 2"
+      [class.btn-outline-primary]="tipoSalida !== 2"
+      type="button" 
+      (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
+      Mandamiento
+    </button>
+    
+    <button class="btn btn-primary btn-generate" type="submit" (click)="onSubmit()">
+      Generar <span class="fw-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
+    </button>
   </div>
 </div>

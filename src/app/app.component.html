@@ -29,11 +29,15 @@
   </div>
 
   <div *ngIf="this.step == 1">
-    <app-seleccion-salida (salidaSeleccionada)="onSalidaSeleccionada($event)" [textoDespacho]="this.textoDespacho" [tipoSalida]="this.tipoSalida" [subtipoSalida]="this.subtipoSalida"></app-seleccion-salida>
+    <div *ngFor="let despacho of despachos">
+      <app-seleccion-salida (salidaSeleccionada)="onSalidaSeleccionada($event)" [textoDespacho]="despacho.textoDespacho" [tipoSalida]="this.tipoSalida" [subtipoSalida]="this.subtipoSalida"></app-seleccion-salida>
+    </div>
   </div>
 
   <div *ngIf="this.step == 2">
-    <app-mostrar-salida [tipoSalida]="this.tipoSalida" [salida]="this.salida" [textoDespacho]="this.textoDespacho"></app-mostrar-salida>
+    <div *ngFor="let despacho of despachos">
+      <app-mostrar-salida [tipoSalida]="this.tipoSalida" [salida]="this.salida" [textoDespacho]="despacho.textoDespacho"></app-mostrar-salida>
+    </div>
   </div>
 </div>
 <router-outlet/>

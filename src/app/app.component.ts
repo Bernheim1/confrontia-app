@@ -22,22 +22,22 @@ export class AppComponent {
   faGavel = faGavel;
   faRepeat = faRepeat;
   step : TipoStepEnum = TipoStepEnum.Inicio;
-  textoDespacho : string = '';
+  despachos : any[] = [];
   tipoSalida = TipoSalidaEnum.SinAsignar;
   subtipoSalida : any;
   salida : Salida = new Salida();
 
-  onTextoIngresado(event : string) 
+  onTextoIngresado(event : any[]) 
   {
     if (event.length > 0)
     {
-      this.textoDespacho = event;
+      this.despachos = event;
     }
   }
 
   onTipoSalidaSeleccionado(event : TipoSalidaEnum)
   {
-    if (this.textoDespacho.length > 0)
+    if (this.despachos.length > 0)
     {
       this.tipoSalida = event;
     }
@@ -45,7 +45,7 @@ export class AppComponent {
 
   onSubtipoSalidaSeleccionado(event : any)
   {
-    if (this.textoDespacho.length > 0 && this.tipoSalida != TipoSalidaEnum.SinAsignar)
+    if (this.despachos.length > 0 && this.tipoSalida != TipoSalidaEnum.SinAsignar)
     {
       this.subtipoSalida = event;
       this.step = TipoStepEnum.SeleccionSalida;
@@ -61,7 +61,7 @@ export class AppComponent {
   onReingresar() 
   {
     this.step = TipoStepEnum.Inicio;
-    this.textoDespacho = '';
+    this.despachos = [];
     this.salida = new Salida();
   }
 }
