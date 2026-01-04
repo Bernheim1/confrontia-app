@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../core/auth/service/auth.service';
 import { faEye, faEyeSlash, faGavel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CoreConfigService } from '../../../../core/services/config.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -17,9 +19,10 @@ export class LoginPageComponent {
   public constructor(
         private formBuilder: FormBuilder,
         private authService: AuthService,
+        private _coreConfigService: CoreConfigService,
         private readonly _router: Router
     ) {
-
+        this.switchLayout(false);
         this.loginForm = this.formBuilder.group({
             username: ['', [Validators.required]],
             passwd: ['', [Validators.required]]
@@ -54,15 +57,16 @@ export class LoginPageComponent {
                     return;
                 }
 
+                this.switchLayout(true);
                 this._router.navigate(['']);
             });
     }
 
-    // private switchLayout(show: boolean): void {
-    //     this._coreConfigService.getConfig().pipe(take(1)).subscribe((res: any) => {
-    //         res.layout.menu.hidden = !show;
-    //         res.layout.navbar.hidden = !show;
-    //         this._coreConfigService.setConfig(res);
-    //     });
-    // }
+    private switchLayout(show: boolean): void {
+        this._coreConfigService.getConfig().pipe(take(1)).subscribe((res: any) => {
+            res.layout.menu.hidden = !show;
+            res.layout.navbar.hidden = !show;
+            this._coreConfigService.setConfig(res);
+        });
+    }
 }

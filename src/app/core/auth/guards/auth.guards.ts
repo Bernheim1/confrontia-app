@@ -3,12 +3,14 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 
 import { Observable, of, switchMap, take } from 'rxjs';
 import { AuthService } from '../service/auth.service';
+import { CoreConfigService } from '../../services/config.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
 
     public constructor(
-        private _authenticationService: AuthService
+        private _authenticationService: AuthService,
+        private _coreConfigService: CoreConfigService
     ) { }
 
     public canActivate(
@@ -24,18 +26,18 @@ export class AuthGuard implements CanActivate {
                     return of(false);
                 }
 
-                // this.switchLayout(true);
+                this.switchLayout(true);
 
                 return of(true);
             })
         );
     }
 
-    // private switchLayout(show: boolean): void {
-    //     this._coreConfigService.getConfig().pipe(take(1)).subscribe((res) => {
-    //         res.layout.menu.hidden = !show;
-    //         res.layout.navbar.hidden = !show;
-    //         this._coreConfigService.setConfig(res);
-    //     });
-    // }
+    private switchLayout(show: boolean): void {
+        this._coreConfigService.getConfig().pipe(take(1)).subscribe((res) => {
+            res.layout.menu.hidden = !show;
+            res.layout.navbar.hidden = !show;
+            this._coreConfigService.setConfig(res);
+        });
+    }
 }

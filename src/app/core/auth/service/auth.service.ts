@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, take, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { User } from '../models/user';
+import { CoreConfigService } from '../../services/config.service';
 
 
 const TOKEN_KEY = `${environment.sessionName}_TOKEN`;
@@ -24,6 +25,7 @@ export class AuthService {
     public constructor(
         private _router: Router,
         private _helper: JwtHelperService,
+        private _coreConfigService: CoreConfigService,
         private _httpClient: HttpClient
     ) {
         // disable console logs in production
@@ -55,9 +57,11 @@ export class AuthService {
 
             if(this._token) {
                 this.loadUserFromToken(this._token);
+                this.switchLayout(true);
                 this.authenticatedSubject$.next(true);
             }
         }
+        else { this.logout(); }
     }
 
     public getAuthorizationHeader(): string {
@@ -97,7 +101,7 @@ export class AuthService {
         AuthService.clearLocalStorageTokens();
         this.authenticatedSubject$.next(false);
         this.currentUserSubject$.next(undefined);
-
+        this.switchLayout(false);
         this._router.navigate(['/login']).then(
             () => {}
         );
@@ -116,6 +120,14 @@ export class AuthService {
 
         this.currentUserSubject$.next(this._user);
         console.log('🔑 User loaded: ', this._user);
+    }
+
+    private switchLayout(show: boolean): void {
+        this._coreConfigService.getConfig().pipe(take(1)).subscribe((res: any) => {
+            res.layout.menu.hidden = !show;
+            res.layout.navbar.hidden = !show;
+            this._coreConfigService.setConfig(res);
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------
