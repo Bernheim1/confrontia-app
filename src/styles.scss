@@ -1,6 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
-@import "../node_modules/bootstrap/scss/functions";
-@import "../node_modules/bootstrap/scss/variables";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 $primary:       #08236e;
 // $secondary:     $yellow-300;
@@ -24,10 +26,6 @@ $theme-colors: (
 //   "dark":       $dark
 );
 
-*:focus {
-    box-shadow: none !important;
-    border-color: $primary !important;
-}
 
 .scale-up-ver-top {
 	-webkit-animation: scale-up-ver-top 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
@@ -61,6 +59,3 @@ $theme-colors: (
               transform-origin: 100% 0%;
     }
   }
-
-
-@import '../node_modules/bootstrap/scss/bootstrap.scss';

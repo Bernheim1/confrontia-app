@@ -5,7 +5,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import * as bootstrap from 'bootstrap';
 import { TipoSalidaEnum } from '../../shared/enums/tipo-salida-enum';
 import { Salida } from '../../shared/models/salida';
 import { faRepeat } from '@fortawesome/free-solid-svg-icons';
@@ -224,8 +223,8 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     navigator.clipboard.writeText(textToCopy).then(() => {
       let toastEl = document.getElementById('myToast');
       if (toastEl) {
-        let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        toast.show();
+        // let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        // toast.show();
       }
     });
   }
@@ -234,8 +233,8 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     navigator.clipboard.writeText(this.processedHtml).then(() => {
       let toastEl = document.getElementById('myToast');
       if (toastEl) {
-        let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        toast.show();
+        // let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        // toast.show();
       }
     });
   }
