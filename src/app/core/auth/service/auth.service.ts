@@ -9,7 +9,6 @@ import { User } from '../models/user';
 
 
 const TOKEN_KEY = `${environment.sessionName}_TOKEN`;
-const ONE_TIME_TOKEN_KEY = `${environment.sessionName}_ONE_TIME_TOKEN`;
 const AUTH_SERVER_ADDRESS = `${environment.basePath}v1/auth`;
 const CHANNEL_NAME = `${environment.sessionName}_CHANNEL`;
 
@@ -35,15 +34,15 @@ export class AuthService {
             window.console.log = (): void => { };
         }
 
-        // this._broadcastChannel.addEventListener('message', (event) => {
-        //     if (event.data.action === 'token_removed') {
-        //         this.logout();
-        //     } else if (event.data.action === 'token_updated') {
-        //         this._token = event.data.token;
-        //         this.loadUserFromToken(this._token);
-        //         this.authenticatedSubject$.next(true);
-        //     }
-        // });
+        this._broadcastChannel.addEventListener('message', (event) => {
+            if (event.data.action === 'token_removed') {
+                this.logout();
+            } else if (event.data.action === 'token_updated') {
+                this._token = event.data.token;
+                this.loadUserFromToken(this._token ?? '');
+                this.authenticatedSubject$.next(true);
+            }
+        });
     }
 
 
@@ -51,7 +50,6 @@ export class AuthService {
     public readonly authenticated$: Observable<boolean | undefined> = this.authenticatedSubject$.asObservable();
 
     public init(): void {
-
         if (AuthService.getStoredAccessToken()) {
             this._token = AuthService.getStoredAccessToken() ?? undefined;
 
@@ -133,9 +131,7 @@ export class AuthService {
         return localStorage.getItem(TOKEN_KEY);
     }
 
-
     private static clearLocalStorageTokens(): void {
         localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(ONE_TIME_TOKEN_KEY);
     }
 }

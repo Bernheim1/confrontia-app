@@ -54,7 +54,7 @@ export class LoginPageComponent {
                     return;
                 }
 
-                // this._router.navigate(['/home']);
+                this._router.navigate(['']);
             });
     }
 
