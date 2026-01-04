@@ -27,7 +27,7 @@ export class CoreConfigService {
   constructor(private _router: Router, @Inject(CORE_CUSTOM_CONFIG) private _config: any) {
     // Get the config from local storage
     if (_config.layout.enableLocalStorage) {
-      this.localConfig = JSON.parse(localStorage.getItem('config') ?? '');
+      this.localConfig = this.getLocalConfig();
     } else {
       localStorage.removeItem('config');
     }
@@ -95,7 +95,7 @@ export class CoreConfigService {
     // Check if localDefault (localStorage if we have else defaultConfig) is different form the default one
     this._router.events.pipe(filter(event => event instanceof ResolveEnd)).subscribe(() => {
       // Get the local config from local storage
-      this.localConfig = JSON.parse(localStorage.getItem('config') ?? '');
+      this.localConfig = this.getLocalConfig();
 
       // Set localDefault to localConfig if we have else defaultConfig
       let localDefault = this.localConfig ? this.localConfig : this._defaultConfig;
@@ -127,7 +127,7 @@ export class CoreConfigService {
     let config;
 
     // Set config = localConfig, If we have else defaultConfig
-    this.localConfig = JSON.parse(localStorage.getItem('config') ?? '');
+    this.localConfig = this.getLocalConfig();
     if (this.localConfig) {
       config = this.localConfig;
     } else {
@@ -163,5 +163,19 @@ export class CoreConfigService {
    */
   resetConfig(): void {
     this._configSubject.next(_.cloneDeep(this._defaultConfig));
+  }
+
+
+  private getLocalConfig(): any | null {
+    const raw = localStorage.getItem('config');
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   }
 }
