@@ -1,0 +1,48 @@
+<div class="fondo">
+    <div class=" overlay">
+        <div class="container-fluid content">
+            <div class="row content justify-content-center">
+                <div class="col-md-3 col-sm-12 p-0 center">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h1 class="pb-1 text-center">
+                                        <fa-icon [icon]="faGavel" class="logo-icon"></fa-icon>
+                                    </h1>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <p>Iniciá sesión con tu nombre de usuario y contraseña</p>
+                                    <form (ngSubmit)="onSubmit()" [formGroup]="loginForm" novalidate novalidate>
+                                        <input formControlName="username" class="form-control input-lg mb-2"
+                                            placeholder="Nombre de Usuario" />
+
+                                        <div class="mb-50 input-group">
+                                            <input formControlName="passwd" [type]="basicPwdShow ? 'text' : 'password'"
+                                                class="form-control" id="basic-default-password"
+                                                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                                aria-describedby="basic-default-password" />
+                                            <div class="input-group-append" (click)="basicPwdShow = !basicPwdShow">
+                                                <span class="input-group-text cursor-pointer">
+                                                    @if(basicPwdShow){
+                                                    <fa-icon [icon]="faEyeSlash"></fa-icon>
+                                                    }
+                                                    @else {
+                                                    <fa-icon [icon]="faEye"></fa-icon>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <button tabindex="4" type="submit" rippleeffect=""
+                                            class="w-100 mt-2 btn btn-primary btn-block waves-effect waves-float waves-light">Acceder</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
