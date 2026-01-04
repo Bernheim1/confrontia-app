@@ -22,7 +22,6 @@ export class AppComponent {
   }
   public coreConfig: any;
 
-
   public ngOnInit(): void {
     this._coreConfigService.config.pipe(takeUntil(this._unsubscribeAll$)).subscribe((config: any) => {
       this.coreConfig = config;
