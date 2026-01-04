@@ -1,0 +1,40 @@
+<header class="mb-4 border-bottom">
+  <div class="row">
+    <!-- Logo Section -->
+    <div class="col-12 col-md-6">
+      <div class="d-flex align-items-center text-dark text-decoration-none brand-logo justify-content-center justify-content-md-start">
+        <fa-icon [icon]="faGavel" class="logo-icon"></fa-icon>
+        <div class="ms-2 text-center text-md-start">
+          <div class="brand-title">Despachos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Button Section (Visible when step != 0) -->
+    <div class="col-12 col-md-6">
+      <div class="d-flex justify-content-center justify-content-md-end align-items-center" *ngIf="this.step != 0">
+        <button class="btn btn-outline-primary" type="button" (click)="onReingresar()">
+          Reingresar
+          <fa-icon [icon]="faRepeat"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+  <div *ngIf="this.step == 0">
+    <app-ingreso-despacho class="scale-up-ver-top" (textoIngresado)="onTextoIngresado($event)" (tipoSalidaOutput)="onTipoSalidaSeleccionado($event)" (subtipoSalidaOutput)="onSubtipoSalidaSeleccionado($event)"></app-ingreso-despacho>
+  </div>
+
+  <div *ngIf="this.step == 1">
+    <div *ngFor="let despacho of despachos">
+      <app-seleccion-salida (salidaSeleccionada)="onSalidaSeleccionada($event)" [textoDespacho]="despacho.textoDespacho" [tipoSalida]="this.tipoSalida" [subtipoSalida]="this.subtipoSalida"></app-seleccion-salida>
+    </div>
+  </div>
+
+  <div *ngIf="this.step == 2">
+    <div *ngFor="let despacho of despachos">
+      <app-mostrar-salida [tipoSalida]="this.tipoSalida" [salida]="this.salida" [textoDespacho]="despacho.textoDespacho"></app-mostrar-salida>
+    </div>
+  </div>
