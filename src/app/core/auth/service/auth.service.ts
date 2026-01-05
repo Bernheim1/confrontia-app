@@ -96,7 +96,6 @@ export class AuthService {
             );
     }
 
-
     public logout(): void {
         AuthService.clearLocalStorageTokens();
         this.authenticatedSubject$.next(false);

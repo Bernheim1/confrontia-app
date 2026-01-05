@@ -56,7 +56,7 @@
                      <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Earnings</a>
                   </li>
                   <li>
-                     <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Sign out</a>
+                     <a (click)="logout()" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Sign out</a>
                   </li>
                </ul>
                </div>
@@ -93,7 +93,7 @@ class="fixed top-18 left-0 w-64 h-full bg-surface-dark transition-all duration-3
       </div>
    </aside>
 
-   <div class="p-4 mt-14 transition-all duration-300" [ngClass]="{ 'ml-64': sidebarOpen, 'ml-0': !sidebarOpen }" >
+   <div class="mt-14 transition-all duration-300" [ngClass]="{ 'ml-64': sidebarOpen, 'ml-0': !sidebarOpen }" >
       <router-outlet/>
    </div>
 }

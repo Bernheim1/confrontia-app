@@ -2,12 +2,13 @@ import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, provideZoneCha
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { JwtModule } from '@auth0/angular-jwt';
 import { environment } from '../environments/environment';
 import { AuthService } from './core/auth/service/auth.service';
 import { CoreConfig } from './core/types';
 import { CORE_CUSTOM_CONFIG } from './core/services/config.service';
+import { jwtInterceptor } from './core/auth/interceptors/jwt.interceptor';
 
 export function initApp(authConfigService: AuthService): () => void {
     return () => authConfigService.init();
@@ -60,7 +61,7 @@ export const appConfig: ApplicationConfig = {
   [ 
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes), 
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([jwtInterceptor])),
     importProvidersFrom([
       JwtModule.forRoot({
         config: {

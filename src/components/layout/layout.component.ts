@@ -5,6 +5,7 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { faGavel, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AuthService } from '../../app/core/auth/service/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -22,7 +23,9 @@ export class LayoutComponent {
   isDark = false;
   private _unsubscribeAll$: Subject<any>;
 
-  public constructor(private _coreConfigService: CoreConfigService) {
+  public constructor(private _coreConfigService: CoreConfigService,
+    private _auth: AuthService
+  ) {
     this._unsubscribeAll$ = new Subject();
   }
   public coreConfig: any;
@@ -63,5 +66,9 @@ export class LayoutComponent {
 
   closeSidebar(): void {
     this.sidebarOpen = false;
+  }
+
+  logout(): void {
+    this._auth.logout();
   }
 }

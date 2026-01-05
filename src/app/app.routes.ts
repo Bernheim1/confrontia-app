@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginPageComponent } from './modules/login/pages/login/login.component';
 import { DespachoComponent } from '../modules/despacho/despacho.component';
 import { LayoutComponent } from '../components/layout/layout.component';
-import { AuthGuard } from './core/auth/guards/auth.guards';
+import { ChangePasswordComponent } from './modules/login/pages/change-password/change-password.component';
 
 export const routes: Routes = [
   {
@@ -22,6 +22,10 @@ export const routes: Routes = [
       {
         path: 'despacho',
         component: DespachoComponent
+      },
+      {
+        path: 'change-password',
+        component: ChangePasswordComponent
       }
     ]
   }
