@@ -15,16 +15,4 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  private _unsubscribeAll$: Subject<any>;
-
-  public constructor(private _coreConfigService: CoreConfigService) {
-    this._unsubscribeAll$ = new Subject();
-  }
-  public coreConfig: any;
-
-  public ngOnInit(): void {
-    this._coreConfigService.config.pipe(takeUntil(this._unsubscribeAll$)).subscribe((config: any) => {
-      this.coreConfig = config;
-    });
-  }
 }

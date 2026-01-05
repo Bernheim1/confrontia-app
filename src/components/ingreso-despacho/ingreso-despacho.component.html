@@ -1,51 +1,64 @@
-<div class="p-5 mb-4 bg-light rounded-3 border border-2 border-primary shadow scale-up-ver-top">
-  <div class="container-fluid">
-    <h1 class="display-5 fw-bold">Ingrese su <span class="subrayado">primer despacho</span></h1>
-    <p class="col-md-8 fs-4">Ingresando su primer despacho aquí, podrá generar los distintos tipos de cédulas y mandamientos que necesite.</p>
+<div class="w-full p-6 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl border-2 border-primary-500 dark:border-primary-400 shadow-lg animate-scale-up">
+  <div class="w-full">
+    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3">
+      Ingrese su <span class="border-b-4 border-primary-500 dark:border-primary-400 pb-1">primer despacho</span>
+    </h1>
+    <p class="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-4">
+      Ingresando su primer despacho aquí, podrá generar los distintos tipos de cédulas y mandamientos que necesite.
+    </p>
 
-    <textarea [(ngModel)]="primerDespacho" class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
+    <textarea 
+      [(ngModel)]="primerDespacho" 
+      class="w-full p-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 
+             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+             focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800
+             outline-none transition-colors resize-none"
+      id="exampleFormControlTextarea1" 
+      rows="15"
+      placeholder="Ingrese el texto del despacho aquí...">
+    </textarea>
 
-    <!-- Responsive buttons -->
-    <div class="d-flex flex-column flex-sm-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3">
-      <!-- Dropdown -->
-    <div class="dropdown mb-2 mb-md-0" style="min-width: 220px;">
-      <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" (click)="toggleDropdown()">
-        {{ textoSalida }}
-      </button>
+    <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 mt-4">
+      <div class="relative min-w-[220px]">
+        <button 
+          class="w-full px-4 py-2.5 text-primary-600 dark:text-primary-400 border-2 border-primary-600 dark:border-primary-400
+                 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 
+                 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-700
+                 transition-all duration-200 font-medium
+                 flex items-center justify-between"
+          type="button" 
+          (click)="toggleDropdown()">
+          <span class="truncate">{{ textoSalida }}</span>
+          <svg class="w-5 h-5 ml-2 transition-transform duration-200" [class.rotate-180]="dropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
 
-      <ul class="dropdown-menu" [class.show]="dropdownOpen">
+        <ul *ngIf="dropdownOpen" class="absolute left-0 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-visible z-50">
+          <li class="relative" (mouseenter)="openSubmenu('mandamiento')" (mouseleave)="closeSubmenu()">
+            <a class="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 flex items-center justify-between">
+              <span>Mandamiento</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+            <ul *ngIf="submenuOpen === 'mandamiento'" class="absolute left-full top-0 ml-1 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
+              <li>
+                <a class="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150" (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
+                  Intimación de Pago
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
 
-        <!-- <li class="dropdown-submenu" 
-            (mouseenter)="openSubmenu('cedula')" 
-            (mouseleave)="closeSubmenu()">
-          <a class="dropdown-item">Cédula</a>
-          <ul class="dropdown-menu" [class.show]="submenuOpen === 'cedula'">
-            <li>
-              <a class="dropdown-item" (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
-                Traslado de Demanda
-              </a>
-            </li>
-          </ul>
-        </li> -->
-
-        <li class="dropdown-submenu" 
-            (mouseenter)="openSubmenu('mandamiento')" 
-            (mouseleave)="closeSubmenu()">
-          <a class="dropdown-item">Mandamiento</a>
-          <ul class="dropdown-menu" [class.show]="submenuOpen === 'mandamiento'">
-            <li>
-              <a class="dropdown-item" (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
-                Intimación de Pago
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-
-      <!-- Button -->
-      <button class="btn btn-outline-primary" type="button" (click)="onSubmit()" style="min-width: 150px;">
-        Ingresar
+      <button 
+        class="px-6 py-2.5 text-white bg-primary-600 dark:bg-primary-500 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600
+               focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-700
+               transition-all duration-200 font-medium min-w-[150px]
+               flex items-center justify-center gap-2"
+        type="button" 
+        (click)="onSubmit()">
+        <span>Ingresar</span>
         <fa-icon [icon]="faArrowRight"></fa-icon>
       </button>
     </div>
