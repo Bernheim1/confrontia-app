@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { faGavel, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from '../../app/core/auth/service/auth.service';
+import { User } from '../../app/core/auth/models/user';
 
 @Component({
   selector: 'app-layout',
@@ -24,16 +25,18 @@ export class LayoutComponent {
   private _unsubscribeAll$: Subject<any>;
 
   public constructor(private _coreConfigService: CoreConfigService,
-    private _auth: AuthService
-  ) {
+    private _auth: AuthService) {
     this._unsubscribeAll$ = new Subject();
   }
   public coreConfig: any;
+  public currentUser: User | undefined;
 
   public ngOnInit(): void {
     this._coreConfigService.config.pipe(takeUntil(this._unsubscribeAll$)).subscribe((config: any) => {
       this.coreConfig = config;
     });
+
+    this._auth.currentUser$.subscribe((user) => { this.currentUser = user; });
 
     const stored = localStorage.getItem('theme');
     if (stored === 'dark') this.isDark = true;

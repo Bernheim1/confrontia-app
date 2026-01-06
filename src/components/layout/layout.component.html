@@ -17,16 +17,14 @@
          <div class="flex items-center">
             <div class="flex items-center ms-3">
                <div>
-               <button type="button" class="border-2 border-solid border-white flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
-                  <span class="sr-only">Open user menu</span>
-                  <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo">
+               <button type="button" class="border-2 border-solid border-primary-400 flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+                  <div class="circle-avatar round" height="40" width="40">{{
+                     this.currentUser?.username?.toUpperCase()?.charAt(0) }}
+                  </div>
                </button>
                </div>
                <div class="z-50 hidden my-4 text-base list-none bg-surface-dark divide-y divide-gray-100 rounded-sm shadow-sm dark:divide-gray-600" id="dropdown-user">
                <div class="px-4 py-3" role="none">
-                  <p class="text-sm text-white" role="none">
-                     Neil Sims
-                  </p>
                   <p class="text-sm font-medium text-white truncate" role="none">
                   </p>
                </div>
@@ -47,16 +45,10 @@
                      </a>
                   </li>
                   <li>
-                     <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Dashboard</a>
-                  </li>
-                  <li>
                      <a href="/change-password" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Cambiar Contraseña</a>
                   </li>
                   <li>
-                     <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Earnings</a>
-                  </li>
-                  <li>
-                     <a (click)="logout()" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Sign out</a>
+                     <a (click)="logout()" class="block px-4 py-2 text-sm text-white hover:bg-primary-400" role="menuitem">Logout</a>
                   </li>
                </ul>
                </div>

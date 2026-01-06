@@ -4,3 +4,14 @@
     line-height: 1; 
     height: auto; 
 }
+
+.circle-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 25px;
+  line-height: 40px;
+  font-family: roboto, arial;
+  color: white;
+  text-align: center;
+}
