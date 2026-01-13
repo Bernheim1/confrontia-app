@@ -20,7 +20,7 @@ export class IngresoDespachoComponent {
   @Output() textoIngresado = new EventEmitter<any[]>();
   @Output() tipoSalidaOutput = new EventEmitter<TipoSalidaEnum>();
   @Output() subtipoSalidaOutput = new EventEmitter<any>();
-  tipoSalida = TipoSalidaEnum.SinAsignar;
+  tipoSalida = TipoSalidaEnum.Mandamiento;
   subtipoSalida : any;
   tipoCedula = TipoCedulaEnum;
   tipoMandamiento = TipoMandamientoEnum;
@@ -79,8 +79,13 @@ export class IngresoDespachoComponent {
   }
 
   addDespacho() {
+
     if(this.items.length < 10)
     {
+      if (this.items.length == 1)
+      {
+        this.tipoSalida = TipoSalidaEnum.Mandamiento;
+      }
       this.masivo = true;
       this.items.push({ primerDespacho: '' });
     }else{

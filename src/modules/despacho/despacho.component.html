@@ -28,13 +28,36 @@
   </div>
 
   <div *ngIf="this.step == 1">
-    <div *ngFor="let despacho of despachos">
-      <app-seleccion-salida (salidaSeleccionada)="onSalidaSeleccionada($event)" [textoDespacho]="despacho.textoDespacho" [tipoSalida]="this.tipoSalida" [subtipoSalida]="this.subtipoSalida"></app-seleccion-salida>
+    <div *ngFor="let despacho of despachos; let i = index" class="mb-4">
+      <app-seleccion-salida 
+        (salidaSeleccionada)="onSalidaSeleccionada($event)"
+        (formularioCompletado)="onFormularioCompletado($event)" 
+        [textoDespacho]="despacho.primerDespacho" 
+        [tipoSalida]="this.tipoSalida" 
+        [subtipoSalida]="this.subtipoSalida"
+        [index]="i"
+        [masivo]="despachos.length > 1"
+        [totalDespachos]="despachos.length"
+        [despachosCompletados]="formulariosValidos.size"
+        [hideButton]="true">
+      </app-seleccion-salida>
     </div>
+    
+    <!-- Botón flotante para generar todos -->
+    <button 
+      class="btn btn-primary btn-generar-flotante" 
+      [class.todos-completos]="formulariosValidos.size === despachos.length"
+      type="button" 
+      (click)="generarTodos()">
+      <span *ngIf="despachos.length > 1" class="badge bg-white text-primary me-2">
+        {{ formulariosValidos.size }}/{{ despachos.length }}
+      </span>
+      Generar <span class="fw-bold">{{ this.tipoSalida == 1 ? (despachos.length > 1 ? 'Cédulas' : 'Cédula') : (despachos.length > 1 ? 'Mandamientos' : 'Mandamiento') }}</span>
+    </button>
   </div>
 
   <div *ngIf="this.step == 2">
-    <div *ngFor="let despacho of despachos">
-      <app-mostrar-salida [tipoSalida]="this.tipoSalida" [salida]="this.salida" [textoDespacho]="despacho.textoDespacho"></app-mostrar-salida>
+    <div *ngFor="let despacho of despachos; let i = index" class="mb-4">
+      <app-mostrar-salida [tipoSalida]="this.tipoSalida" [salida]="this.salida[i]" [textoDespacho]="despacho.primerDespacho" [masivo]="despachos.length > 1"></app-mostrar-salida>
     </div>
   </div>

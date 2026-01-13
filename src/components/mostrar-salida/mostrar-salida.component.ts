@@ -22,6 +22,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   @Input() tipoSalida : TipoSalidaEnum = TipoSalidaEnum.Mandamiento;
   @Input() salida?: Salida;
   @Input() textoDespacho?: string;
+  @Input() masivo?: boolean = false;
 
   faCheck = faCheck;
   faRepeat = faRepeat;
@@ -32,6 +33,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   loading = false;
   error: string | null = null;
   copiedOnce = false;
+  private copiedTimeout: any;
 
   // FormData con todas las claves que usa tu plantilla (valores por defecto '')
   formData: Record<string, string> = {
@@ -232,10 +234,22 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
 
   copyRawHtml() {
     navigator.clipboard.writeText(this.processedHtml).then(() => {
-      let toastEl = document.getElementById('myToast');
-      if (toastEl) {
-        let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        toast.show();
+      // Para modo masivo: mostrar feedback temporal en el botón
+      if (this.masivo) {
+        this.copiedOnce = true;
+        if (this.copiedTimeout) clearTimeout(this.copiedTimeout);
+        this.copiedTimeout = setTimeout(() => {
+          this.copiedOnce = false;
+        }, 2000);
+      }
+      
+      // Toast solo en modo no masivo
+      if (!this.masivo) {
+        let toastEl = document.getElementById('myToast');
+        if (toastEl) {
+          let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+          toast.show();
+        }
       }
     });
   }

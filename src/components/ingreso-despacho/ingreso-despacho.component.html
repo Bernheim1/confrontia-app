@@ -9,40 +9,23 @@
 
       <!-- Responsive buttons -->
       <div class="d-flex flex-column flex-sm-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3">
-        <!-- Dropdown -->
-      <div *ngIf="!masivo" class="dropdown mb-2 mb-md-0" style="min-width: 220px;">
-        <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" (click)="toggleDropdown()">
-          {{ textoSalida }}
-        </button>     
-
-        <ul class="dropdown-menu" [class.show]="dropdownOpen">
-
-          <!-- <li class="dropdown-submenu" 
-              (mouseenter)="openSubmenu('cedula')" 
-              (mouseleave)="closeSubmenu()">
-            <a class="dropdown-item">Cédula</a>
-            <ul class="dropdown-menu" [class.show]="submenuOpen === 'cedula'">
-              <li>
-                <a class="dropdown-item" (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
-                  Traslado de Demanda
-                </a>
-              </li>
-            </ul>
-          </li> -->
-
-          <li class="dropdown-submenu" 
-              (mouseenter)="openSubmenu('mandamiento')" 
-              (mouseleave)="closeSubmenu()">
-            <a class="dropdown-item">Mandamiento</a>
-            <ul class="dropdown-menu" [class.show]="submenuOpen === 'mandamiento'">
-              <li>
-                <a class="dropdown-item" (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
-                  Intimación de Pago
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <!-- Toggle Selector -->
+      <div *ngIf="!masivo" class="toggle-selector mb-2 mb-md-0">
+            <button 
+              class="toggle-btn" 
+              [class.active]="tipoSalida === 1"
+              type="button" 
+              (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
+              Cédula
+            </button>
+            
+            <button 
+              class="toggle-btn" 
+              [class.active]="tipoSalida === 2"
+              type="button" 
+              (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
+              Mandamiento
+            </button>
       </div>
 
         <!-- Button -->
@@ -66,32 +49,32 @@
 </div>
 
 <div *ngIf="masivo" class="floating-container">
-  <button
-    class="floating-add-btn"
-    type="button"
-    aria-label="Agregar ingreso"
-    (click)="addDespacho()">
-    <span class="floating-add-icon">+</span>
-  </button>
   
   <div class="floating-actions">
     <button 
-      class="btn btn-selector" 
-      [class.btn-primary]="tipoSalida === 1"
-      [class.btn-outline-primary]="tipoSalida !== 1"
+      class="btn btn-selector btn-primary" 
       type="button" 
-      (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
-      Cédula
+      (click)="addDespacho()">
+      + Agregar ingreso
     </button>
-    
-    <button 
-      class="btn btn-selector" 
-      [class.btn-primary]="tipoSalida === 2"
-      [class.btn-outline-primary]="tipoSalida !== 2"
-      type="button" 
-      (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
-      Mandamiento
-    </button>
+
+    <div class="toggle-selector">
+            <button 
+              class="toggle-btn" 
+              [class.active]="tipoSalida === 1"
+              type="button" 
+              (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
+              Cédula
+            </button>
+            
+            <button 
+              class="toggle-btn" 
+              [class.active]="tipoSalida === 2"
+              type="button" 
+              (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
+              Mandamiento
+            </button>
+    </div>
     
     <button class="btn btn-primary btn-generate" type="submit" (click)="onSubmit()">
       Generar <span class="fw-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>

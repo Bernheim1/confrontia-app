@@ -1,4 +1,9 @@
 <div class="p-5 bg-light rounded-3 border border-2 border-primary shadow scale-up-ver-top mb-3">
+    <!-- Header para modo masivo -->
+    <div *ngIf="masivo" class="masivo-header mb-4 pb-3 border-bottom border-2 border-primary">
+        <h4 class="mb-0 text-primary fw-bold text-center">{{ formulario.get('expediente.caratulaExpediente')?.value || 'Despacho ' + (index + 1) }}</h4>
+    </div>
+    
     <div class="col-md-12">
         <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
         <div class="container">
@@ -342,6 +347,6 @@
     </form>
     </div>
 </div>
-<button class="btn btn-primary btn-generar-flotante" type="submit" (click)="onSubmit()">
+<button *ngIf="!hideButton" class="btn btn-primary btn-generar-flotante" type="submit" (click)="onSubmit()">
   Generar <span class="fw-bold">{{ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
 </button>

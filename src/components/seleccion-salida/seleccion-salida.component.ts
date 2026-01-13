@@ -30,10 +30,16 @@ export class SeleccionSalidaComponent implements OnInit {
   faCircleInfo = faCircleInfo;
   faArrowRight = faArrowRight;
 
-  @Output() salidaSeleccionada = new EventEmitter<Salida>();
+  @Output() salidaSeleccionada = new EventEmitter<{ salida: Salida, index: number }>();
+  @Output() formularioCompletado = new EventEmitter<{ index: number, valido: boolean }>();
   @Input() textoDespacho: string = '';
   @Input() tipoSalida: TipoSalidaEnum = TipoSalidaEnum.SinAsignar;
   @Input() subtipoSalida: any;
+  @Input() index: number = 0;
+  @Input() masivo: boolean = false;
+  @Input() totalDespachos: number = 1;
+  @Input() despachosCompletados: number = 0;
+  @Input() hideButton: boolean = false;
 
   formulario!: FormGroup;
   textoTitulo = '';
@@ -172,6 +178,14 @@ export class SeleccionSalidaComponent implements OnInit {
         this.filtroJuzgado = v || '';
         this.applyFilter(this.filtroJuzgado);
       }
+    });
+
+    // Escuchar cambios en el formulario para notificar cuando esté completo
+    this.formulario.statusChanges.subscribe(status => {
+      this.formularioCompletado.emit({ 
+        index: this.index, 
+        valido: status === 'VALID' 
+      });
     });
 
     setTimeout(() => this.intentarMapearOrganoDesdeCsv(), 0);
@@ -377,7 +391,12 @@ export class SeleccionSalidaComponent implements OnInit {
       return;
     }
     const retorno = this.mapSalida();
-    this.salidaSeleccionada.emit(retorno);
+    this.salidaSeleccionada.emit({ salida: retorno, index: this.index });
+  }
+
+  submitFromParent(index: number) {
+    this.index = index;
+    this.onSubmit();
   }
 
   mapSalida(): Salida {

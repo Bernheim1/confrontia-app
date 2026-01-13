@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChildren, QueryList } from '@angular/core';
 import { TipoSalidaEnum } from '../../shared/enums/tipo-salida-enum';
 import { faGavel, faRepeat } from '@fortawesome/free-solid-svg-icons';
 import { TipoStepEnum } from '../../shared/enums/tipo-step-enum';
@@ -9,6 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IngresoDespachoComponent } from '../../components/ingreso-despacho/ingreso-despacho.component';
 import { MostrarSalidaComponent } from '../../components/mostrar-salida/mostrar-salida.component';
 import { SeleccionSalidaComponent } from '../../components/seleccion-salida/seleccion-salida.component';
+import { DespachoService } from '../../shared/services/despacho/despacho.service';
 
 @Component({
   selector: 'app-despacho',
@@ -24,7 +25,13 @@ export class DespachoComponent {
   despachos : any[] = [];
   tipoSalida = TipoSalidaEnum.SinAsignar;
   subtipoSalida : any;
-  salida : Salida = new Salida();
+  salida : Salida[] = [];
+  salidasRecolectadas: Map<number, Salida> = new Map();
+  formulariosValidos: Set<number> = new Set();
+  
+  @ViewChildren(SeleccionSalidaComponent) seleccionComponents!: QueryList<SeleccionSalidaComponent>;
+
+  constructor(private despachoService: DespachoService) {}
 
   onTextoIngresado(event : any[]) 
   {
@@ -51,16 +58,45 @@ export class DespachoComponent {
     }
   }
 
-  onSalidaSeleccionada(event : Salida) 
+  onSalidaSeleccionada(event: { salida: Salida, index: number }) 
   {
-    this.salida = event;
-    this.step = TipoStepEnum.MostrarSalida;
+    this.salidasRecolectadas.set(event.index, event.salida);
+    
+    // Solo avanzar cuando tengamos todas las salidas
+    if (this.salidasRecolectadas.size === this.despachos.length) {
+      // Ordenar las salidas según el índice
+      this.salida = Array.from({ length: this.despachos.length }, (_, i) => 
+        this.salidasRecolectadas.get(i)!
+      );
+      this.step = TipoStepEnum.MostrarSalida;
+    }
+  }
+
+  generarTodos() {
+    // Limpiar salidas previas
+    this.salidasRecolectadas.clear();
+    this.salida = [];
+    
+    // Iterar sobre todos los componentes y ejecutar su submit
+    this.seleccionComponents.forEach((component, index) => {
+      component.submitFromParent(index);
+    });
+  }
+
+  onFormularioCompletado(event: { index: number, valido: boolean }) {
+    if (event.valido) {
+      this.formulariosValidos.add(event.index);
+    } else {
+      this.formulariosValidos.delete(event.index);
+    }
   }
 
   onReingresar() 
   {
     this.step = TipoStepEnum.Inicio;
     this.despachos = [];
-    this.salida = new Salida();
+    this.salida = [];
+    this.salidasRecolectadas.clear();
+    this.formulariosValidos.clear();
   }
 }

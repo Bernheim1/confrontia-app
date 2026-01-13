@@ -331,71 +331,83 @@ export class DespachoService {
       let puntos = 0;
       const detalles: string[] = [];
 
-      // Número (obligatorio si ambos)
+      // Número (obligatorio si ambos - sin excepciones)
       if (numDet && numCat) {
         if (numDet === numCat) {
-          puntos += 500;
+          puntos += 600;
           detalles.push(`num=${numDet}`);
         } else {
           continue;
         }
       }
 
-      // Zona
+      // Zona - más estricta
       if (zonaDet && zonaCat) {
         if (zonaDet === zonaCat) {
-          puntos += 350;
+          puntos += 400;
           detalles.push('zona=exacta');
         } else {
           const inter = zonaTokensDet.filter(t => zonaTokensCat.includes(t));
-          if (inter.length) {
+          // Requerir al menos 50% de tokens coincidentes
+          const porcentajeCoincidencia = inter.length / Math.max(zonaTokensDet.length, zonaTokensCat.length);
+          
+          if (porcentajeCoincidencia >= 0.5) {
             const esPrefijo = zonaTokensDet.every((t, i) => zonaTokensCat[i] === t);
-            if (esPrefijo) {
-              puntos += 320;
+            if (esPrefijo && inter.length === zonaTokensDet.length) {
+              puntos += 350;
               detalles.push(`zona=prefijo(${inter.join('+')})`);
-            } else {
-              puntos += 240;
-              detalles.push(`zona=inter(${inter.join('+')})`);
+            } else if (inter.length >= 2) {
+              // Solo dar puntos si hay al menos 2 tokens coincidentes
+              puntos += 200;
+              detalles.push(`zona=parcial(${inter.join('+')})`);
             }
           } else {
+            // Solo permitir pequeña distancia de edición
             const baseDet = zonaTokensDet.slice(0, 2).join(' ');
             const baseCat = zonaTokensCat.slice(0, 2).join(' ');
             const distZona = this.calcularDistanciaTexto(baseDet, baseCat);
-            if (distZona <= 3) {
-              puntos += 140;
-              detalles.push(`zona~(dist:${distZona})`);
+            // Más estricto: solo hasta 2 caracteres de diferencia
+            if (distZona <= 2) {
+              puntos += 100;
+              detalles.push(`zona~tipeo(dist:${distZona})`);
             }
           }
         }
 
-        // Boost adicional si vino de prefijo "JUZGADO:" y el catálogo incluye todos los tokens detectados
-        if (labelFlag && zonaTokensDet.length && zonaTokensDet.every(t => zonaTokensCat.includes(t))) {
-          puntos += 200;
+        // Boost reducido para prefijo
+        if (labelFlag && zonaTokensDet.length >= 2 && zonaTokensDet.every(t => zonaTokensCat.includes(t))) {
+          puntos += 100;
           detalles.push('boost=label+zona');
         }
       }
 
-      // Palabras clave
+      // Palabras clave - peso reducido
       const palabrasDet = this.extraerPalabrasClaveJuzgado(detNorm);
       const palabrasCat = this.extraerPalabrasClaveJuzgado(catNorm);
       palabrasDet.forEach(p => {
         if (palabrasCat.includes(p)) {
-          puntos += 80;
+          puntos += 50;
           detalles.push(`+${p}`);
         }
       });
 
-      // Similaridad global (menor peso)
+      // Similaridad global - peso muy reducido, solo para casos casi exactos
       const distTotal = this.calcularDistanciaTexto(detNorm, catNorm);
       const longitudMax = Math.max(detNorm.length, catNorm.length);
-      const similitud = 1 - (distTotal / longitudMax);
-      const puntosSimil = Math.round(similitud * 100);
-      puntos += puntosSimil;
-      detalles.push(`sim=${(similitud * 100).toFixed(0)}%`);
-
+      
+      // Solo dar puntos si la distancia es muy pequeña (errores de tipeo menores)
       if (distTotal <= 3) {
-        puntos += 110;
+        const similitud = 1 - (distTotal / longitudMax);
+        const puntosSimil = Math.round(similitud * 50); // Reducido de 100 a 50
+        puntos += puntosSimil;
+        detalles.push(`sim=${(similitud * 100).toFixed(0)}%`);
+        
+        puntos += 80; // Reducido de 110
         detalles.push('casi-exacto');
+      } else if (distTotal <= 5) {
+        // Pequeña tolerancia para errores de tipeo
+        puntos += 30;
+        detalles.push(`tipeo-menor(dist:${distTotal})`);
       }
 
       if (puntos > 0) candidatos.push({ entry, puntos, detalles });
@@ -413,10 +425,10 @@ export class DespachoService {
       detalles: c.detalles
     })));
 
-    // Override zona fuerte (si alguno contiene todos los tokens y está dentro de margen)
-    if (zonaTokensDet.length) {
+    // Override zona fuerte - solo con margen muy pequeño
+    if (zonaTokensDet.length >= 2) {
       const topPuntos = candidatos[0].puntos;
-      const grupo = candidatos.filter(c => topPuntos - c.puntos <= 20);
+      const grupo = candidatos.filter(c => topPuntos - c.puntos <= 10); // Reducido de 20 a 10
       const preferente = grupo.find(c => {
         const zCatTokens = this.tokenizarZona(this.extraerZonaJuzgado(this.normalizarClaveJuzgado(c.entry.juzgado)));
         return zonaTokensDet.every(t => zCatTokens.includes(t));
@@ -428,7 +440,8 @@ export class DespachoService {
     }
 
     const mejor = candidatos[0];
-    const umbralMinimo = numDet ? 420 : 280;
+    // Umbrales más altos y estrictos
+    const umbralMinimo = numDet ? 600 : 450; // Aumentado de 420/280 a 600/450
     if (mejor.puntos < umbralMinimo) {
       console.warn(`⚠️ Mejor candidato con ${mejor.puntos} (<${umbralMinimo})`);
       return;
