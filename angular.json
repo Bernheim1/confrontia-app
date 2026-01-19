@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/notificame",
+            "outputPath": "dist/confrontia-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -51,7 +51,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumError": "8kB"
                 }
               ],
               "outputHashing": "all"
@@ -103,7 +103,10 @@
           }
         },
         "deploy": {
-          "builder": "angular-cli-ghpages:deploy"
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "baseHref": "https://bernheim1.github.io/confrontia-app/"
+          }
         }
       }
     }
