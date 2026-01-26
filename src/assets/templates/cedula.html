@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cédula</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; }
+    table { border-collapse: collapse; }
+    td { vertical-align: top; padding: 2px; }
+    h1 { margin: 0; font-size: 24px; }
+    .contenedor {
+      border: 1pt solid black;
+      width: 567px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+<p>Fecha de recepción en Oficina, Delegación o Juzgado de Paz</p>
+
+<table cellpadding="0" cellspacing="0" class="contenedor">
+<tbody>
+<tr><td>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:300px">
+			<h1><strong>CC</strong></h1>
+			</td>
+			<td style="width:268px">
+			<p><strong>Fecha de recepci&oacute;n en Ofic../</strong></p>
+
+			<p><strong>Deleg. o Juzgado de Paz</strong></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:40px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:360px">
+			<p>&nbsp;</p>
+
+			<p><strong>PODER JUDICIAL PROVINCIA DE BUENOS AIRES</strong></p>
+			</td>
+			<td style="width:113px">
+			<p>&nbsp;</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:93px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:361px">
+			<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CEDULA</strong></p>
+			</td>
+			<td style="width:114px">
+			<p>Sello del &Oacute;rgano</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:180px">
+			<p>Nombre del Organo</p>
+			</td>
+			<td style="width:388px">
+			<p>{{organo}}</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px">
+			<p>Domicilio del Organo</p>
+			</td>
+			<td style="width:388px">
+			<p>{{direccion}}</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px">
+			<p>Nombre del Requerido</p>
+			</td>
+			<td style="width:388px">
+			<p>{{textoRequerido}}</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:328px">
+			<p>DOMICILIO: {{domicilio}}</p>
+			</td>
+			<td style="width:240px">
+			<p>NRO: {{nro}}</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:56px">
+			<p>PISO</p>
+			</td>
+			<td style="width:56px">
+			<p>{{piso}}</p>
+			</td>
+			<td style="width:48px">
+			<p>DTO.</p>
+			</td>
+			<td style="width:56px">
+			<p>{{depto}}</p>
+			</td>
+			<td style="width:112px">
+			<p>UNIDAD: {{unidad}}</p>
+			</td>
+			<td style="width:240px">
+			<p>LOCALIDAD/PARTIDO: {{localidad}}</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:567px">
+			<p><strong><em>TIPO DE DOMICILIO</em></strong> (Indicar por <strong>SI</strong> &ndash; <strong>NO</strong> seg&uacute;n corresponda)</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:174px">
+			<p>Denunciado</p>
+			</td>
+			<td style="width:34px">
+			<p>{{denunciado}}</p>
+			</td>
+			<td style="width:126px">
+			<p>Constituido</p>
+			</td>
+			<td style="width:34px">
+			<p>{{constituido}}</p>
+			</td>
+			<td style="width:200px">
+			<p>&nbsp;</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:567px">
+			<p><strong><em>CAR&Aacute;CTER</em></strong> (Indicar por <strong>SI</strong> &ndash; <strong>NO</strong> seg&uacute;n corresponda)</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:135px">
+			<p>URGENTE</p>
+			</td>
+			<td style="width:15px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:47px">
+			<p>{{urgente}}</p>
+			</td>
+			<td style="width:25px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:256px">
+			<p>Y/O HABILITACION DE DIA Y HORA</p>
+			</td>
+			<td style="width:20px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:52px">
+			<p>{{habilitacionDiaHora}}</p>
+			</td>
+			<td style="width:15px">
+			<p>&nbsp;</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><strong><em>OBSERVACIONES ESPECIALES</em></strong></p>
+
+<p>&nbsp;</p>
+
+<p>{{observacionesEspeciales}}</p>
+
+<table border="1" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td colspan="8" style="width:568px">
+			<p>(testar lo que no corresponda)</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:70px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:77px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:53px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:64px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:80px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:80px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:56px">
+			<p>SI/NO</p>
+
+			<p>copias</p>
+			</td>
+			<td style="width:88px">
+			<p>SI/NO</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:70px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:77px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:53px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:64px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:80px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:80px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:56px">
+			<p>&nbsp;</p>
+			</td>
+			<td style="width:88px">
+			<p>&nbsp;</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:70px">
+			<p>N&ordm; de orden</p>
+			</td>
+			<td style="width:77px">
+			<p>Expte. N&ordm;</p>
+			</td>
+			<td style="width:53px">
+			<p>ZONA</p>
+			</td>
+			<td style="width:64px">
+			<p>FUERO</p>
+			</td>
+			<td style="width:80px">
+			<p>N&ordm;&nbsp; ORG.</p>
+			</td>
+			<td style="width:80px">
+			<p>DEP. JUD.</p>
+			</td>
+			<td style="width:56px">
+			<p>En&nbsp;&nbsp;&nbsp;&nbsp; fs.</p>
+			</td>
+			<td style="width:88px">
+			<p>PERSONAL</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<table cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width:568px">
+			<p>NOTIFICO a Ud. que en el expediente caratulado <strong>{{caratulaExpediente}}</strong></p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p>que tramita por ante este &oacute;rgano, se ha resuelto:</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p>{{textoNotificacion}}</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p><strong>... la presente cédula se encuentra suscripto con FIRMA DIGITAL, por lo que la Oficina de Mandamientos y Notificaciones correspondiente deberá verificar su autenticidad escaneando el código QR inserto al final del documento (o ingresando el alfanumérico en el sitio: https://notificaciones.scba.gov.ar/verificar.aspx) y que podrá consultar la causa en la Mesa Virtual de Entradas (MEV: https://mev.scba.gov.ar/loguin.asp), todo lo cual sustituye cualquier otro sello manual o firma ológrafa (art. 1, apartado 3 punto c.6), Res. 10/20 -RP/SPL- SCBA).</strong></p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p>&nbsp;</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p>Copias: {{copiasTraslado}}</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p>QUEDA UD. DEBIDAMENTE NOTIFICADO</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:568px">
+			<p>En la ciudad de {{Ciudad}}, a los {{FechaDia}} días del mes de {{FechaMes}} del año {{FechaAño}}</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>

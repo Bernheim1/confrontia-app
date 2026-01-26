@@ -96,7 +96,13 @@
                             <h4 class="">Domicilio del <span class="subrayado">Requerido</span></h4>
                         </div>
                         <div class="card-body domicilio-requerido">
-                            <div formGroupName="domicilioRequerido" class="row g-3">
+                            <div formGroupName="textoContenido" class="row g-3" *ngIf="esCedula()">
+                                <div class="col-12">
+                                    <label class="form-label">Nombre del Requerido</label>
+                                    <input type="text" placeholder="Nombre completo del requerido" class="form-control" formControlName="requerido">
+                                </div>
+                            </div>
+                            <div formGroupName="domicilioRequerido" class="row g-3" [ngClass]="{'mt-2': esCedula()}">
                                 <div class="col-12">
                                     <label class="form-label">Localidad</label>
                                     <input type="text" placeholder="Localidad" class="form-control" formControlName="localidad"
@@ -238,7 +244,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-3" *ngIf="esMandamiento()">
                 <div class="col-md-12 col-xs-12">
                     <div class="card">
                         <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
@@ -293,11 +299,11 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-3" *ngIf="esMandamiento()">
                 <div class="col-md-12 col-xs-12">
                     <div class="card">
                         <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4>Contenido de su <span class="subrayado">{{this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento'}}</span></h4>
+                            <h4>Contenido de su <span class="subrayado">Mandamiento</span></h4>
                         </div>
                         <div class="card-body fs-5 lh-5" style="text-align: justify;" id="editable-text" formGroupName="textoContenido">
                             El Oficial de Justicia de la zona que corresponda, se constituirá, para la ejecución del presente en el domicilio de 
@@ -342,7 +348,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>            
         </div>
     </form>
     </div>

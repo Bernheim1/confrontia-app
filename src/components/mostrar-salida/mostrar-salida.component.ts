@@ -97,6 +97,11 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
         this.replacePlaceholders(this.formData);
       }
     }
+    
+    // Si cambió el tipoSalida, recarga la plantilla correspondiente
+    if (changes['tipoSalida'] && !changes['tipoSalida'].firstChange) {
+      this.loadTemplate();
+    }
   }
 
   // Convierte booleanos a "SI"/"NO"
@@ -113,7 +118,8 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
       juzgadoTribunal: s.juzgadoTribunal || '',
       tipoDiligencia: s.tipoDiligencia || '',
       caratulaExpediente: s.caratulaExpediente || '',
-      copiasTraslado: this.boolToSiNo(s.copiasTraslado),
+      // Para cédulas, copias siempre es SI
+      copiasTraslado: this.tipoSalida === TipoSalidaEnum.Cedula ? 'SI' : this.boolToSiNo(s.copiasTraslado),
       urgente: this.boolToSiNo(s.urgente),
       habilitacionDiaHora: this.boolToSiNo(s.habilitacionDiaHora),
       denunciado: this.boolToSiNo(s.denunciado),
@@ -126,8 +132,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
       denunciaOtroDomicilio: this.boolToSiNo(s.denunciaOtroDomicilio),
       denunciaDeBienes: this.boolToSiNo(s.denunciaBienes),
       otros: s.otrosFacultades || '',    // texto libre que pusiste en Salida
-      otrosFacultades: s.otrosFacultades || '',
-      textoDespacho: this.textoDespacho || ''
+      otrosFacultades: s.otrosFacultades || ''
     };
 
     // textoContenido
@@ -136,6 +141,9 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     fd['montoCapitalNumerico'] = (s.montoCapitalNumerico !== null && s.montoCapitalNumerico !== undefined) ? String(s.montoCapitalNumerico) : '';
     fd['montoInteresesTexto'] = s.montoInteresesTexto || '';
     fd['montoInteresesNumerico'] = (s.montoInteresesNumerico !== null && s.montoInteresesNumerico !== undefined) ? String(s.montoInteresesNumerico) : '';
+    fd['textoNotificacion'] = s.textoNotificacion || '';
+    // textoDespacho ahora viene del objeto Salida en lugar de @Input
+    fd['textoDespacho'] = s.textoDespacho || '';
 
     // domicilio/datos de ubicación
     fd['domicilio'] = s.domicilio || '';
@@ -144,6 +152,17 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     fd['piso'] = (s.piso !== null && s.piso !== undefined) ? String(s.piso) : '';
     fd['depto'] = s.depto || '';
     fd['unidad'] = s.unidad || '';
+
+    // Observaciones especiales - condicional para cédula
+    if (this.tipoSalida === TipoSalidaEnum.Cedula) {
+      if (s.bajoResponsabilidad) {
+        fd['observacionesEspeciales'] = '(Traslado de demanda – Art.94CPCC- Art.524 CPCC – Bajo responsabilidad de la parte)';
+      } else {
+        fd['observacionesEspeciales'] = '(Traslado de demanda – Art.94CPCC- Art.524 CPCC – Tachar: "Bajo responsabilidad de la parte")';
+      }
+    } else {
+      fd['observacionesEspeciales'] = '';
+    }
 
   // Fecha actual
   const hoy = new Date();
@@ -175,7 +194,14 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   }
 
   // Carga plantilla y reemplaza placeholders
-  loadTemplate(path: string = 'assets/templates/mandamiento.html') {
+  loadTemplate(path?: string) {
+    // Si no se pasa path, lo determina según tipoSalida
+    if (!path) {
+      path = this.tipoSalida === TipoSalidaEnum.Cedula 
+        ? 'assets/templates/cedula.html'
+        : 'assets/templates/mandamiento.html';
+    }
+
     this.loading = true;
     this.error = null;
     this.http.get(path, { responseType: 'text' }).subscribe({

@@ -1,5 +1,5 @@
 import { Component, ViewChildren, QueryList } from '@angular/core';
-import { TipoSalidaEnum } from '../../shared/enums/tipo-salida-enum';
+import { TipoSalidaEnum, TipoMandamientoEnum, TipoCedulaEnum } from '../../shared/enums/tipo-salida-enum';
 import { faGavel, faRepeat } from '@fortawesome/free-solid-svg-icons';
 import { TipoStepEnum } from '../../shared/enums/tipo-step-enum';
 import { Salida } from '../../shared/models/salida';
@@ -46,6 +46,12 @@ export class DespachoComponent {
     if (this.despachos.length > 0)
     {
       this.tipoSalida = event;
+      // Asignar subtipo por defecto según el tipo
+      if (event === TipoSalidaEnum.Mandamiento) {
+        this.subtipoSalida = TipoMandamientoEnum.IntimacionPago;
+      } else if (event === TipoSalidaEnum.Cedula) {
+        this.subtipoSalida = TipoCedulaEnum.TrasladoDemanda;
+      }
     }
   }
 

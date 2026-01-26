@@ -49,6 +49,8 @@ export class Salida {
   montoCapitalNumerico: string | null = null;
   montoInteresesTexto: string = '';
   montoInteresesNumerico: string | null = null;
+  textoNotificacion: string = ''; // texto libre para notificación en cédula
+  textoDespacho: string = ''; // texto del proveído para mandamiento
 
   constructor(init?: Partial<Salida>) {
     if (init) Object.assign(this, init);

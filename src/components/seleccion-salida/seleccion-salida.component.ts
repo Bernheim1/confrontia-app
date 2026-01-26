@@ -49,6 +49,15 @@ export class SeleccionSalidaComponent implements OnInit {
   juzgadosIntervinientes: Array<{ juzgado: string; direccion?: string; raw?: any }> = [];
   juzgadosFiltrados: Array<{ juzgado: string; direccion?: string; raw?: any }> = [];
 
+  // Métodos helper para el template
+  esMandamiento(): boolean {
+    return this.tipoSalida === TipoSalidaEnum.Mandamiento;
+  }
+
+  esCedula(): boolean {
+    return this.tipoSalida === TipoSalidaEnum.Cedula;
+  }
+
   openDropdown = false;
   highlightedIndex = -1;
   @ViewChild('organoInput') organoInput!: ElementRef<HTMLInputElement>;
@@ -61,11 +70,7 @@ export class SeleccionSalidaComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tipoSalida'] || changes['subtipoSalida']) {
       this.textoTitulo =
-        TipoSalidaTexto[this.tipoSalida] +
-        ' - ' +
-        (this.tipoSalida == 1
-          ? TipoCedulaTexto[this.subtipoSalida as TipoCedulaEnum]
-          : TipoMandamientoTexto[this.subtipoSalida as TipoMandamientoEnum]);
+        TipoSalidaTexto[this.tipoSalida]
     }
   }
 
@@ -115,12 +120,25 @@ export class SeleccionSalidaComponent implements OnInit {
         montoCapitalTexto: [''],
         montoCapitalNumerico: [''],
         montoInteresesTexto: [''],
-        montoInteresesNumerico: ['']
+        montoInteresesNumerico: [''],
+        textoNotificacion: [''],
+        textoDespacho: ['']
       })
     });
 
     await this.despachoService.inicializarCatalogoDesdeAssets();
-    const datos = await this.despachoService.procesarDespachoAsync(this.textoDespacho, this.tipoSalida, this.subtipoSalida);
+    
+    // Si subtipoSalida es undefined, asignar valor por defecto según tipoSalida
+    let subtipoFinal = this.subtipoSalida;
+    if (subtipoFinal === undefined || subtipoFinal === null) {
+      if (this.tipoSalida === TipoSalidaEnum.Mandamiento) {
+        subtipoFinal = TipoMandamientoEnum.IntimacionPago;
+      } else if (this.tipoSalida === TipoSalidaEnum.Cedula) {
+        subtipoFinal = TipoCedulaEnum.TrasladoDemanda;
+      }
+    }
+    
+    const datos = await this.despachoService.procesarDespachoAsync(this.textoDespacho, this.tipoSalida, subtipoFinal);
 
     this.formulario.patchValue({
       organo: {
@@ -157,7 +175,9 @@ export class SeleccionSalidaComponent implements OnInit {
         montoCapitalTexto: datos.textoContenido?.montoCapitalTexto || '',
         montoCapitalNumerico: datos.textoContenido?.montoCapitalNumerico ?? '',
         montoInteresesTexto: datos.textoContenido?.montoInteresesTexto || '',
-        montoInteresesNumerico: datos.textoContenido?.montoInteresesNumerico ?? ''
+        montoInteresesNumerico: datos.textoContenido?.montoInteresesNumerico ?? '',
+        textoNotificacion: datos.textoContenido?.textoNotificacion || '',
+        textoDespacho: datos.textoContenido?.textoDespacho || ''
       }
     });
 
@@ -465,6 +485,9 @@ export class SeleccionSalidaComponent implements OnInit {
         ? String(montoIntNumControlVal).replace(/^\(\s*/, '').replace(/\s*\)$/, '')
         : '';
     retorno.montoInteresesNumerico = montoIntNum.trim() !== '' ? montoIntNum : null;
+
+    retorno.textoNotificacion = this.formulario.get('textoContenido.textoNotificacion')?.value || '';
+    retorno.textoDespacho = this.formulario.get('textoContenido.textoDespacho')?.value || '';
 
     return retorno;
   }

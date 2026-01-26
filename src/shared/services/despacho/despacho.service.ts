@@ -15,6 +15,7 @@ interface ExpedienteInfo {
   caratulaExpediente: string;
   numeroExpediente: string;
   copiasTraslado: boolean;
+  tipoDiligencia: string;
 }
 interface CaracterInfo {
   urgente: boolean;
@@ -40,6 +41,8 @@ interface TextoContenidoInfo {
   montoCapitalNumerico: string;
   montoInteresesTexto: string;
   montoInteresesNumerico: string;
+  textoNotificacion: string;
+  textoDespacho: string;
 }
 
 interface JuzgadoCatalogEntry {
@@ -55,6 +58,8 @@ export class DespachoService {
   private catalogo: JuzgadoCatalogEntry[] = [];
   private catalogoReady$ = new BehaviorSubject<boolean>(false);
   private cargaEnCurso = false;
+  private catalogoNormalizado: Map<string, { norm: string; num: string | null; zona: string | null; tokens: string[] }> = new Map();
+  private debugMode = false; // Activar para logs detallados
 
   async inicializarCatalogoDesdeAssets(ruta: string = 'assets/database/direcciones-juzgados.csv'): Promise<void> {
     if (this.catalogoReady$.value || this.cargaEnCurso) return;
@@ -92,14 +97,29 @@ export class DespachoService {
     if (tipoSalida === TipoSalidaEnum.Cedula) subtipoKey = TipoCedulaEnum[subtipoSalida];
     else if (tipoSalida === TipoSalidaEnum.Mandamiento) subtipoKey = TipoMandamientoEnum[subtipoSalida];
 
+    console.log('🔍 DEBUG procesarDespacho:');
+    console.log('  tipoSalida (enum):', tipoSalida);
+    console.log('  subtipoSalida (enum):', subtipoSalida);
+    console.log('  tipoKey (string):', tipoKey);
+    console.log('  subtipoKey (string):', subtipoKey);
+    console.log('  PLANTILLAS completo:', PLANTILLAS);
+    console.log('  PLANTILLAS[tipoKey]:', PLANTILLAS[tipoKey]);
+    console.log('  PLANTILLAS[tipoKey]?.[subtipoKey]:', PLANTILLAS[tipoKey]?.[subtipoKey]);
+
     const plantilla = PLANTILLAS[tipoKey]?.[subtipoKey] || {};
+    console.log('  plantilla a aplicar:', plantilla);
+    
     const textoNormalizado = this.normalizarTexto(despachoTexto);
 
     let resultado = tipoKey === 'Mandamiento'
       ? this.generarMandamiento(textoNormalizado, subtipoKey)
       : this.generarCedula(textoNormalizado, subtipoKey);
 
+    console.log('  resultado ANTES de aplicar plantilla:', JSON.parse(JSON.stringify(resultado)));
     resultado = this.aplicarPlantilla(resultado, plantilla);
+    console.log('  resultado DESPUÉS de aplicar plantilla:', JSON.parse(JSON.stringify(resultado)));
+    console.log('  tipoDiligencia final:', resultado.expediente?.tipoDiligencia);
+    
     return resultado;
   }
 
@@ -149,6 +169,16 @@ export class DespachoService {
       juzgado: r.juzgado?.trim() || '',
       direccion: r.direccion?.trim() || ''
     }));
+    
+    // Pre-procesar catálogo para mejor performance
+    this.catalogoNormalizado.clear();
+    this.catalogo.forEach(entry => {
+      const norm = this.normalizarClaveJuzgado(entry.juzgado);
+      const num = this.extraerNumeroJuzgado(norm);
+      const zona = this.extraerZonaJuzgado(norm);
+      const tokens = this.tokenizarZona(zona);
+      this.catalogoNormalizado.set(entry.juzgado, { norm, num, zona, tokens });
+    });
   }
   
 
@@ -197,45 +227,82 @@ export class DespachoService {
     let juzgadoTribunal = '';
     let direccionJuzgado = '';
 
-    // 1) Intento prioritario: línea con prefijo "JUZGADO:"
-    // Captura toda la línea hasta salto, permitiendo varias palabras después del número y el guión.
+    // ========== PRIORIDAD MÁXIMA: Prefijo "JUZGADO:" ==========
+    // Formato esperado más común: "Juzgado:\nJUZGADO EN LO CIVIL Y COMERCIAL Nº10 - SAN MARTIN"
     let detectado = '';
     let labelFlag = false;
-    const prefijoMatch = texto.match(/JUZGADO:\s*(JUZGADO\s+[^\n]+)/i);
+    
+    // Patrón mejorado: captura todo después de "JUZGADO:" hasta fin de línea o doble salto
+    const prefijoMatch = texto.match(/JUZGADO:\s*\n?\s*(JUZGADO\s+[^\n]+?)(?:\n\n|\n(?=[A-Z][a-z]+:)|$)/i);
     if (prefijoMatch) {
       detectado = prefijoMatch[1].trim();
       labelFlag = true;
+      console.log('🏷️ Detectado con prefijo JUZGADO:', detectado);
     }
 
-    // 2) Patrones si no hubo prefijo (ampliados para varias palabras tras el guión)
-    const patrones = [
-      /JUZGADO\s+EN\s+LO\s+CIVIL\s+Y\s+COMERCIAL\s+N[º°]?\s*\d+(?:\s*-\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
-      /JUZGADO\s+CIVIL\s+Y\s+COMERCIAL\s+N[º°]?\s*\d+(?:\s*-\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
-      /JUZGADO\s+EN\s+LO\s+CIVIL\s+Y\s+COMERCIAL\s+N\s*\d+(?:\s*-\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
-      /JUZGADO\s+CIVIL\s+Y\s+COMERCIAL\s+N\s*\d+(?:\s*-\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i
-    ];
-
+    // Fallback: buscar sin salto de línea
     if (!detectado) {
-      for (const r of patrones) {
-        const m = texto.match(r);
-        if (m) { detectado = m[0]; break; }
+      const prefijoDirecto = texto.match(/JUZGADO:\s*(JUZGADO\s+[^\n]+)/i);
+      if (prefijoDirecto) {
+        detectado = prefijoDirecto[1].trim();
+        labelFlag = true;
+        console.log('🏷️ Detectado con prefijo JUZGADO (directo):', detectado);
       }
     }
 
-    if (!detectado) return { organo, juzgadoInterviniente, direccionJuzgado, juzgadoTribunal };
+    // ========== PATRONES SECUNDARIOS (sin prefijo) ==========
+    if (!detectado) {
+      const patrones = [
+        // Con "EN LO" y zona
+        /JUZGADO\s+EN\s+LO\s+CIVIL\s+Y\s+COMERCIAL\s+N[º°]?\s*\d+(?:\s*[-–]\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
+        // Sin "EN LO" y con zona
+        /JUZGADO\s+CIVIL\s+Y\s+COMERCIAL\s+N[º°]?\s*\d+(?:\s*[-–]\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
+        // Con "EN LO" sin símbolo º
+        /JUZGADO\s+EN\s+LO\s+CIVIL\s+Y\s+COMERCIAL\s+N\s*\d+(?:\s*[-–]\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
+        // Sin "EN LO" sin símbolo º
+        /JUZGADO\s+CIVIL\s+Y\s+COMERCIAL\s+N\s*\d+(?:\s*[-–]\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i,
+        // Juzgado de Paz Letrado
+        /JUZGADO\s+DE\s+PAZ\s+LETRADO\s+N[º°]?\s*\d+(?:\s*[-–]\s*[A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)?/i
+      ];
 
-    // Limpieza mínima: colapsar espacios y quitar puntos finales
-    detectado = detectado.replace(/\s+/g, ' ').replace(/[.,;:\-]+\s*$/,'').trim();
+      for (const r of patrones) {
+        const m = texto.match(r);
+        if (m) { 
+          detectado = m[0];
+          console.log('📋 Detectado sin prefijo:', detectado);
+          break; 
+        }
+      }
+    }
+
+    if (!detectado) {
+      console.warn('⚠️ No se pudo extraer información de juzgado');
+      return { organo, juzgadoInterviniente, direccionJuzgado, juzgadoTribunal };
+    }
+
+    // ========== LIMPIEZA Y NORMALIZACIÓN ==========
+    // Limpiar caracteres extra al final, colapsar espacios
+    detectado = detectado
+      .replace(/\s+/g, ' ')
+      .replace(/[.,;:]+\s*$/,'')
+      .trim();
+    
+    // Capitalizar para presentación
     detectado = this.capitalizarFrase(detectado);
 
+    // Valores por defecto (antes de buscar en catálogo)
     organo = juzgadoInterviniente = juzgadoTribunal = detectado;
 
+    // ========== BÚSQUEDA EN CATÁLOGO ==========
     const mejor = this.matchJuzgadoCatalogoFlexible(detectado, labelFlag);
     if (mejor) {
       organo = mejor.juzgado;
       juzgadoInterviniente = mejor.juzgado;
       juzgadoTribunal = mejor.juzgado;
       direccionJuzgado = mejor.direccion || '';
+      console.log('✅ Juzgado final desde catálogo:', mejor.juzgado);
+    } else {
+      console.log('⚠️ Usando juzgado detectado sin catálogo:', detectado);
     }
 
     return { organo, juzgadoInterviniente, direccionJuzgado, juzgadoTribunal };
@@ -246,12 +313,21 @@ export class DespachoService {
     return texto
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
+      // Expandir abreviaturas comunes
+      .replace(/\bc\s*y\s*c\b/g, 'civil comercial')
+      .replace(/\bciv\s*y\s*com\b/g, 'civil comercial')
+      .replace(/\bciv\.\s*y\s*com\./g, 'civil comercial')
+      // Normalizar frases completas
       .replace(/juzgado\s+en\s+lo\s+civil\s+y\s+comercial/g, 'juzgado civil comercial')
       .replace(/juzgado\s+civil\s+y\s+comercial/g, 'juzgado civil comercial')
       .replace(/juzgado\s+de\s+paz\s+letrado/g, 'juzgado paz letrado')
+      // Normalizar numeración
       .replace(/\bn[º°]+/g, 'n')
-      .replace(/\bnro\.?/g, 'n')
+      .replace(/\bnro\.?\s*/g, 'n')
+      .replace(/\bnum\.?\s*/g, 'n')
+      .replace(/\bnumero\s*/g, 'n')
       .replace(/\bn\s*(\d+)/g, 'n$1')
+      // Limpiar separadores y puntuación
       .replace(/\s*-\s*/g, ' ')
       .replace(/[,.;:"()]/g, ' ')
       .replace(/\s+/g, ' ')
@@ -309,129 +385,202 @@ export class DespachoService {
     const numDet = this.extraerNumeroJuzgado(detNorm);
     const zonaDet = this.extraerZonaJuzgado(detNorm);
     const zonaTokensDet = this.tokenizarZona(zonaDet);
+    const tipoJuzgadoDet = this.extraerTipoJuzgado(detNorm);
 
-    console.log('🔍 Detectado normalizado:', detNorm);
-    console.log('🔢 Número extraído:', numDet);
-    console.log('📍 Zona detectada:', zonaDet);
-    if (labelFlag) console.log('🏷️ Prefijo JUZGADO: aplicado (boost zona)');
+    if (this.debugMode) {
+      console.log('🔍 Detectado normalizado:', detNorm);
+      console.log('🔢 Número extraído:', numDet);
+      console.log('📍 Zona detectada:', zonaDet);
+      console.log('⚖️ Tipo juzgado:', tipoJuzgadoDet);
+      if (labelFlag) console.log('🏷️ Prefijo JUZGADO: aplicado (boost zona)');
+    }
 
+    // ========== PASO 1: MATCH EXACTO (early return) ==========
+    for (const entry of this.catalogo) {
+      const cached = this.catalogoNormalizado.get(entry.juzgado);
+      if (!cached) continue;
+      
+      if (cached.norm === detNorm) {
+        console.log('✅ Match EXACTO:', entry.juzgado);
+        return entry;
+      }
+    }
+
+    // ========== PASO 2: BÚSQUEDA POR SCORING ==========
     interface Candidato {
       entry: JuzgadoCatalogEntry;
       puntos: number;
+      penalizaciones: number;
       detalles: string[];
     }
     const candidatos: Candidato[] = [];
 
     for (const entry of this.catalogo) {
-      const catNorm = this.normalizarClaveJuzgado(entry.juzgado);
-      const numCat = this.extraerNumeroJuzgado(catNorm);
-      const zonaCat = this.extraerZonaJuzgado(catNorm);
-      const zonaTokensCat = this.tokenizarZona(zonaCat);
+      const cached = this.catalogoNormalizado.get(entry.juzgado);
+      if (!cached) continue;
 
+      const { norm: catNorm, num: numCat, zona: zonaCat, tokens: zonaTokensCat } = cached;
+      
       let puntos = 0;
+      let penalizaciones = 0;
       const detalles: string[] = [];
 
-      // Número (obligatorio si ambos - sin excepciones)
+      // -------- CRITERIO 1: NÚMERO (crítico) --------
       if (numDet && numCat) {
         if (numDet === numCat) {
-          puntos += 600;
+          puntos += 700; // Aumentado de 600
           detalles.push(`num=${numDet}`);
         } else {
+          // Números diferentes = descarte inmediato
+          continue;
+        }
+      } else if (numDet || numCat) {
+        // Uno tiene número y otro no = penalización fuerte
+        penalizaciones += 300;
+        detalles.push('num-mismatch');
+      }
+
+      // -------- CRITERIO 2: TIPO DE JUZGADO --------
+      const tipoJuzgadoCat = this.extraerTipoJuzgado(catNorm);
+      if (tipoJuzgadoDet && tipoJuzgadoCat) {
+        if (tipoJuzgadoDet === tipoJuzgadoCat) {
+          puntos += 200;
+          detalles.push(`tipo=${tipoJuzgadoDet}`);
+        } else {
+          // Tipos diferentes (ej: civil vs paz) = descarte
           continue;
         }
       }
 
-      // Zona - más estricta
+      // -------- CRITERIO 3: ZONA GEOGRÁFICA --------
       if (zonaDet && zonaCat) {
         if (zonaDet === zonaCat) {
-          puntos += 400;
+          puntos += 500; // Aumentado de 400
           detalles.push('zona=exacta');
         } else {
           const inter = zonaTokensDet.filter(t => zonaTokensCat.includes(t));
-          // Requerir al menos 50% de tokens coincidentes
           const porcentajeCoincidencia = inter.length / Math.max(zonaTokensDet.length, zonaTokensCat.length);
           
-          if (porcentajeCoincidencia >= 0.5) {
+          if (porcentajeCoincidencia >= 0.66) { // Aumentado de 0.5
             const esPrefijo = zonaTokensDet.every((t, i) => zonaTokensCat[i] === t);
             if (esPrefijo && inter.length === zonaTokensDet.length) {
-              puntos += 350;
+              puntos += 400; // Aumentado de 350
               detalles.push(`zona=prefijo(${inter.join('+')})`);
             } else if (inter.length >= 2) {
-              // Solo dar puntos si hay al menos 2 tokens coincidentes
-              puntos += 200;
+              puntos += 250; // Aumentado de 200
               detalles.push(`zona=parcial(${inter.join('+')})`);
             }
+          } else if (porcentajeCoincidencia >= 0.33) {
+            // Coincidencia baja = penalización leve
+            penalizaciones += 50;
+            puntos += 100;
+            detalles.push(`zona=débil(${inter.length})`);
           } else {
-            // Solo permitir pequeña distancia de edición
+            // Sin coincidencia significativa
             const baseDet = zonaTokensDet.slice(0, 2).join(' ');
             const baseCat = zonaTokensCat.slice(0, 2).join(' ');
             const distZona = this.calcularDistanciaTexto(baseDet, baseCat);
-            // Más estricto: solo hasta 2 caracteres de diferencia
+            
             if (distZona <= 2) {
-              puntos += 100;
+              puntos += 120; // Aumentado de 100
               detalles.push(`zona~tipeo(dist:${distZona})`);
+            } else {
+              // Zonas muy diferentes = penalización
+              penalizaciones += 100;
+              detalles.push('zona-mismatch');
             }
           }
         }
 
-        // Boost reducido para prefijo
+        // Boost por prefijo label
         if (labelFlag && zonaTokensDet.length >= 2 && zonaTokensDet.every(t => zonaTokensCat.includes(t))) {
-          puntos += 100;
+          puntos += 150; // Aumentado de 100
           detalles.push('boost=label+zona');
         }
+      } else if (zonaDet || zonaCat) {
+        // Uno tiene zona y otro no
+        penalizaciones += 50;
+        detalles.push('zona-parcial');
       }
 
-      // Palabras clave - peso reducido
+      // -------- CRITERIO 4: PALABRAS CLAVE --------
       const palabrasDet = this.extraerPalabrasClaveJuzgado(detNorm);
       const palabrasCat = this.extraerPalabrasClaveJuzgado(catNorm);
+      let palabrasMatch = 0;
       palabrasDet.forEach(p => {
         if (palabrasCat.includes(p)) {
-          puntos += 50;
-          detalles.push(`+${p}`);
+          puntos += 60; // Aumentado de 50
+          palabrasMatch++;
         }
       });
+      if (palabrasMatch > 0) detalles.push(`+${palabrasMatch}palabras`);
 
-      // Similaridad global - peso muy reducido, solo para casos casi exactos
+      // -------- CRITERIO 5: SIMILARIDAD GLOBAL --------
       const distTotal = this.calcularDistanciaTexto(detNorm, catNorm);
       const longitudMax = Math.max(detNorm.length, catNorm.length);
       
-      // Solo dar puntos si la distancia es muy pequeña (errores de tipeo menores)
-      if (distTotal <= 3) {
+      if (distTotal <= 2) {
+        // Casi idéntico (errores mínimos)
         const similitud = 1 - (distTotal / longitudMax);
-        const puntosSimil = Math.round(similitud * 50); // Reducido de 100 a 50
-        puntos += puntosSimil;
-        detalles.push(`sim=${(similitud * 100).toFixed(0)}%`);
-        
-        puntos += 80; // Reducido de 110
-        detalles.push('casi-exacto');
-      } else if (distTotal <= 5) {
-        // Pequeña tolerancia para errores de tipeo
-        puntos += 30;
+        const puntosSimil = Math.round(similitud * 100);
+        puntos += puntosSimil + 120;
+        detalles.push(`sim=${(similitud * 100).toFixed(0)}%+casi-exacto`);
+      } else if (distTotal <= 4) {
+        // Errores menores
+        puntos += 60;
         detalles.push(`tipeo-menor(dist:${distTotal})`);
+      } else if (distTotal <= 8) {
+        // Errores moderados
+        puntos += 20;
+        detalles.push(`tipeo-mod(dist:${distTotal})`);
+      } else {
+        // Muy diferentes
+        penalizaciones += Math.min(distTotal * 2, 100);
       }
 
-      if (puntos > 0) candidatos.push({ entry, puntos, detalles });
+      // -------- SCORING FINAL --------
+      const puntosFinales = Math.max(0, puntos - penalizaciones);
+      
+      if (puntosFinales > 0) {
+        candidatos.push({ 
+          entry, 
+          puntos: puntosFinales,
+          penalizaciones,
+          detalles: [...detalles, `(${puntos}-${penalizaciones}=${puntosFinales})`]
+        });
+      }
     }
 
+    // ========== PASO 3: SELECCIÓN DEL MEJOR ==========
     if (!candidatos.length) {
       console.warn('❌ Sin candidatos');
       return;
     }
 
     candidatos.sort((a, b) => b.puntos - a.puntos);
-    console.log('🏆 Top 3 candidatos:', candidatos.slice(0, 3).map(c => ({
-      juzgado: c.entry.juzgado,
-      puntos: c.puntos,
-      detalles: c.detalles
-    })));
+    
+    if (this.debugMode) {
+      console.log('🏆 Top 5 candidatos:', candidatos.slice(0, 5).map(c => ({
+        juzgado: c.entry.juzgado,
+        puntos: c.puntos,
+        detalles: c.detalles
+      })));
+    } else {
+      // Solo mostrar top 3 en modo normal
+      console.log('🏆 Top 3 candidatos:', candidatos.slice(0, 3).map(c => ({
+        juzgado: c.entry.juzgado,
+        puntos: c.puntos
+      })));
+    }
 
-    // Override zona fuerte - solo con margen muy pequeño
+    // -------- OVERRIDE POR ZONA COMPLETA --------
     if (zonaTokensDet.length >= 2) {
       const topPuntos = candidatos[0].puntos;
-      const grupo = candidatos.filter(c => topPuntos - c.puntos <= 10); // Reducido de 20 a 10
+      const grupo = candidatos.filter(c => topPuntos - c.puntos <= 15); // Aumentado de 10
       const preferente = grupo.find(c => {
-        const zCatTokens = this.tokenizarZona(this.extraerZonaJuzgado(this.normalizarClaveJuzgado(c.entry.juzgado)));
-        return zonaTokensDet.every(t => zCatTokens.includes(t));
+        const cached = this.catalogoNormalizado.get(c.entry.juzgado);
+        if (!cached) return false;
+        return zonaTokensDet.every(t => cached.tokens.includes(t));
       });
       if (preferente && preferente.entry !== candidatos[0].entry) {
         console.log('➡️ Override por zona completa:', preferente.entry.juzgado);
@@ -439,16 +588,35 @@ export class DespachoService {
       }
     }
 
+    // -------- VALIDACIÓN DE UMBRAL --------
     const mejor = candidatos[0];
-    // Umbrales más altos y estrictos
-    const umbralMinimo = numDet ? 600 : 450; // Aumentado de 420/280 a 600/450
+    const umbralMinimo = numDet ? 700 : 500; // Aumentado de 600/450
+    
     if (mejor.puntos < umbralMinimo) {
-      console.warn(`⚠️ Mejor candidato con ${mejor.puntos} (<${umbralMinimo})`);
+      console.warn(`⚠️ Mejor candidato con ${mejor.puntos} puntos (<${umbralMinimo}) - baja confianza`);
+      // Retornar de todos modos si el margen es razonable
+      if (mejor.puntos >= umbralMinimo * 0.8) {
+        console.log('⚡ Aceptado con confianza media:', mejor.entry.juzgado);
+        return mejor.entry;
+      }
       return;
     }
 
     console.log('✅ Match seleccionado:', mejor.entry.juzgado, '→', mejor.entry.direccion);
     return mejor.entry;
+  }
+
+  /**
+   * Extrae el tipo de juzgado (civil comercial, paz letrado, etc.)
+   */
+  private extraerTipoJuzgado(textoNorm: string): string {
+    if (textoNorm.includes('juzgado civil comercial')) return 'civil-comercial';
+    if (textoNorm.includes('juzgado paz letrado')) return 'paz-letrado';
+    if (textoNorm.includes('juzgado penal')) return 'penal';
+    if (textoNorm.includes('juzgado familia')) return 'familia';
+    if (textoNorm.includes('juzgado trabajo')) return 'trabajo';
+    if (textoNorm.includes('tribunal')) return 'tribunal';
+    return '';
   }
 
   private calcularDistanciaTexto(a: string, b: string): number {
@@ -493,8 +661,11 @@ export class DespachoService {
     caratulaExpediente = caratulaExpediente.replace(/"\.$/, '').replace(/"/g, '');
 
     const copiasTraslado = /código QR|copias de traslado|traslado.*QR/i.test(texto);
+    
+    // tipoDiligencia se dejará vacío aquí, se completará desde la plantilla
+    const tipoDiligencia = '';
 
-    return { caratulaExpediente, numeroExpediente, copiasTraslado };
+    return { caratulaExpediente, numeroExpediente, copiasTraslado, tipoDiligencia };
   }
 
   // ---------------- Caracter ----------------
@@ -629,13 +800,70 @@ export class DespachoService {
     const requerido = this.extraerRequerido(texto);
     const { montoCapitalTexto, montoCapitalNumerico } = this.extraerMontoCapital(texto);
     const { montoInteresesTexto, montoInteresesNumerico } = this.extraerMontoIntereses(texto);
+    const textoNotificacion = this.extraerTextoNotificacion(texto);
+    // textoDespacho es el mismo que textoNotificacion (el proveído completo)
+    const textoDespacho = textoNotificacion;
     return {
       requerido,
       montoCapitalTexto,
       montoCapitalNumerico,
       montoInteresesTexto,
-      montoInteresesNumerico
+      montoInteresesNumerico,
+      textoNotificacion,
+      textoDespacho
     };
+  }
+
+  /**
+   * Extrae el texto del proveído/resolución eliminando los campos del encabezado del sistema
+   * (Número, Carátula, Juzgado, Lista de referencias, etc.)
+   */
+  private extraerTextoNotificacion(texto: string): string {
+    if (!texto) return '';
+    
+    // Buscar el inicio del texto real después de los campos del sistema
+    // Patrones comunes de inicio:
+    const patronesInicio = [
+      /Lista de referencias[\s\S]*?(?:PRIMER DESPACHO|SE PROVEE|AUTOS Y VISTOS)/i,
+      /(?:PRIMER DESPACHO|SE PROVEE)[\s\S]*?(?=\n[A-Z])/i,
+      /Juzgado:[\s\S]*?\n\n(.+)/i
+    ];
+
+    let textoLimpio = texto;
+    
+    // Intentar encontrar dónde comienza el proveído real
+    for (const patron of patronesInicio) {
+      const match = texto.match(patron);
+      if (match) {
+        const posicion = match.index! + match[0].length;
+        textoLimpio = texto.substring(posicion).trim();
+        break;
+      }
+    }
+    
+    // Si no encontramos patrones específicos, intentar otra estrategia:
+    // Buscar después de "Juzgado:" y luego el primer párrafo que parece ser el proveído
+    if (textoLimpio === texto) {
+      const despuesJuzgado = texto.match(/Juzgado:[\s\S]*?\n\n([\s\S]+)/i);
+      if (despuesJuzgado) {
+        textoLimpio = despuesJuzgado[1].trim();
+        
+        // Quitar líneas que parecen encabezados del sistema
+        const lineas = textoLimpio.split('\n');
+        let inicioReal = 0;
+        for (let i = 0; i < lineas.length; i++) {
+          const linea = lineas[i].trim();
+          // Si la línea parece ser parte del proveído (tiene palabras y no es un campo)
+          if (linea.length > 30 && !linea.match(/^(Número|Carátula|Juzgado|Lista de referencias):/i)) {
+            inicioReal = i;
+            break;
+          }
+        }
+        textoLimpio = lineas.slice(inicioReal).join('\n').trim();
+      }
+    }
+    
+    return textoLimpio;
   }
 
   private extraerMontoCapital(texto: string): { montoCapitalTexto: string; montoCapitalNumerico: string } {
@@ -823,7 +1051,7 @@ export class DespachoService {
 
     let literal = '';
     const regexLiteral =
-      /PESOS?\s+([A-ZÁÉÍÓÚÑ ]+?)(?:\s*\(|\s*,\s+QUE\s+SE|\s+QUE\s+SE\s+PRESUPONEN|\s+QUE\s+SE\s+PRESUPUESTA|\s+PARA\s+RESPONDER|\s+POR\s+INTERESES|\s+POR\s+INTERES|\s+PARA\s+INTERESES|\s+PARA\s+INTERES|$)/i;
+      /PESOS?\s+([A-ZÁÉÍÓÚÑ ]+?)(?:\s+CON\s+\d{1,3}\/\d{1,3}|\s*\(|\s*,\s+QUE\s+SE|\s+QUE\s+SE\s+PRESUPONEN|\s+QUE\s+SE\s+PRESUPUESTA|\s+PARA\s+RESPONDER|\s+POR\s+INTERESES|\s+POR\s+INTERES|\s+PARA\s+INTERESES|\s+PARA\s+INTERES|$)/i;
     const mLit = segmento.match(regexLiteral);
     if (mLit) {
       literal = mLit[1]
@@ -843,7 +1071,12 @@ export class DespachoService {
       montoInteresesTexto = `PESOS ${literal}`;
     } else if (!literal && numeroBruto) {
       // construir texto desde número si no se pudo extraer literal
-      const numEntero = parseInt(numeroBruto.replace(/[^\d]/g,''),10);
+      // Normalizar correctamente: quitar puntos de miles, convertir coma decimal a punto, tomar solo parte entera
+      const numeroNormalizado = numeroBruto
+        .replace(/[^\d.,]/g,'')
+        .replace(/\.(?=\d{3}(\D|$))/g,'')   // quita puntos de miles
+        .replace(/,(\d{2})$/,'.$1');         // coma decimal -> punto
+      const numEntero = parseInt(numeroNormalizado.split('.')[0], 10);
       const literalAuto = this.numeroATextoGrande(numEntero);
       if (literalAuto) montoInteresesTexto = `PESOS ${literalAuto.toUpperCase()}`;
     }
@@ -915,9 +1148,15 @@ export class DespachoService {
   // ---------------- Plantilla ----------------
   private aplicarPlantilla(resultado: any, plantilla: any): any {
     Object.keys(plantilla).forEach(key => {
-      if (typeof plantilla[key] === 'object' && plantilla[key] !== null && typeof resultado[key] === 'object') {
+      if (typeof plantilla[key] === 'object' && plantilla[key] !== null && !Array.isArray(plantilla[key])) {
+        // Si el resultado no tiene la clave o no es un objeto, inicializar
+        if (!resultado[key] || typeof resultado[key] !== 'object') {
+          resultado[key] = {};
+        }
+        // Merge profundo: mantener valores del resultado y sobrescribir con plantilla
         resultado[key] = { ...resultado[key], ...plantilla[key] };
       } else {
+        // Para valores primitivos, sobrescribir directamente
         resultado[key] = plantilla[key];
       }
     });
