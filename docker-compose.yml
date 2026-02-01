@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # MongoDB
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin123}
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app_network
+
+  # API .NET 7
+  webapi:
+    image: ${API_IMAGE_NAME:-notificame-api}:${API_IMAGE_TAG:-latest}
+    container_name: webapi
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__MongoDB=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongo:27017
+      - ASPNETCORE_URLS=http://+:5000
+    depends_on:
+      - mongo
+    networks:
+      - app_network
+
+  # Frontend Angular
+  frontend:
+    image: notificame-frontend:latest
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - webapi
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    external: true

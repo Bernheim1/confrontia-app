@@ -1,0 +1,35 @@
+# Dependencias
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist
+.angular
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+coverage
+.nyc_output
+
+# Misc
+.git
+.gitignore
+README.md
+.editorconfig
+.eslintrc.json
+
+# Environment files (se copiarán manualmente según necesidad)
+.env
+.env.local
+.env.*.local
