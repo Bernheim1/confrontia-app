@@ -1,31 +1,34 @@
-# Stage 1: Build de la aplicación Angular
-FROM node:20-alpine AS build
-
+# Build stage
+FROM node:18-alpine AS build
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Copy package files
 COPY package*.json ./
 
-# Instalar dependencias
+# Install dependencies
 RUN npm ci --legacy-peer-deps
 
-# Copiar el código fuente
+# Copy source code
 COPY . .
 
-# Build de producción
+# Build for production
 RUN npm run build -- --configuration production
 
-# Stage 2: Servir con Nginx
+# Runtime stage
 FROM nginx:alpine
 
-# Copiar configuración personalizada de Nginx
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy built app
+COPY --from=build /app/dist/notificame /usr/share/nginx/html
 
-# Copiar los archivos compilados desde el stage anterior
-COPY --from=build /app/dist/notificame/browser /usr/share/nginx/html
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Exponer el puerto 80
+# Expose port 80
 EXPOSE 80
 
-# Comando para iniciar Nginx
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

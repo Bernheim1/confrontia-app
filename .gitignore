@@ -40,3 +40,12 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+nginx.conf
+.dockerignore
+
+# Environment files with sensitive data
+src/environments/environment.prod.ts

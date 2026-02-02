@@ -1,35 +1,17 @@
-# Dependencias
 node_modules
 npm-debug.log
 yarn-error.log
-
-# Build outputs
-dist
 .angular
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Tests
-coverage
-.nyc_output
-
-# Misc
+dist
 .git
 .gitignore
-README.md
-.editorconfig
-.eslintrc.json
-
-# Environment files (se copiarán manualmente según necesidad)
+*.md
+.vscode
+.idea
+.DS_Store
+coverage
 .env
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
