@@ -1,5 +1,6 @@
 import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -9,6 +10,7 @@ import { AuthService } from './core/auth/service/auth.service';
 import { CoreConfig } from './core/types';
 import { CORE_CUSTOM_CONFIG } from './core/services/config.service';
 import { jwtInterceptor } from './core/auth/interceptors/jwt.interceptor';
+import { provideToastr } from 'ngx-toastr';
 
 export function initApp(authConfigService: AuthService): () => void {
     return () => authConfigService.init();
@@ -62,6 +64,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes), 
     provideHttpClient(withInterceptors([jwtInterceptor])),
+    provideToastr(),
+    provideAnimations(),
     importProvidersFrom([
       JwtModule.forRoot({
         config: {

@@ -1,15 +1,8 @@
-<div class="w-full py-4">
-  <header class="mb-4 border-b border-gray-200">
+<div class="w-full">
+  <header class="mb-4 border-b border-gray-200"  *ngIf="this.step != 0">
     <div class="grid grid-cols-1 md:grid-cols-2">
-      <!-- Logo Section -->
-      <div class="flex items-center justify-center md:justify-start text-gray-900 brand-logo">
-        <div class="ml-2 mb-3 text-center md:text-left">
-          <div class="brand-title">Despacho</div>
-        </div>
-      </div>
-
       <!-- Button Section (Visible when step != 0) -->
-      <div class="flex justify-center md:justify-end items-center" *ngIf="this.step != 0">
+      <div class="flex justify-center md:justify-end items-center">
         <button
           type="button"
           (click)="onReingresar()"
@@ -22,29 +15,43 @@
     </div>
   </header>
 
+
   <div *ngIf="this.step == 0">
-    <app-ingreso-despacho
-      class="scale-up-ver-top"
-      (textoIngresado)="onTextoIngresado($event)"
-      (tipoSalidaOutput)="onTipoSalidaSeleccionado($event)"
-      (subtipoSalidaOutput)="onSubtipoSalidaSeleccionado($event)"
-    ></app-ingreso-despacho>
+    <app-ingreso-despacho class="scale-up-ver-top" (textoIngresado)="onTextoIngresado($event)" (tipoSalidaOutput)="onTipoSalidaSeleccionado($event)" (subtipoSalidaOutput)="onSubtipoSalidaSeleccionado($event)"></app-ingreso-despacho>
   </div>
 
   <div *ngIf="this.step == 1">
-    <app-seleccion-salida
-      (salidaSeleccionada)="onSalidaSeleccionada($event)"
-      [textoDespacho]="this.textoDespacho"
-      [tipoSalida]="this.tipoSalida"
-      [subtipoSalida]="this.subtipoSalida"
-    ></app-seleccion-salida>
+    <div *ngFor="let despacho of despachos; let i = index" class="mb-4">
+      <app-seleccion-salida 
+        (salidaSeleccionada)="onSalidaSeleccionada($event)"
+        (formularioCompletado)="onFormularioCompletado($event)" 
+        [textoDespacho]="despacho.primerDespacho" 
+        [tipoSalida]="this.tipoSalida" 
+        [subtipoSalida]="this.subtipoSalida"
+        [index]="i"
+        [masivo]="despachos.length > 1"
+        [totalDespachos]="despachos.length"
+        [despachosCompletados]="formulariosValidos.size"
+        [hideButton]="true">
+      </app-seleccion-salida>
+    </div>
+    
+    <!-- Botón flotante para generar todos -->
+    <button 
+      class="btn bg-primary-900 btn-generar-flotante" 
+      [class.todos-completos]="formulariosValidos.size === despachos.length"
+      type="button" 
+      (click)="generarTodos()">
+      <span *ngIf="despachos.length > 1" class="badge bg-white text-primary me-2">
+        {{ formulariosValidos.size }}/{{ despachos.length }}
+      </span>
+      Generar <span class="fw-bold">{{ this.tipoSalida == 1 ? (despachos.length > 1 ? 'Cédulas' : 'Cédula') : (despachos.length > 1 ? 'Mandamientos' : 'Mandamiento') }}</span>
+    </button>
   </div>
 
   <div *ngIf="this.step == 2">
-    <app-mostrar-salida
-      [tipoSalida]="this.tipoSalida"
-      [salida]="this.salida"
-      [textoDespacho]="this.textoDespacho"
-    ></app-mostrar-salida>
+    <div *ngFor="let despacho of despachos; let i = index" class="mb-4">
+      <app-mostrar-salida [tipoSalida]="this.tipoSalida" [salida]="this.salida[i]" [textoDespacho]="despacho.primerDespacho" [masivo]="despachos.length > 1"></app-mostrar-salida>
+    </div>
   </div>
 </div>

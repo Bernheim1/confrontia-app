@@ -30,10 +30,16 @@ export class SeleccionSalidaComponent implements OnInit {
   faCircleInfo = faCircleInfo;
   faArrowRight = faArrowRight;
 
-  @Output() salidaSeleccionada = new EventEmitter<Salida>();
+  @Output() salidaSeleccionada = new EventEmitter<{ salida: Salida, index: number }>();
+  @Output() formularioCompletado = new EventEmitter<{ index: number, valido: boolean }>();
   @Input() textoDespacho: string = '';
   @Input() tipoSalida: TipoSalidaEnum = TipoSalidaEnum.SinAsignar;
   @Input() subtipoSalida: any;
+  @Input() index: number = 0;
+  @Input() masivo: boolean = false;
+  @Input() totalDespachos: number = 1;
+  @Input() despachosCompletados: number = 0;
+  @Input() hideButton: boolean = false;
 
   formulario!: FormGroup;
   textoTitulo = '';
@@ -42,6 +48,15 @@ export class SeleccionSalidaComponent implements OnInit {
   filtroJuzgado: string = '';
   juzgadosIntervinientes: Array<{ juzgado: string; direccion?: string; raw?: any }> = [];
   juzgadosFiltrados: Array<{ juzgado: string; direccion?: string; raw?: any }> = [];
+
+  // Métodos helper para el template
+  esMandamiento(): boolean {
+    return this.tipoSalida === TipoSalidaEnum.Mandamiento;
+  }
+
+  esCedula(): boolean {
+    return this.tipoSalida === TipoSalidaEnum.Cedula;
+  }
 
   openDropdown = false;
   highlightedIndex = -1;
@@ -55,11 +70,7 @@ export class SeleccionSalidaComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tipoSalida'] || changes['subtipoSalida']) {
       this.textoTitulo =
-        TipoSalidaTexto[this.tipoSalida] +
-        ' - ' +
-        (this.tipoSalida == 1
-          ? TipoCedulaTexto[this.subtipoSalida as TipoCedulaEnum]
-          : TipoMandamientoTexto[this.subtipoSalida as TipoMandamientoEnum]);
+        TipoSalidaTexto[this.tipoSalida]
     }
   }
 
@@ -109,12 +120,25 @@ export class SeleccionSalidaComponent implements OnInit {
         montoCapitalTexto: [''],
         montoCapitalNumerico: [''],
         montoInteresesTexto: [''],
-        montoInteresesNumerico: ['']
+        montoInteresesNumerico: [''],
+        textoNotificacion: [''],
+        textoDespacho: ['']
       })
     });
 
     await this.despachoService.inicializarCatalogoDesdeAssets();
-    const datos = await this.despachoService.procesarDespachoAsync(this.textoDespacho, this.tipoSalida, this.subtipoSalida);
+    
+    // Si subtipoSalida es undefined, asignar valor por defecto según tipoSalida
+    let subtipoFinal = this.subtipoSalida;
+    if (subtipoFinal === undefined || subtipoFinal === null) {
+      if (this.tipoSalida === TipoSalidaEnum.Mandamiento) {
+        subtipoFinal = TipoMandamientoEnum.IntimacionPago;
+      } else if (this.tipoSalida === TipoSalidaEnum.Cedula) {
+        subtipoFinal = TipoCedulaEnum.TrasladoDemanda;
+      }
+    }
+    
+    const datos = await this.despachoService.procesarDespachoAsync(this.textoDespacho, this.tipoSalida, subtipoFinal);
 
     this.formulario.patchValue({
       organo: {
@@ -151,7 +175,9 @@ export class SeleccionSalidaComponent implements OnInit {
         montoCapitalTexto: datos.textoContenido?.montoCapitalTexto || '',
         montoCapitalNumerico: datos.textoContenido?.montoCapitalNumerico ?? '',
         montoInteresesTexto: datos.textoContenido?.montoInteresesTexto || '',
-        montoInteresesNumerico: datos.textoContenido?.montoInteresesNumerico ?? ''
+        montoInteresesNumerico: datos.textoContenido?.montoInteresesNumerico ?? '',
+        textoNotificacion: datos.textoContenido?.textoNotificacion || '',
+        textoDespacho: datos.textoContenido?.textoDespacho || ''
       }
     });
 
@@ -172,6 +198,14 @@ export class SeleccionSalidaComponent implements OnInit {
         this.filtroJuzgado = v || '';
         this.applyFilter(this.filtroJuzgado);
       }
+    });
+
+    // Escuchar cambios en el formulario para notificar cuando esté completo
+    this.formulario.statusChanges.subscribe(status => {
+      this.formularioCompletado.emit({ 
+        index: this.index, 
+        valido: status === 'VALID' 
+      });
     });
 
     setTimeout(() => this.intentarMapearOrganoDesdeCsv(), 0);
@@ -377,7 +411,12 @@ export class SeleccionSalidaComponent implements OnInit {
       return;
     }
     const retorno = this.mapSalida();
-    this.salidaSeleccionada.emit(retorno);
+    this.salidaSeleccionada.emit({ salida: retorno, index: this.index });
+  }
+
+  submitFromParent(index: number) {
+    this.index = index;
+    this.onSubmit();
   }
 
   mapSalida(): Salida {
@@ -446,6 +485,9 @@ export class SeleccionSalidaComponent implements OnInit {
         ? String(montoIntNumControlVal).replace(/^\(\s*/, '').replace(/\s*\)$/, '')
         : '';
     retorno.montoInteresesNumerico = montoIntNum.trim() !== '' ? montoIntNum : null;
+
+    retorno.textoNotificacion = this.formulario.get('textoContenido.textoNotificacion')?.value || '';
+    retorno.textoDespacho = this.formulario.get('textoContenido.textoDespacho')?.value || '';
 
     return retorno;
   }

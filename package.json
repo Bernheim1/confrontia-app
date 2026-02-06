@@ -23,6 +23,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "flowbite": "^4.0.1",
     "lodash": "^4.17.21",
+    "ngx-toastr": "^19.1.0",
     "papaparse": "^5.5.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

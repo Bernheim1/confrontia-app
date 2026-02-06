@@ -1,347 +1,509 @@
-<div class="p-5 bg-light rounded-3 border border-2 border-primary shadow scale-up-ver-top">
-    <div class="col-md-12">
-        <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
-        <div class="container">
-            <div class="d-flex align-items-center justify-content-center mb-2">
-                <fa-icon style="font-size: 1.7rem; color: var(--bs-primary)" [icon]="faCircleInfo"></fa-icon>&nbsp;&nbsp;
-                <h3 class="">Información de su <span class="subrayado">{{this.textoTitulo}}</span></h3>
+<div class="p-5 bg-gray-100 rounded-xl border-2 border-primary shadow mb-3">
+
+  <!-- Header modo masivo -->
+  <div *ngIf="masivo" class="mb-4 pb-3 border-b-2 border-primary">
+    <h4 class="text-primary font-bold text-center">
+      {{ formulario.get('expediente.caratulaExpediente')?.value || 'Despacho ' + (index + 1) }}
+    </h4>
+  </div>
+
+  <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+    <div class="max-w-7xl mx-auto px-4">
+
+      <!-- Título -->
+      <div class="flex items-center justify-center mb-4 gap-2">
+        <fa-icon class="text-primary text-2xl" [icon]="faCircleInfo"></fa-icon>
+        <h3 class="text-xl font-semibold">
+          Información de su <span class="underline">{{ this.textoTitulo }}</span>
+        </h3>
+      </div>
+
+      <!-- ===== PRIMERA FILA ===== -->
+      <div class="grid grid-cols-12 gap-6">
+
+        <!-- Órgano -->
+        <div class="col-span-12 md:col-span-6">
+          <div class="bg-white rounded-lg border shadow">
+            <div class="border-b px-4 py-3 text-center">
+              <h4 class="font-semibold">Órgano</h4>
             </div>
-            <div class="row">
-                <div class="col-md-6 col-xs-12">
-                    <div class="card">
-                        <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4 class="">Órgano</h4>
-                        </div>
-                        <div class="card-body">
-                            <div formGroupName="organo" class="row g-3">
-                                <div class="col-12">
-                                <label class="form-label">Órgano</label>
-                                <div class="position-relative" tabindex="0" (keydown)="onKeydown($event)">
-                                    <input
-                                    #organoInput
-                                    type="text"
-                                    class="form-control mb-2"
-                                    placeholder="Escriba para filtrar..."
-                                    formControlName="organo"
-                                    (input)="onFiltroJuzgado($any($event.target).value)"
-                                    (focus)="onFocusInput()"
-                                    (blur)="onBlurDropdown()"
-                                    autocomplete="off"
-                                    aria-autocomplete="list"
-                                    [attr.aria-expanded]="openDropdown"
-                                    aria-controls="organo-list"
-                                    role="combobox"
-                                    />
-                                    <ul id="organo-list"
-                                        *ngIf="openDropdown && juzgadosFiltrados?.length"
-                                        class="list-group position-absolute w-100 shadow"
-                                        style="z-index:1000; max-height:260px; overflow:auto;"
-                                        (mouseenter)="onListMouseEnter()"
-                                        (mouseleave)="onListMouseLeave()"
-                                        (mousedown)="onListMouseDown()">
-                                    <li *ngFor="let item of juzgadosFiltrados; let i = index"
-                                        (mouseenter)="highlight(i)"
-                                        (click)="chooseJuzgado(item)"
-                                        class="list-group-item list-group-item-action"
-                                        [class.active]="i === highlightedIndex"
-                                        role="option"
-                                        [attr.aria-selected]="i === highlightedIndex">
-                                        {{ item.juzgado || item }}
-                                    </li>
-                                    </ul>
-                                </div>
-                                <div class="text-danger" *ngIf="campoInvalido('organo.organo')">
-                                    El órgano es obligatorio.
-                                </div>
-                                </div>
-                                <div class="col-12">
-                                <label class="form-label">Juzgado Interviniente</label>
-                                <input type="text"
-                                        placeholder="Juzgado Interviniente"
-                                        class="form-control"
-                                        formControlName="juzgadoInterviniente"
-                                        [ngClass]="{'is-invalid': campoInvalido('organo.juzgadoInterviniente')}">
-                                <div class="text-danger" *ngIf="campoInvalido('organo.juzgadoInterviniente')">
-                                    El Juzgado Interviniente es obligatorio.
-                                </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Juzgado/Tribunal</label>
-                                    <input type="text" placeholder="Juzgado/Tribunal" class="form-control" formControlName="juzgadoTribunal"
-                                    [ngClass]="{'is-invalid': campoInvalido('organo.juzgadoTribunal')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('organo.juzgadoTribunal')">
-                                        El Juzgado/Tribunal es obligatorio.
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Dirección</label>
-                                    <input type="text" placeholder="Dirección" class="form-control" formControlName="direccionJuzgado"
-                                    [ngClass]="{'is-invalid': campoInvalido('organo.direccionJuzgado')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('organo.direccionJuzgado')">
-                                        La dirección es obligatoria.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+            <div class="p-4">
+              <div formGroupName="organo" class="grid grid-cols-12 gap-4">
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Órgano</label>
+
+                  <div class="relative" tabindex="0" (keydown)="onKeydown($event)">
+                    <input
+                      #organoInput
+                      type="text"
+                      class="w-full rounded-md border px-3 py-2 mb-2 focus:ring-2 focus:ring-primary"
+                      placeholder="Escriba para filtrar..."
+                      formControlName="organo"
+                      (input)="onFiltroJuzgado($any($event.target).value)"
+                      (focus)="onFocusInput()"
+                      (blur)="onBlurDropdown()"
+                      autocomplete="off"
+                    />
+
+                    <ul
+                      *ngIf="openDropdown && juzgadosFiltrados?.length"
+                      class="absolute z-50 w-full max-h-64 overflow-auto rounded-md border bg-white shadow"
+                    >
+                      <li
+                        *ngFor="let item of juzgadosFiltrados; let i = index"
+                        (mouseenter)="highlight(i)"
+                        (click)="chooseJuzgado(item)"
+                        class="px-3 py-2 cursor-pointer hover:bg-primary/10"
+                        [class.bg-primary]="i === highlightedIndex"
+                        [class.text-white]="i === highlightedIndex"
+                      >
+                        {{ item.juzgado || item }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div *ngIf="campoInvalido('organo.organo')" class="text-red-600 text-sm">
+                    El órgano es obligatorio.
+                  </div>
                 </div>
-                <div class="col-md-6 col-xs-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-center align-items-center">
-                            <h4 class="">Domicilio del <span class="subrayado">Requerido</span></h4>
-                        </div>
-                        <div class="card-body domicilio-requerido">
-                            <div formGroupName="domicilioRequerido" class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Localidad</label>
-                                    <input type="text" placeholder="Localidad" class="form-control" formControlName="localidad"
-                                    [ngClass]="{'is-invalid': campoInvalido('domicilioRequerido.localidad')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('domicilioRequerido.localidad')">
-                                        La localidad es obligatoria.
-                                    </div>
-                                </div>
-                    
-                                <div class="col-12">
-                                    <label class="form-label">Domicilio</label>
-                                    <input type="text" placeholder="Domicilio" class="form-control" formControlName="domicilio"
-                                    [ngClass]="{'is-invalid': campoInvalido('domicilioRequerido.domicilio')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('domicilioRequerido.domicilio')">
-                                        El domicilio es obligatorio.
-                                    </div>
-                                </div>
-                    
-                                <div class="col-md-6">
-                                    <label class="form-label">Nro</label>
-                                    <input type="text" placeholder="Nro" class="form-control" formControlName="nro"
-                                    [ngClass]="{'is-invalid': campoInvalido('domicilioRequerido.nro')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('domicilioRequerido.nro')">
-                                        Ingrese un número válido o "S/N".
-                                    </div>
-                                </div>
-                    
-                                <div class="col-md-6">
-                                    <label class="form-label">Piso</label>
-                                    <input type="number" placeholder="Piso" class="form-control" formControlName="piso" min="0" max="99" 
-                                    [ngClass]="{'is-invalid': campoInvalido('domicilioRequerido.piso')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('domicilioRequerido.piso')">
-                                        El piso debe estar entre 0 y 99.
-                                    </div>
-                                </div>
-                    
-                                <div class="col-md-6">
-                                    <label class="form-label">Depto</label>
-                                    <input type="text" placeholder="Depto" class="form-control" formControlName="depto"
-                                    [ngClass]="{'is-invalid': campoInvalido('domicilioRequerido.depto')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('domicilioRequerido.depto')">
-                                        El departamento no es obligatorio.
-                                    </div>
-                                </div>
-                    
-                                <div class="col-md-6">
-                                    <label class="form-label">Unidad</label>
-                                    <input type="text" placeholder="Unidad" class="form-control" formControlName="unidad">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Juzgado Interviniente</label>
+                  <input
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2"
+                    formControlName="juzgadoInterviniente"
+                  />
+                  <div *ngIf="campoInvalido('organo.juzgadoInterviniente')" class="text-red-600 text-sm">
+                    El Juzgado Interviniente es obligatorio.
+                  </div>
                 </div>
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Juzgado / Tribunal</label>
+                  <input
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2"
+                    formControlName="juzgadoTribunal"
+                  />
+                </div>
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Dirección</label>
+                  <input
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2"
+                    formControlName="direccionJuzgado"
+                  />
+                </div>
+
+              </div>
             </div>
-            <div class="row mt-3">
-                <div class="col-md-6 col-xs-12">
-                    <div class="card">
-                        <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4 class="">Expediente</h4>
-                        </div>
-                        <div class="card-body">
-                            <div formGroupName="expediente" class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Tipo de diligencia</label>
-                                    <input type="text" placeholder="Tipo de diligencia" class="form-control" formControlName="tipoDiligencia"
-                                    [ngClass]="{'is-invalid': campoInvalido('expediente.tipoDiligencia')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('expediente.tipoDiligencia')">
-                                        El Tipo de diligencia es obligatorio.
-                                    </div>
-                                </div>
-                    
-                                <div class="col-12">
-                                    <label class="form-label">Carátula del expediente</label>
-                                    <input type="text" placeholder="Carátula del expediente" class="form-control" formControlName="caratulaExpediente"
-                                    [ngClass]="{'is-invalid': campoInvalido('expediente.caratulaExpediente')}">
-                                    <div class="text-danger" *ngIf="campoInvalido('expediente.caratulaExpediente')">
-                                        La Carátula del expediente es obligatoria.
-                                    </div>
-                                </div>
-                    
-                                <div class="col-md-12">
-                                    <div class="form-check form-switch mt-3">
-                                        <label class="form-check-label" for="copiasTraslado">Copias para traslado</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="copiasTraslado" formControlName="copiasTraslado">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-xs-12">
-                    <div class="card">
-                        <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4 class="">Carácter</h4>
-                        </div>
-                        <div class="card-body">
-                            <div formGroupName="caracter" class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="urgente">Urgente</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="urgente" formControlName="urgente" >
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="habilitacionDiaHora">Y/o habilitacion de dia y hora</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="habilitacionDiaHora" formControlName="habilitacionDiaHora" >
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="bajoResponsabilidad">Bajo responsabilidad</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="bajoResponsabilidad" formControlName="bajoResponsabilidad" >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4 class="">Tipo de Domicilio</h4>
-                        </div>
-                        <div class="card-body">
-                            <div formGroupName="tipoDomicilio" class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="denunciado">Denunciado</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="denunciado" formControlName="denunciado">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="constituido">Constituido</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="constituido" formControlName="constituido">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-12 col-xs-12">
-                    <div class="card">
-                        <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4 class="">Facultades y atribuciones</h4>
-                        </div>
-                        <div class="card-body">
-                            <div formGroupName="facultadesAtribuciones" class="row g-3">
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="allanamiento">Allanamiento</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="allanamiento" formControlName="allanamiento">
-                                        </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="allanamientoDomicilioSinOcupantes">Allanamiento en domicilio sin ocupantes</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="allanamientoDomicilioSinOcupantes" formControlName="allanamientoDomicilioSinOcupantes">
-                                        </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="auxilioFuerzaPublica">Con auxilio de la fuerza pública</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="auxilioFuerzaPublica" formControlName="auxilioFuerzaPublica">
-                                        </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="conCerrajero">Con cerrajero</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="conCerrajero" formControlName="conCerrajero" >
-                                        </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="denunciaOtroDomicilio">Denuncia de otro domicilio</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="denunciaOtroDomicilio" formControlName="denunciaOtroDomicilio" >
-                                        </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="denunciaBienes">Denuncia de bienes</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="denunciaBienes" formControlName="denunciaBienes" >
-                                        </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <label class="form-check-label" for="otros">Otros</label>
-                                        <input class="form-check-input" type="checkbox" role="switch" id="otros" formControlName="otros" >
-                                        </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-12 col-xs-12">
-                    <div class="card">
-                        <div class="card-header header-subrayado d-flex justify-content-center align-items-center">
-                            <h4>Contenido de su <span class="subrayado">{{this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento'}}</span></h4>
-                        </div>
-                        <div class="card-body fs-5 lh-5" style="text-align: justify;" id="editable-text" formGroupName="textoContenido">
-                            El Oficial de Justicia de la zona que corresponda, se constituirá, para la ejecución del presente en el domicilio de 
-                            <span 
-                            class="editable"
-                            contenteditable="true"
-                            contenteditableModel
-                            formControlName="requerido"
-                            appPreventEnter>
-                            </span>
-                            sito en calle y procederá a intimar para que de pago en el acto de serle requerida la suma de 
-                            <span 
-                            class="editable"
-                            contenteditable="true"
-                            contenteditableModel
-                            formControlName="montoCapitalTexto"
-                            appPreventEnter>
-                            </span>
-                            <span 
-                            class="editable"
-                            contenteditable="true"
-                            contenteditableModel
-                            formControlName="montoCapitalNumerico"
-                            appPreventEnter>
-                            </span>
-                            en concepto de capital, más la de 
-                            <span 
-                            class="editable"
-                            contenteditable="true"
-                            contenteditableModel
-                            formControlName="montoInteresesTexto"
-                            appPreventEnter>
-                            </span>
-                            <span 
-                            class="editable"
-                            contenteditable="true"
-                            contenteditableModel
-                            formControlName="montoInteresesNumerico"
-                            appPreventEnter>
-                            </span>
-                            que el Juzgado presupuesto “prima facie” para responder intereses y costas de la ejecución. En caso de dar resultado negativo la intimación de pago, ello importará la citación a los ejecutados para oponer excepciones legítimas dentro del plazo de cinco días, bajo apercibimiento de llevarse adelante la ejecución (art. 540 CPC), como asimismo el requerimiento para que dentro de dicho plazo constituya domicilio legal bajo apercibimiento de tenerlo por constituido en los Estrados del Juzgado en los términos del art. 41 del Código Citado.
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </form>
+
+        <!-- Domicilio requerido -->
+        <div class="col-span-12 md:col-span-6">
+          <div class="bg-white rounded-lg border shadow">
+            <div class="border-b px-4 py-3 text-center">
+              <h4 class="font-semibold">
+                Domicilio del <span class="underline">Requerido</span>
+              </h4>
+            </div>
+
+            <div class="p-4">
+              <div formGroupName="domicilioRequerido" class="grid grid-cols-12 gap-4">
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Localidad</label>
+                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="localidad" />
+                </div>
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Domicilio</label>
+                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="domicilio" />
+                </div>
+
+                <div class="col-span-6">
+                  <label class="block text-sm font-medium mb-1">Nro</label>
+                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="nro" />
+                </div>
+
+                <div class="col-span-6">
+                  <label class="block text-sm font-medium mb-1">Piso</label>
+                  <input type="number" class="w-full rounded-md border px-3 py-2" formControlName="piso" />
+                </div>
+
+                <div class="col-span-6">
+                  <label class="block text-sm font-medium mb-1">Depto</label>
+                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="depto" />
+                </div>
+
+                <div class="col-span-6">
+                  <label class="block text-sm font-medium mb-1">Unidad</label>
+                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="unidad" />
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== SEGUNDA FILA ===== -->
+      <div class="grid grid-cols-12 gap-6 mt-6">
+
+  <!-- Expediente -->
+  <div class="col-span-12 md:col-span-6">
+    <div class="bg-white rounded-lg border shadow">
+
+      <div class="border-b px-4 py-3 text-center">
+        <h4 class="font-semibold">Expediente</h4>
+      </div>
+
+      <div class="p-4">
+        <div formGroupName="expediente" class="grid grid-cols-12 gap-4">
+
+          <div class="col-span-12">
+            <label class="block text-sm font-medium mb-1">Tipo de diligencia</label>
+            <input
+              type="text"
+              class="w-full rounded-md border px-3 py-2"
+              formControlName="tipoDiligencia"
+            />
+          </div>
+
+          <div class="col-span-12">
+            <label class="block text-sm font-medium mb-1">Carátula del expediente</label>
+            <input
+              type="text"
+              class="w-full rounded-md border px-3 py-2"
+              formControlName="caratulaExpediente"
+            />
+          </div>
+
+          <!-- Copias traslado -->
+          <div class="col-span-12">
+            <label class="inline-flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                formControlName="copiasTraslado"
+                class="sr-only peer"
+              />
+              <div
+                class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                       after:w-5 after:h-5 after:bg-white after:rounded-full
+                       after:transition-all peer-checked:after:translate-x-5"
+              ></div>
+              <span class="text-sm">Copias para traslado</span>
+            </label>
+          </div>
+
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Carácter + Tipo domicilio -->
+  <div class="col-span-12 md:col-span-6 space-y-6">
+
+    <!-- Carácter -->
+    <div class="bg-white rounded-lg border shadow">
+      <div class="border-b px-4 py-3 text-center">
+        <h4 class="font-semibold">Carácter</h4>
+      </div>
+
+      <div class="p-4">
+        <div formGroupName="caracter" class="grid grid-cols-12 gap-4">
+
+          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="urgente" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+            <span class="text-sm">Urgente</span>
+          </label>
+
+          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="habilitacionDiaHora" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+            <span class="text-sm">Habilitación día y hora</span>
+          </label>
+
+          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="bajoResponsabilidad" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+            <span class="text-sm">Bajo responsabilidad</span>
+          </label>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipo domicilio -->
+    <div class="bg-white rounded-lg border shadow">
+      <div class="border-b px-4 py-3 text-center">
+        <h4 class="font-semibold">Tipo de Domicilio</h4>
+      </div>
+
+      <div class="p-4">
+        <div formGroupName="tipoDomicilio" class="grid grid-cols-12 gap-4">
+
+          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="denunciado" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+            <span class="text-sm">Denunciado</span>
+          </label>
+
+          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="constituido" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+            <span class="text-sm">Constituido</span>
+          </label>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-<button class="btn btn-primary btn-generar-flotante" type="submit" (click)="onSubmit()">
-  Generar <span class="fw-bold">{{ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
+
+
+      <!-- ===== FACULTADES ===== -->
+     <div *ngIf="esMandamiento()" class="mt-6">
+  <div class="bg-white rounded-lg border shadow">
+
+    <!-- Header -->
+    <div class="border-b px-4 py-3 flex items-center justify-center">
+      <h4 class="font-semibold">Facultades y atribuciones</h4>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4">
+      <div
+        formGroupName="facultadesAtribuciones"
+        class="grid grid-cols-1 md:grid-cols-4 gap-4"
+      >
+
+        <!-- Allanamiento -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="allanamiento"
+            formControlName="allanamiento"
+            class="sr-only peer"
+          />
+          <div
+            class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                   after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                   after:w-5 after:h-5 after:bg-white after:rounded-full
+                   after:transition-all peer-checked:after:translate-x-5"
+          ></div>
+          <span class="text-sm">Allanamiento</span>
+        </label>
+
+        <!-- Allanamiento sin ocupantes -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="allanamientoDomicilioSinOcupantes"
+            formControlName="allanamientoDomicilioSinOcupantes"
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                      after:w-5 after:h-5 after:bg-white after:rounded-full
+                      after:transition-all peer-checked:after:translate-x-5"></div>
+          <span class="text-sm">Allanamiento en domicilio sin ocupantes</span>
+        </label>
+
+        <!-- Auxilio fuerza pública -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="auxilioFuerzaPublica"
+            formControlName="auxilioFuerzaPublica"
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                      after:w-5 after:h-5 after:bg-white after:rounded-full
+                      after:transition-all peer-checked:after:translate-x-5"></div>
+          <span class="text-sm">Con auxilio de la fuerza pública</span>
+        </label>
+
+        <!-- Cerrajero -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="conCerrajero"
+            formControlName="conCerrajero"
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                      after:w-5 after:h-5 after:bg-white after:rounded-full
+                      after:transition-all peer-checked:after:translate-x-5"></div>
+          <span class="text-sm">Con cerrajero</span>
+        </label>
+
+        <!-- Otro domicilio -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="denunciaOtroDomicilio"
+            formControlName="denunciaOtroDomicilio"
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                      after:w-5 after:h-5 after:bg-white after:rounded-full
+                      after:transition-all peer-checked:after:translate-x-5"></div>
+          <span class="text-sm">Denuncia de otro domicilio</span>
+        </label>
+
+        <!-- Bienes -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="denunciaBienes"
+            formControlName="denunciaBienes"
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                      after:w-5 after:h-5 after:bg-white after:rounded-full
+                      after:transition-all peer-checked:after:translate-x-5"></div>
+          <span class="text-sm">Denuncia de bienes</span>
+        </label>
+
+        <!-- Otros -->
+        <label class="inline-flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="otros"
+            formControlName="otros"
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
+                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                      after:w-5 after:h-5 after:bg-white after:rounded-full
+                      after:transition-all peer-checked:after:translate-x-5"></div>
+          <span class="text-sm">Otros</span>
+        </label>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <!-- ===== TEXTO MANDAMIENTO ===== -->
+      <div *ngIf="esMandamiento()" class="mt-6">
+  <div class="bg-white rounded-lg border shadow">
+
+    <!-- Header -->
+    <div class="border-b px-4 py-3 flex items-center justify-center">
+      <h4>
+        Contenido de su <span class="underline">Mandamiento</span>
+      </h4>
+    </div>
+
+    <!-- Body -->
+    <div
+      id="editable-text"
+      formGroupName="textoContenido"
+      class="p-6 text-base md:text-lg leading-relaxed text-justify space-x-1"
+    >
+      El Oficial de Justicia de la zona que corresponda, se constituirá, para la
+      ejecución del presente en el domicilio de
+
+      <span
+        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]"
+        contenteditable="true"
+        contenteditableModel
+        formControlName="requerido"
+        appPreventEnter
+      ></span>
+
+      sito en calle y procederá a intimar para que de pago en el acto de serle
+      requerida la suma de
+
+      <span
+        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]"
+        contenteditable="true"
+        contenteditableModel
+        formControlName="montoCapitalTexto"
+        appPreventEnter
+      ></span>
+
+      <span
+        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[4rem]"
+        contenteditable="true"
+        contenteditableModel
+        formControlName="montoCapitalNumerico"
+        appPreventEnter
+      ></span>
+
+      en concepto de capital, más la de
+
+      <span
+        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]"
+        contenteditable="true"
+        contenteditableModel
+        formControlName="montoInteresesTexto"
+        appPreventEnter
+      ></span>
+
+      <span
+        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[4rem]"
+        contenteditable="true"
+        contenteditableModel
+        formControlName="montoInteresesNumerico"
+        appPreventEnter
+      ></span>
+
+      que el Juzgado presupuesto “prima facie” para responder intereses y costas de
+      la ejecución. En caso de dar resultado negativo la intimación de pago, ello
+      importará la citación a los ejecutados para oponer excepciones legítimas
+      dentro del plazo de cinco días, bajo apercibimiento de llevarse adelante la
+      ejecución (art. 540 CPC), como asimismo el requerimiento para que dentro de
+      dicho plazo constituya domicilio legal bajo apercibimiento de tenerlo por
+      constituido en los Estrados del Juzgado en los términos del art. 41 del
+      Código Citado.
+    </div>
+
+  </div>
+</div>
+
+
+    </div>
+  </form>
+</div>
+
+<!-- Botón flotante -->
+<button
+  *ngIf="!hideButton"
+  type="submit"
+  (click)="onSubmit()"
+  class="fixed bottom-6 right-6 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+>
+  Generar <span class="font-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
 </button>

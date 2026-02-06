@@ -8,6 +8,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TipoSalidaEnum } from '../../shared/enums/tipo-salida-enum';
 import { Salida } from '../../shared/models/salida';
 import { faRepeat } from '@fortawesome/free-solid-svg-icons';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-mostrar-salida',
@@ -21,6 +22,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   @Input() tipoSalida : TipoSalidaEnum = TipoSalidaEnum.Mandamiento;
   @Input() salida?: Salida;
   @Input() textoDespacho?: string;
+  @Input() masivo?: boolean = false;
 
   faCheck = faCheck;
   faRepeat = faRepeat;
@@ -31,6 +33,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   loading = false;
   error: string | null = null;
   copiedOnce = false;
+  private copiedTimeout: any;
 
   // FormData con todas las claves que usa tu plantilla (valores por defecto '')
   formData: Record<string, string> = {
@@ -73,7 +76,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     textoDespacho: ''
   };
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     // Si al inicializar ya tenés una salida, aplicala antes de cargar template
@@ -94,6 +97,11 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
         this.replacePlaceholders(this.formData);
       }
     }
+    
+    // Si cambió el tipoSalida, recarga la plantilla correspondiente
+    if (changes['tipoSalida'] && !changes['tipoSalida'].firstChange) {
+      this.loadTemplate();
+    }
   }
 
   // Convierte booleanos a "SI"/"NO"
@@ -110,7 +118,8 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
       juzgadoTribunal: s.juzgadoTribunal || '',
       tipoDiligencia: s.tipoDiligencia || '',
       caratulaExpediente: s.caratulaExpediente || '',
-      copiasTraslado: this.boolToSiNo(s.copiasTraslado),
+      // Para cédulas, copias siempre es SI
+      copiasTraslado: this.tipoSalida === TipoSalidaEnum.Cedula ? 'SI' : this.boolToSiNo(s.copiasTraslado),
       urgente: this.boolToSiNo(s.urgente),
       habilitacionDiaHora: this.boolToSiNo(s.habilitacionDiaHora),
       denunciado: this.boolToSiNo(s.denunciado),
@@ -123,8 +132,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
       denunciaOtroDomicilio: this.boolToSiNo(s.denunciaOtroDomicilio),
       denunciaDeBienes: this.boolToSiNo(s.denunciaBienes),
       otros: s.otrosFacultades || '',    // texto libre que pusiste en Salida
-      otrosFacultades: s.otrosFacultades || '',
-      textoDespacho: this.textoDespacho || ''
+      otrosFacultades: s.otrosFacultades || ''
     };
 
     // textoContenido
@@ -133,6 +141,9 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     fd['montoCapitalNumerico'] = (s.montoCapitalNumerico !== null && s.montoCapitalNumerico !== undefined) ? String(s.montoCapitalNumerico) : '';
     fd['montoInteresesTexto'] = s.montoInteresesTexto || '';
     fd['montoInteresesNumerico'] = (s.montoInteresesNumerico !== null && s.montoInteresesNumerico !== undefined) ? String(s.montoInteresesNumerico) : '';
+    fd['textoNotificacion'] = s.textoNotificacion || '';
+    // textoDespacho ahora viene del objeto Salida en lugar de @Input
+    fd['textoDespacho'] = s.textoDespacho || '';
 
     // domicilio/datos de ubicación
     fd['domicilio'] = s.domicilio || '';
@@ -141,6 +152,17 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     fd['piso'] = (s.piso !== null && s.piso !== undefined) ? String(s.piso) : '';
     fd['depto'] = s.depto || '';
     fd['unidad'] = s.unidad || '';
+
+    // Observaciones especiales - condicional para cédula
+    if (this.tipoSalida === TipoSalidaEnum.Cedula) {
+      if (s.bajoResponsabilidad) {
+        fd['observacionesEspeciales'] = '(Traslado de demanda – Art.94CPCC- Art.524 CPCC – Bajo responsabilidad de la parte)';
+      } else {
+        fd['observacionesEspeciales'] = '(Traslado de demanda – Art.94CPCC- Art.524 CPCC – Tachar: "Bajo responsabilidad de la parte")';
+      }
+    } else {
+      fd['observacionesEspeciales'] = '';
+    }
 
   // Fecha actual
   const hoy = new Date();
@@ -172,7 +194,14 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   }
 
   // Carga plantilla y reemplaza placeholders
-  loadTemplate(path: string = 'assets/templates/mandamiento.html') {
+  loadTemplate(path?: string) {
+    // Si no se pasa path, lo determina según tipoSalida
+    if (!path) {
+      path = this.tipoSalida === TipoSalidaEnum.Cedula 
+        ? 'assets/templates/cedula.html'
+        : 'assets/templates/mandamiento.html';
+    }
+
     this.loading = true;
     this.error = null;
     this.http.get(path, { responseType: 'text' }).subscribe({
@@ -221,20 +250,26 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     temp.innerHTML = this.processedHtml;
     const textToCopy = temp.innerText || temp.textContent || '';
     navigator.clipboard.writeText(textToCopy).then(() => {
-      let toastEl = document.getElementById('myToast');
-      if (toastEl) {
-        // let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        // toast.show();
-      }
+      const message = `El contenido de su ${ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' } fue copiado`
+      this.toastr.success(message, 'Exito')
     });
   }
 
   copyRawHtml() {
     navigator.clipboard.writeText(this.processedHtml).then(() => {
-      let toastEl = document.getElementById('myToast');
-      if (toastEl) {
-        // let toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        // toast.show();
+      // Para modo masivo: mostrar feedback temporal en el botón
+      if (this.masivo) {
+        this.copiedOnce = true;
+        if (this.copiedTimeout) clearTimeout(this.copiedTimeout);
+        this.copiedTimeout = setTimeout(() => {
+          this.copiedOnce = false;
+        }, 2000);
+      }
+      
+      // Toast solo en modo no masivo
+      if (!this.masivo) {
+        const message = `El contenido de su ${ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' } fue copiado`
+        this.toastr.success(message, 'Exito')
       }
     });
   }

@@ -6,9 +6,16 @@ export const PLANTILLAS: {
   }
 } = {
   Mandamiento: {
-    IntimacionPago: { tipoDomicilio: { denunciado: true, constituido: false }, expediente: { copiasTraslado: true, tipoDiligencia: 'Mandamiento de intimación de pago y citación de remate' } },
+    IntimacionPago: { 
+      tipoDomicilio: { denunciado: true, constituido: false }, 
+      expediente: { copiasTraslado: true, tipoDiligencia: 'Mandamiento de intimación de pago y citación de remate' },
+      caracter: { urgente: false, habilitacionDiaHora: false }
+    },
   },
   Cedula: {
-    TrasladoDemanda: { urgente: true },
+    TrasladoDemanda: { 
+      tipoDomicilio: { denunciado: true, constituido: false },
+      expediente: { copiasTraslado: true, tipoDiligencia: 'Cédula de traslado de demanda' }
+    },
   }
 };
