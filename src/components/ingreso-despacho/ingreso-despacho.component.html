@@ -44,7 +44,7 @@
              text-[15px] leading-relaxed
              text-ink-light dark:text-ink-dark
              placeholder:text-primary-300
-             resize-none outline-none"
+             resize-none border-none"
     ></textarea>
       
     </div>
@@ -52,7 +52,7 @@
           <!-- Toggle Selector -->
           <div *ngIf="!masivo" class="toggle-selector mb-2 mb-md-0">
                 <button 
-                  class="toggle-btn bg-surface-light dark:bg-primary-900 text-ink-light dark:text-ink-dark" 
+                  class="toggle-btn bg-primary-900 text-ink-dark" 
                   [class.active]="tipoSalida === 1"
                   type="button" 
                   (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
@@ -60,7 +60,7 @@
                 </button>
                 
                 <button 
-                  class="toggle-btn bg-surface-light dark:bg-primary-900 text-ink-light dark:text-ink-dark" 
+                  class="toggle-btn bg-primary-900 text-ink-dark" 
                   [class.active]="tipoSalida === 2"
                   type="button" 
                   (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
@@ -69,7 +69,7 @@
           </div>
 
             <!-- Button -->
-            <button *ngIf="!masivo" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" type="button" (click)="onSubmit()" style="min-width: 150px;">
+            <button *ngIf="!masivo" class="float-right text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" type="button" (click)="onSubmit()" style="min-width: 150px;">
               Ingresar
               <fa-icon [icon]="faArrowRight"></fa-icon>
             </button>
