@@ -18,8 +18,8 @@
 </div>
 
 <div *ngIf="!masivo" class="btn-group btn-generar-flotante">
-  <button class="btn text-white" type="button" (click)="copyRawHtml(); copiedOnce = true">
-    Copiar <span class="fw-bold bg-primary-900">{{ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
+  <button class="btn text-white bg-primary-900" type="button" (click)="copyRawHtml(); copiedOnce = true">
+    Copiar {{ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}
   </button>
   <button *ngIf="copiedOnce" class="btn text-white" type="button" (click)="onReingresar()" aria-label="Reingresar">
     <fa-icon [icon]="faRepeat"></fa-icon>

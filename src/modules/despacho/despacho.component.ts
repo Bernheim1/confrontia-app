@@ -79,7 +79,7 @@ export class DespachoComponent {
   }
 
   generarTodos() {
-    // Limpiar salidas previas
+     // Limpiar salidas previas
     this.salidasRecolectadas.clear();
     this.salida = [];
     

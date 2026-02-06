@@ -1,8 +1,8 @@
-<div class="p-5 bg-gray-100 rounded-xl border-2 border-primary shadow mb-3">
+<div class="p-5 dark:bg-primary-800 bg-gray-100 rounded-xl border-2 border-primary shadow mb-3">
 
   <!-- Header modo masivo -->
   <div *ngIf="masivo" class="mb-4 pb-3 border-b-2 border-primary">
-    <h4 class="text-primary font-bold text-center">
+    <h4 class="text-ink-light dark:text-ink-dark text-primary font-bold text-center">
       {{ formulario.get('expediente.caratulaExpediente')?.value || 'Despacho ' + (index + 1) }}
     </h4>
   </div>
@@ -13,7 +13,7 @@
       <!-- Título -->
       <div class="flex items-center justify-center mb-4 gap-2">
         <fa-icon class="text-primary text-2xl" [icon]="faCircleInfo"></fa-icon>
-        <h3 class="text-xl font-semibold">
+        <h3 class="text-xl text-ink-light dark:text-ink-dark font-semibold">
           Información de su <span class="underline">{{ this.textoTitulo }}</span>
         </h3>
       </div>
@@ -23,7 +23,7 @@
 
         <!-- Órgano -->
         <div class="col-span-12 md:col-span-6">
-          <div class="bg-white rounded-lg border shadow">
+          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
             <div class="border-b px-4 py-3 text-center">
               <h4 class="font-semibold">Órgano</h4>
             </div>
@@ -35,30 +35,17 @@
                   <label class="block text-sm font-medium mb-1">Órgano</label>
 
                   <div class="relative" tabindex="0" (keydown)="onKeydown($event)">
-                    <input
-                      #organoInput
-                      type="text"
-                      class="w-full rounded-md border px-3 py-2 mb-2 focus:ring-2 focus:ring-primary"
-                      placeholder="Escriba para filtrar..."
-                      formControlName="organo"
-                      (input)="onFiltroJuzgado($any($event.target).value)"
-                      (focus)="onFocusInput()"
-                      (blur)="onBlurDropdown()"
-                      autocomplete="off"
-                    />
+                    <input #organoInput type="text"
+                      class="w-full dark:bg-primary-600 rounded-md border px-3 py-2 mb-2 focus:ring-2 focus:ring-primary"
+                      placeholder="Escriba para filtrar..." formControlName="organo"
+                      (input)="onFiltroJuzgado($any($event.target).value)" (focus)="onFocusInput()"
+                      (blur)="onBlurDropdown()" autocomplete="off" />
 
-                    <ul
-                      *ngIf="openDropdown && juzgadosFiltrados?.length"
-                      class="absolute z-50 w-full max-h-64 overflow-auto rounded-md border bg-white shadow"
-                    >
-                      <li
-                        *ngFor="let item of juzgadosFiltrados; let i = index"
-                        (mouseenter)="highlight(i)"
-                        (click)="chooseJuzgado(item)"
-                        class="px-3 py-2 cursor-pointer hover:bg-primary/10"
-                        [class.bg-primary]="i === highlightedIndex"
-                        [class.text-white]="i === highlightedIndex"
-                      >
+                    <ul *ngIf="openDropdown && juzgadosFiltrados?.length"
+                      class="absolute z-50 w-full max-h-64 overflow-auto rounded-md border bg-white shadow">
+                      <li *ngFor="let item of juzgadosFiltrados; let i = index" (mouseenter)="highlight(i)"
+                        (click)="chooseJuzgado(item)" class="px-3 py-2 cursor-pointer hover:bg-primary/10"
+                        [class.bg-primary]="i === highlightedIndex" [class.text-white]="i === highlightedIndex">
                         {{ item.juzgado || item }}
                       </li>
                     </ul>
@@ -71,11 +58,8 @@
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Juzgado Interviniente</label>
-                  <input
-                    type="text"
-                    class="w-full rounded-md border px-3 py-2"
-                    formControlName="juzgadoInterviniente"
-                  />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2"
+                    formControlName="juzgadoInterviniente" />
                   <div *ngIf="campoInvalido('organo.juzgadoInterviniente')" class="text-red-600 text-sm">
                     El Juzgado Interviniente es obligatorio.
                   </div>
@@ -83,20 +67,12 @@
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Juzgado / Tribunal</label>
-                  <input
-                    type="text"
-                    class="w-full rounded-md border px-3 py-2"
-                    formControlName="juzgadoTribunal"
-                  />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="juzgadoTribunal" />
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Dirección</label>
-                  <input
-                    type="text"
-                    class="w-full rounded-md border px-3 py-2"
-                    formControlName="direccionJuzgado"
-                  />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="direccionJuzgado" />
                 </div>
 
               </div>
@@ -106,7 +82,7 @@
 
         <!-- Domicilio requerido -->
         <div class="col-span-12 md:col-span-6">
-          <div class="bg-white rounded-lg border shadow">
+          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
             <div class="border-b px-4 py-3 text-center">
               <h4 class="font-semibold">
                 Domicilio del <span class="underline">Requerido</span>
@@ -118,32 +94,32 @@
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Localidad</label>
-                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="localidad" />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="localidad" />
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Domicilio</label>
-                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="domicilio" />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="domicilio" />
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Nro</label>
-                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="nro" />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="nro" />
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Piso</label>
-                  <input type="number" class="w-full rounded-md border px-3 py-2" formControlName="piso" />
+                  <input type="number" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="piso" />
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Depto</label>
-                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="depto" />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="depto" />
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Unidad</label>
-                  <input type="text" class="w-full rounded-md border px-3 py-2" formControlName="unidad" />
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="unidad" />
                 </div>
 
               </div>
@@ -156,342 +132,276 @@
       <!-- ===== SEGUNDA FILA ===== -->
       <div class="grid grid-cols-12 gap-6 mt-6">
 
-  <!-- Expediente -->
-  <div class="col-span-12 md:col-span-6">
-    <div class="bg-white rounded-lg border shadow">
+        <!-- Expediente -->
+        <div class="col-span-12 md:col-span-6">
+          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
 
-      <div class="border-b px-4 py-3 text-center">
-        <h4 class="font-semibold">Expediente</h4>
-      </div>
+            <div class="border-b px-4 py-3 text-center">
+              <h4 class="font-semibold">Expediente</h4>
+            </div>
 
-      <div class="p-4">
-        <div formGroupName="expediente" class="grid grid-cols-12 gap-4">
+            <div class="p-4">
+              <div formGroupName="expediente" class="grid grid-cols-12 gap-4">
 
-          <div class="col-span-12">
-            <label class="block text-sm font-medium mb-1">Tipo de diligencia</label>
-            <input
-              type="text"
-              class="w-full rounded-md border px-3 py-2"
-              formControlName="tipoDiligencia"
-            />
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Tipo de diligencia</label>
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="tipoDiligencia" />
+                </div>
+
+                <div class="col-span-12">
+                  <label class="block text-sm font-medium mb-1">Carátula del expediente</label>
+                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="caratulaExpediente" />
+                </div>
+
+
+
+                <div class="col-span-12">
+                  <label class="inline-flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" formControlName="copiasTraslado" class="sr-only peer" />
+                    <div class="w-11 h-6  bg-white rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5">
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carácter + Tipo domicilio -->
+        <div class="col-span-12 md:col-span-6 space-y-6">
+
+          <!-- Carácter -->
+          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
+            <div class="border-b px-4 py-3 text-center">
+              <h4 class="font-semibold">Carácter</h4>
+            </div>
+
+            <div class="p-4">
+              <div formGroupName="caracter" class="grid grid-cols-12 gap-4">
+
+                <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" formControlName="urgente" class="sr-only peer" />
+                  <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                  <span class="text-sm">Urgente</span>
+                </label>
+
+                <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" formControlName="habilitacionDiaHora" class="sr-only peer" />
+                  <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                  <span class="text-sm">Habilitación día y hora</span>
+                </label>
+
+                <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" formControlName="bajoResponsabilidad" class="sr-only peer" />
+                  <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                  <span class="text-sm">Bajo responsabilidad</span>
+                </label>
+
+              </div>
+            </div>
           </div>
 
-          <div class="col-span-12">
-            <label class="block text-sm font-medium mb-1">Carátula del expediente</label>
-            <input
-              type="text"
-              class="w-full rounded-md border px-3 py-2"
-              formControlName="caratulaExpediente"
-            />
-          </div>
+          <!-- Tipo domicilio -->
+          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
+            <div class="border-b px-4 py-3 text-center">
+              <h4 class="font-semibold">Tipo de Domicilio</h4>
+            </div>
 
-          <!-- Copias traslado -->
-          <div class="col-span-12">
-            <label class="inline-flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                formControlName="copiasTraslado"
-                class="sr-only peer"
-              />
-              <div
-                class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                       after:w-5 after:h-5 after:bg-white after:rounded-full
-                       after:transition-all peer-checked:after:translate-x-5"
-              ></div>
-              <span class="text-sm">Copias para traslado</span>
-            </label>
+            <div class="p-4">
+              <div formGroupName="tipoDomicilio" class="grid grid-cols-12 gap-4">
+
+                <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" formControlName="denunciado" class="sr-only peer" />
+                  <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                  <span class="text-sm">Denunciado</span>
+                </label>
+
+                <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" formControlName="constituido" class="sr-only peer" />
+                  <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                  <span class="text-sm">Constituido</span>
+                </label>
+
+              </div>
+            </div>
           </div>
 
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Carácter + Tipo domicilio -->
-  <div class="col-span-12 md:col-span-6 space-y-6">
-
-    <!-- Carácter -->
-    <div class="bg-white rounded-lg border shadow">
-      <div class="border-b px-4 py-3 text-center">
-        <h4 class="font-semibold">Carácter</h4>
-      </div>
-
-      <div class="p-4">
-        <div formGroupName="caracter" class="grid grid-cols-12 gap-4">
-
-          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" formControlName="urgente" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                        after:w-5 after:h-5 after:bg-white after:rounded-full
-                        after:transition-all peer-checked:after:translate-x-5"></div>
-            <span class="text-sm">Urgente</span>
-          </label>
-
-          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" formControlName="habilitacionDiaHora" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                        after:w-5 after:h-5 after:bg-white after:rounded-full
-                        after:transition-all peer-checked:after:translate-x-5"></div>
-            <span class="text-sm">Habilitación día y hora</span>
-          </label>
-
-          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" formControlName="bajoResponsabilidad" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                        after:w-5 after:h-5 after:bg-white after:rounded-full
-                        after:transition-all peer-checked:after:translate-x-5"></div>
-            <span class="text-sm">Bajo responsabilidad</span>
-          </label>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Tipo domicilio -->
-    <div class="bg-white rounded-lg border shadow">
-      <div class="border-b px-4 py-3 text-center">
-        <h4 class="font-semibold">Tipo de Domicilio</h4>
-      </div>
-
-      <div class="p-4">
-        <div formGroupName="tipoDomicilio" class="grid grid-cols-12 gap-4">
-
-          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" formControlName="denunciado" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                        after:w-5 after:h-5 after:bg-white after:rounded-full
-                        after:transition-all peer-checked:after:translate-x-5"></div>
-            <span class="text-sm">Denunciado</span>
-          </label>
-
-          <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" formControlName="constituido" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                        after:w-5 after:h-5 after:bg-white after:rounded-full
-                        after:transition-all peer-checked:after:translate-x-5"></div>
-            <span class="text-sm">Constituido</span>
-          </label>
-
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
 
 
       <!-- ===== FACULTADES ===== -->
-     <div *ngIf="esMandamiento()" class="mt-6">
-  <div class="bg-white rounded-lg border shadow">
+      <div *ngIf="esMandamiento()" class="mt-6">
+        <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
 
-    <!-- Header -->
-    <div class="border-b px-4 py-3 flex items-center justify-center">
-      <h4 class="font-semibold">Facultades y atribuciones</h4>
-    </div>
+          <!-- Header -->
+          <div class="border-b px-4 py-3 flex items-center justify-center">
+            <h4 class="font-semibold">Facultades y atribuciones</h4>
+          </div>
 
-    <!-- Body -->
-    <div class="p-4">
-      <div
-        formGroupName="facultadesAtribuciones"
-        class="grid grid-cols-1 md:grid-cols-4 gap-4"
-      >
+          <!-- Body -->
+          <div class="p-4">
+            <div formGroupName="facultadesAtribuciones" class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-        <!-- Allanamiento -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="allanamiento"
-            formControlName="allanamiento"
-            class="sr-only peer"
-          />
-          <div
-            class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                   after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                   after:w-5 after:h-5 after:bg-white after:rounded-full
-                   after:transition-all peer-checked:after:translate-x-5"
-          ></div>
-          <span class="text-sm">Allanamiento</span>
-        </label>
+              <!-- Allanamiento -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="allanamiento" formControlName="allanamiento" class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Allanamiento</span>
+              </label>
 
-        <!-- Allanamiento sin ocupantes -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="allanamientoDomicilioSinOcupantes"
-            formControlName="allanamientoDomicilioSinOcupantes"
-            class="sr-only peer"
-          />
-          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                      after:w-5 after:h-5 after:bg-white after:rounded-full
-                      after:transition-all peer-checked:after:translate-x-5"></div>
-          <span class="text-sm">Allanamiento en domicilio sin ocupantes</span>
-        </label>
+              <!-- Allanamiento sin ocupantes -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="allanamientoDomicilioSinOcupantes"
+                  formControlName="allanamientoDomicilioSinOcupantes" class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Allanamiento en domicilio sin ocupantes</span>
+              </label>
 
-        <!-- Auxilio fuerza pública -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="auxilioFuerzaPublica"
-            formControlName="auxilioFuerzaPublica"
-            class="sr-only peer"
-          />
-          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                      after:w-5 after:h-5 after:bg-white after:rounded-full
-                      after:transition-all peer-checked:after:translate-x-5"></div>
-          <span class="text-sm">Con auxilio de la fuerza pública</span>
-        </label>
+              <!-- Auxilio fuerza pública -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="auxilioFuerzaPublica" formControlName="auxilioFuerzaPublica"
+                  class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Con auxilio de la fuerza pública</span>
+              </label>
 
-        <!-- Cerrajero -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="conCerrajero"
-            formControlName="conCerrajero"
-            class="sr-only peer"
-          />
-          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                      after:w-5 after:h-5 after:bg-white after:rounded-full
-                      after:transition-all peer-checked:after:translate-x-5"></div>
-          <span class="text-sm">Con cerrajero</span>
-        </label>
+              <!-- Cerrajero -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="conCerrajero" formControlName="conCerrajero" class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Con cerrajero</span>
+              </label>
 
-        <!-- Otro domicilio -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="denunciaOtroDomicilio"
-            formControlName="denunciaOtroDomicilio"
-            class="sr-only peer"
-          />
-          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                      after:w-5 after:h-5 after:bg-white after:rounded-full
-                      after:transition-all peer-checked:after:translate-x-5"></div>
-          <span class="text-sm">Denuncia de otro domicilio</span>
-        </label>
+              <!-- Otro domicilio -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="denunciaOtroDomicilio" formControlName="denunciaOtroDomicilio"
+                  class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Denuncia de otro domicilio</span>
+              </label>
 
-        <!-- Bienes -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="denunciaBienes"
-            formControlName="denunciaBienes"
-            class="sr-only peer"
-          />
-          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                      after:w-5 after:h-5 after:bg-white after:rounded-full
-                      after:transition-all peer-checked:after:translate-x-5"></div>
-          <span class="text-sm">Denuncia de bienes</span>
-        </label>
+              <!-- Bienes -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="denunciaBienes" formControlName="denunciaBienes" class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Denuncia de bienes</span>
+              </label>
 
-        <!-- Otros -->
-        <label class="inline-flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="otros"
-            formControlName="otros"
-            class="sr-only peer"
-          />
-          <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-primary relative
-                      after:content-[''] after:absolute after:top-0.5 after:left-0.5
-                      after:w-5 after:h-5 after:bg-white after:rounded-full
-                      after:transition-all peer-checked:after:translate-x-5"></div>
-          <span class="text-sm">Otros</span>
-        </label>
+              <!-- Otros -->
+              <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="otros" formControlName="otros" class="sr-only peer" />
+                <div class="w-11 h-6 bg-gray-300 rounded-full relative
+                        peer-checked:bg-blue-600
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:w-5 after:h-5 after:bg-white after:rounded-full
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+                <span class="text-sm">Otros</span>
+              </label>
 
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
 
       <!-- ===== TEXTO MANDAMIENTO ===== -->
       <div *ngIf="esMandamiento()" class="mt-6">
-  <div class="bg-white rounded-lg border shadow">
+        <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
 
-    <!-- Header -->
-    <div class="border-b px-4 py-3 flex items-center justify-center">
-      <h4>
-        Contenido de su <span class="underline">Mandamiento</span>
-      </h4>
-    </div>
+          <!-- Header -->
+          <div class="border-b px-4 py-3 flex items-center justify-center">
+            <h4>
+              Contenido de su <span class="underline">Mandamiento</span>
+            </h4>
+          </div>
 
-    <!-- Body -->
-    <div
-      id="editable-text"
-      formGroupName="textoContenido"
-      class="p-6 text-base md:text-lg leading-relaxed text-justify space-x-1"
-    >
-      El Oficial de Justicia de la zona que corresponda, se constituirá, para la
-      ejecución del presente en el domicilio de
+          <!-- Body -->
+          <div id="editable-text" formGroupName="textoContenido"
+            class="p-6 text-base md:text-lg leading-relaxed text-justify space-x-1">
+            El Oficial de Justicia de la zona que corresponda, se constituirá, para la
+            ejecución del presente en el domicilio de
 
-      <span
-        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]"
-        contenteditable="true"
-        contenteditableModel
-        formControlName="requerido"
-        appPreventEnter
-      ></span>
+            <span class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]" contenteditable="true"
+              contenteditableModel formControlName="requerido" appPreventEnter></span>
 
-      sito en calle y procederá a intimar para que de pago en el acto de serle
-      requerida la suma de
+            sito en calle y procederá a intimar para que de pago en el acto de serle
+            requerida la suma de
 
-      <span
-        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]"
-        contenteditable="true"
-        contenteditableModel
-        formControlName="montoCapitalTexto"
-        appPreventEnter
-      ></span>
+            <span class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]" contenteditable="true"
+              contenteditableModel formControlName="montoCapitalTexto" appPreventEnter></span>
 
-      <span
-        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[4rem]"
-        contenteditable="true"
-        contenteditableModel
-        formControlName="montoCapitalNumerico"
-        appPreventEnter
-      ></span>
+            <span class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[4rem]" contenteditable="true"
+              contenteditableModel formControlName="montoCapitalNumerico" appPreventEnter></span>
 
-      en concepto de capital, más la de
+            en concepto de capital, más la de
 
-      <span
-        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]"
-        contenteditable="true"
-        contenteditableModel
-        formControlName="montoInteresesTexto"
-        appPreventEnter
-      ></span>
+            <span class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[6rem]" contenteditable="true"
+              contenteditableModel formControlName="montoInteresesTexto" appPreventEnter></span>
 
-      <span
-        class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[4rem]"
-        contenteditable="true"
-        contenteditableModel
-        formControlName="montoInteresesNumerico"
-        appPreventEnter
-      ></span>
+            <span class="inline-block border-b border-dashed border-gray-400 px-1 min-w-[4rem]" contenteditable="true"
+              contenteditableModel formControlName="montoInteresesNumerico" appPreventEnter></span>
 
-      que el Juzgado presupuesto “prima facie” para responder intereses y costas de
-      la ejecución. En caso de dar resultado negativo la intimación de pago, ello
-      importará la citación a los ejecutados para oponer excepciones legítimas
-      dentro del plazo de cinco días, bajo apercibimiento de llevarse adelante la
-      ejecución (art. 540 CPC), como asimismo el requerimiento para que dentro de
-      dicho plazo constituya domicilio legal bajo apercibimiento de tenerlo por
-      constituido en los Estrados del Juzgado en los términos del art. 41 del
-      Código Citado.
-    </div>
+            que el Juzgado presupuesto “prima facie” para responder intereses y costas de
+            la ejecución. En caso de dar resultado negativo la intimación de pago, ello
+            importará la citación a los ejecutados para oponer excepciones legítimas
+            dentro del plazo de cinco días, bajo apercibimiento de llevarse adelante la
+            ejecución (art. 540 CPC), como asimismo el requerimiento para que dentro de
+            dicho plazo constituya domicilio legal bajo apercibimiento de tenerlo por
+            constituido en los Estrados del Juzgado en los términos del art. 41 del
+            Código Citado.
+          </div>
 
-  </div>
-</div>
+        </div>
+      </div>
 
 
     </div>
@@ -499,11 +409,7 @@
 </div>
 
 <!-- Botón flotante -->
-<button
-  *ngIf="!hideButton"
-  type="submit"
-  (click)="onSubmit()"
-  class="fixed bottom-6 right-6 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
->
+<button *ngIf="!hideButton" type="submit" (click)="onSubmit()"
+  class="fixed bottom-6 right-6 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
   Generar <span class="font-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
 </button>

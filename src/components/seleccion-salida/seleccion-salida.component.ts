@@ -400,7 +400,7 @@ export class SeleccionSalidaComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.formulario.invalid) {
+     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       Object.keys(this.formulario.controls).forEach(key => {
         const control = this.formulario.get(key);

@@ -78,13 +78,6 @@
   <hr>
 </div>
 <div *ngIf="!masivo" class="bg-secondary rounded-xl border-2 border-secondary shadow">
-    <!-- <button
-      type="button"
-      (click)="addDespacho()"
-      class="bg-surface-card text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 w-full text-center rounded-lg px-4 py-3 text-lg font-semibold
-             border border-white text-ink-light dark:text-ink-dark  transition-colors duration-200">
-      + Agregar Ingreso
-    </button> -->
     <button (click)="addDespacho()" class="fixed bottom-6 right-6 bg-primary-600 hover:bg-primary-700 text-white w-20
      h-20 rounded-full shadow-xl flex items-center justify-center">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,17 +88,17 @@
 
 <div *ngIf="masivo" class="floating-container">
   
-  <div class="floating-actions">
+  <div class="floating-actions dark:bg-primary-800">
     <button 
-      class="btn btn-selector btn-outline-primary" 
+      class="text-white bg-primary-600 hover:bg-primary-700 font-medium rounded-md text-md px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
       type="button" 
       (click)="addDespacho()">
-      + Agregar ingreso
+      Agregar ingreso
     </button>
 
     <div class="toggle-selector btn-selector">
             <button 
-              class="toggle-btn" 
+              class="toggle-btn bg-primary-900 text-ink-dark" 
               [class.active]="tipoSalida === 1"
               type="button" 
               (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)">
@@ -113,7 +106,7 @@
             </button>
             
             <button 
-              class="toggle-btn" 
+              class="toggle-btn bg-primary-900 text-ink-dark " 
               [class.active]="tipoSalida === 2"
               type="button" 
               (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)">
@@ -121,7 +114,7 @@
             </button>
     </div>
     
-    <button class="btn btn-primary btn-generate" type="submit" (click)="onSubmit()">
+    <button class="text-white bg-primary-600 hover:bg-primary-700 font-medium rounded-md text-md px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" type="submit" (click)="onSubmit()">
       Generar <span class="fw-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
     </button>
   </div>
