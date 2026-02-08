@@ -1,7 +1,11 @@
 export const environment = {
   production: true,
-  apiUrl: '/api',
-  basePath: 'https://localhost:7193/',
-  debug: false,
-  sessionName: 'CONFRONTIA',
+  // @ts-ignore
+  apiUrl: window.env?.apiUrl || 'http://76.13.229.224/api/',
+  // @ts-ignore
+  basePath: window.env?.apiUrl || 'http://76.13.229.224/api/',
+  // @ts-ignore
+  debug: window.env?.debug || false,
+  // @ts-ignore
+  sessionName: window.env?.sessionName || 'CONFRONTIA',
 };
