@@ -1,27 +1,27 @@
 <div class="viewer-root">
   <!-- Preview del HTML procesado -->
-   <div class="bg-light rounded-3 border border-2 border-primary shadow scale-up-ver-top overflow-hidden">
+   <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm scale-up-ver-top overflow-hidden mb-6">
      <!-- Header para modo masivo -->
-     <div *ngIf="masivo" class="masivo-header d-flex justify-content-between align-items-center p-3 bg-white border-bottom border-primary border-2">
-       <h5 class="mb-0 fw-bold text-primary">{{ formData['caratulaExpediente'] || 'Sin carátula' }}</h5>
-       <button class="btn btn-outline-primary btn-sm" type="button" (click)="copyRawHtml()" title="Copiar este documento">
-         <fa-icon [icon]="faCheck" *ngIf="copiedOnce"></fa-icon>
+     <div *ngIf="masivo" class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+       <h5 class="text-lg font-bold text-primary-600 dark:text-primary-200 m-0">{{ formData['caratulaExpediente'] || 'Sin carátula' }}</h5>
+       <button class="px-4 py-2 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-600 dark:hover:text-white rounded-xl text-sm font-medium transition-colors" type="button" (click)="copyRawHtml()" title="Copiar este documento">
+         <fa-icon [icon]="faCheck" *ngIf="copiedOnce">&nbsp;</fa-icon>
          <span *ngIf="!copiedOnce">Copiar</span>
          <span *ngIf="copiedOnce">Copiado</span>
        </button>
      </div>
      
-     <div class="p-5">
+     <div class="p-6 sm:p-8 text-white">
        <div class="preview" [innerHTML]="processedHtmlSafe"></div>
      </div>
    </div>
 </div>
 
-<div *ngIf="!masivo" class="btn-group btn-generar-flotante">
-  <button class="btn text-white bg-primary-900" type="button" (click)="copyRawHtml(); copiedOnce = true">
+<div *ngIf="!masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex gap-3">
+  <button class="px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl font-medium shadow-xl transition-all duration-200 hover:scale-[1.02]" type="button" (click)="copyRawHtml(); copiedOnce = true">
     Copiar {{ this.tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}
   </button>
-  <button *ngIf="copiedOnce" class="btn text-white" type="button" (click)="onReingresar()" aria-label="Reingresar">
+  <button *ngIf="copiedOnce" class="px-4 py-3 text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-xl shadow-xl transition-all duration-200 hover:scale-[1.02]" type="button" (click)="onReingresar()" title="Reingresar">
     <fa-icon [icon]="faRepeat"></fa-icon>
   </button>
 </div>

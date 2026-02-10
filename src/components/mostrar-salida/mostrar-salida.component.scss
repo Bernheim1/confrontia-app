@@ -78,8 +78,13 @@
   padding: 12px;
   font-family: "Times New Roman", serif;
   font-size: 14px;
-  color: #000; /* 👈 fuerza currentColor = negro */
+  color: #000;
   line-height: 1.3;
+}
+
+/* Dark mode: ya no necesitamos filtro porque aplicamos estilos inline */
+:host-context(.dark) .preview {
+  /* Los estilos se aplican via JS ahora */
 }
 
 /* Tablas */
@@ -92,7 +97,7 @@
 /* Celdas */
 .preview td,
 .preview th {
-  border: 1px solid #000 !important; /* 👈 fuerza borde negro aunque haya currentColor */
+  border: 1px solid #000 !important;
   padding: 4px 6px;
   vertical-align: top;
   word-wrap: break-word;

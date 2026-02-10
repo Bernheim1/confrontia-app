@@ -27,6 +27,7 @@ export class IngresoDespachoComponent {
   textoSalida = 'Seleccione tipo de salida'
   items : any[] = [{primerDespacho: ''}];
   masivo : boolean = false;
+  errorIndex: number | null = null;
 
   constructor(private toastr: ToastrService) 
   {
@@ -34,6 +35,30 @@ export class IngresoDespachoComponent {
   }
   
   onSubmit() {
+    // Validar que todos los items tengan al menos un carácter
+    const emptyIndex = this.items.findIndex(item => !item.primerDespacho || item.primerDespacho.trim().length === 0);
+    
+    if (emptyIndex !== -1) {
+      this.errorIndex = emptyIndex;
+      this.toastr.error('Debe ingresar texto en el despacho antes de continuar', 'Error');
+      
+      // Hacer scroll al elemento con error
+      setTimeout(() => {
+        const element = document.getElementById(`despacho-${emptyIndex}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      
+      // Limpiar el error después de 3 segundos
+      setTimeout(() => {
+        this.errorIndex = null;
+      }, 3000);
+      
+      return;
+    }
+    
+    this.errorIndex = null;
     this.textoIngresado.emit(this.items);
     this.tipoSalidaOutput.emit(this.tipoSalida);
     this.subtipoSalidaOutput.emit(this.subtipoSalida);

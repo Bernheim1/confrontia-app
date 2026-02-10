@@ -27,7 +27,8 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   faCheck = faCheck;
   faRepeat = faRepeat;
   rawHtml: string = '';
-  processedHtml: string = '';
+  processedHtml: string = ''; // HTML limpio para copiar
+  processedHtmlForDisplay: string = ''; // HTML con estilos para mostrar
   processedHtmlSafe: SafeHtml | null = null;
   mostrarTest = false;
   loading = false;
@@ -76,7 +77,20 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
     textoDespacho: ''
   };
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer, private toastr: ToastrService) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer, private toastr: ToastrService) {
+    // Observar cambios de tema en tiempo real
+    const observer = new MutationObserver(() => {
+      if (this.processedHtml) {
+        // Re-aplicar el HTML cuando cambia el tema
+        this.applyProcessedHtml(this.processedHtml);
+      }
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
 
   ngOnInit(): void {
     // Si al inicializar ya tenés una salida, aplicala antes de cargar template
@@ -241,8 +255,46 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   }
 
   private applyProcessedHtml(html: string) {
-    this.processedHtml = html;
-    this.processedHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.processedHtml = html; // guardamos el HTML limpio
+    
+    // Detectar si estamos en dark mode
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    
+    if (isDarkMode) {
+      // Agregar estilos inline para dark mode
+      this.processedHtmlForDisplay = this.applyDarkModeStyles(html);
+    } else {
+      this.processedHtmlForDisplay = html;
+    }
+    
+    this.processedHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.processedHtmlForDisplay);
+  }
+  
+  private applyDarkModeStyles(html: string): string {
+    // Crear un elemento temporal para procesar el HTML
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    
+    // Aplicar estilos a todos los elementos de texto
+    const allElements = div.querySelectorAll('*');
+    allElements.forEach((el: Element) => {
+      const htmlEl = el as HTMLElement;
+      const tagName = htmlEl.tagName.toLowerCase();
+      
+      // Aplicar color blanco a elementos de texto
+      if (tagName === 'p' || tagName === 'span' || tagName === 'div' || tagName === 'td' || tagName === 'th' || tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4' || tagName === 'strong' || tagName === 'b') {
+        const currentStyle = htmlEl.getAttribute('style') || '';
+        htmlEl.setAttribute('style', currentStyle + '; color: #ffffff !important;');
+      }
+      
+      // Aplicar bordes blancos a tablas
+      if (tagName === 'td' || tagName === 'th' || tagName === 'table') {
+        const currentStyle = htmlEl.getAttribute('style') || '';
+        htmlEl.setAttribute('style', currentStyle + '; border-color: #ffffff !important;');
+      }
+    });
+    
+    return div.innerHTML;
   }
 
   copyRenderedText() {
