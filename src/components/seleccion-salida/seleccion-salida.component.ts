@@ -11,6 +11,8 @@ import { ContenteditableValueAccessorDirective } from '../../shared/directives/c
 import { TextoMonedaANumeroPipe } from '../../shared/pipes/textoMonedaANumero.pipe';
 import { HttpClient } from '@angular/common/http';
 import Papa from 'papaparse';
+import { CasoService } from '../../services/caso/caso.service';
+import { CreateCasoCommand } from '../../services/caso/commands/create-caso-command';
 
 @Component({
   selector: 'app-seleccion-salida',
@@ -65,7 +67,9 @@ export class SeleccionSalidaComponent implements OnInit {
   preventClose = false;
   suppressOpen = false;
 
-  constructor(private fb: FormBuilder, private despachoService: DespachoService, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private despachoService: DespachoService, private http: HttpClient,
+    private readonly _casoService: CasoService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tipoSalida'] || changes['subtipoSalida']) {
@@ -411,6 +415,12 @@ export class SeleccionSalidaComponent implements OnInit {
       return;
     }
     const retorno = this.mapSalida();
+
+    const command: CreateCasoCommand = {
+      casos: [retorno]
+    }
+    this._casoService.create(command).subscribe();
+
     this.salidaSeleccionada.emit({ salida: retorno, index: this.index });
   }
 

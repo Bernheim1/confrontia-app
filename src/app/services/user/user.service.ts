@@ -14,8 +14,8 @@ export class UserService {
     protected controller = 'v1/user';
 
     public changePassword(userId: string, command: ChangePasswordCommand): Observable<void> {
-    const url = `${this.basePath}${this.controller}/${userId}/change-password`;
+      const url = `${this.basePath}${this.controller}/${userId}/change-password`;
 
-    return this.http.put<void>(url, command);
-  }
+      return this.http.put<void>(url, command);
+    }
 }
