@@ -59,7 +59,7 @@
    </nav>
 
 <aside
-class="fixed top-18 left-0 w-64 h-full bg-surface-dark transition-all duration-300 transform"
+class="fixed top-16 left-0 w-64 h-full bg-surface-dark transition-all duration-300 transform z-40"
           [ngClass]="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
 >
       <div class="h-full px-3 pt-4 pb-4 overflow-y-auto bg-surface-dark">
@@ -85,11 +85,15 @@ class="fixed top-18 left-0 w-64 h-full bg-surface-dark transition-all duration-3
       </div>
    </aside>
 
-   <div class="mt-14 transition-all duration-300" [ngClass]="{ 'ml-64': sidebarOpen, 'ml-0': !sidebarOpen }" >
-      <router-outlet/>
+   <div class="pt-20 pb-8 px-4 sm:px-6 lg:px-8 transition-all duration-300 bg-gray-100 dark:bg-gray-900 min-h-screen" [ngClass]="{ 'ml-64': sidebarOpen, 'ml-0': !sidebarOpen }" >
+      <div class="max-w-7xl mx-auto">
+         <router-outlet/>
+      </div>
    </div>
 }
 @else {
-   <router-outlet/>
+   <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <router-outlet/>
+   </div>
 }
 

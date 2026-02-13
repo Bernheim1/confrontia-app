@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, SimpleChanges, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowRight, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faCircleInfo, faRepeat, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Salida } from '../../shared/models/salida';
 import { TipoCedulaEnum, TipoCedulaTexto, TipoMandamientoEnum, TipoMandamientoTexto, TipoSalidaEnum, TipoSalidaTexto } from '../../shared/enums/tipo-salida-enum';
 import { PreventEnterDirective } from '../../shared/directives/prevent-enter.directive';
@@ -31,9 +31,12 @@ import { CreateCasoCommand } from '../../services/caso/commands/create-caso-comm
 export class SeleccionSalidaComponent implements OnInit {
   faCircleInfo = faCircleInfo;
   faArrowRight = faArrowRight;
+  faRepeat = faRepeat;
+  faCheck = faCheck;
 
   @Output() salidaSeleccionada = new EventEmitter<{ salida: Salida, index: number }>();
   @Output() formularioCompletado = new EventEmitter<{ index: number, valido: boolean }>();
+  @Output() reingresar = new EventEmitter<void>();
   @Input() textoDespacho: string = '';
   @Input() tipoSalida: TipoSalidaEnum = TipoSalidaEnum.SinAsignar;
   @Input() subtipoSalida: any;
@@ -41,9 +44,10 @@ export class SeleccionSalidaComponent implements OnInit {
   @Input() masivo: boolean = false;
   @Input() totalDespachos: number = 1;
   @Input() despachosCompletados: number = 0;
-  @Input() hideButton: boolean = false;
 
   formulario!: FormGroup;
+  hasError: boolean = false;
+  generado: boolean = false;
   textoTitulo = '';
   private montoTextoPipe = new TextoMonedaANumeroPipe();
 
@@ -406,6 +410,21 @@ export class SeleccionSalidaComponent implements OnInit {
   onSubmit() {
      if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
+      this.hasError = true;
+      
+      // Hacer scroll al elemento con error
+      setTimeout(() => {
+        const element = document.getElementById(`salida-${this.index}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      
+      // Limpiar el error después de 3 segundos
+      setTimeout(() => {
+        this.hasError = false;
+      }, 3000);
+      
       Object.keys(this.formulario.controls).forEach(key => {
         const control = this.formulario.get(key);
         if (control?.invalid) {
@@ -414,6 +433,9 @@ export class SeleccionSalidaComponent implements OnInit {
       });
       return;
     }
+    
+    this.hasError = false;
+    this.generado = true;
     const retorno = this.mapSalida();
 
     const command: CreateCasoCommand = {
@@ -422,6 +444,11 @@ export class SeleccionSalidaComponent implements OnInit {
     this._casoService.create(command).subscribe();
 
     this.salidaSeleccionada.emit({ salida: retorno, index: this.index });
+    
+    // Resetear generado después de 2 segundos
+    setTimeout(() => {
+      this.generado = false;
+    }, 2000);
   }
 
   submitFromParent(index: number) {
@@ -527,5 +554,9 @@ export class SeleccionSalidaComponent implements OnInit {
   onListMouseDown() {
     this.preventClose = true;
     setTimeout(() => (this.preventClose = false), 250);
+  }
+
+  onReingresar() {
+    this.reingresar.emit();
   }
 }

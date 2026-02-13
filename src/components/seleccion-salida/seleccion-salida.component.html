@@ -1,34 +1,41 @@
-<div class="p-5 dark:bg-primary-800 bg-gray-100 rounded-xl border-2 border-primary shadow mb-3">
+<div [id]="'salida-' + index" class="p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-xl border shadow-sm mb-6 overflow-hidden transition-all duration-300"
+     [class.border-red-500]="hasError"
+     [class.border-gray-200]="!hasError"
+     [class.dark:border-red-500]="hasError"
+     [class.dark:border-gray-700]="!hasError"
+     [class.ring-4]="hasError"
+     [class.ring-red-200]="hasError"
+     [class.dark:ring-red-900]="hasError">
 
   <!-- Header modo masivo -->
-  <div *ngIf="masivo" class="mb-4 pb-3 border-b-2 border-primary">
+  <div *ngIf="masivo" class="mb-6 pb-4 border-b-2 border-primary">
     <h4 class="text-ink-light dark:text-ink-dark text-primary font-bold text-center">
       {{ formulario.get('expediente.caratulaExpediente')?.value || 'Despacho ' + (index + 1) }}
     </h4>
   </div>
 
   <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto">
 
       <!-- Título -->
-      <div class="flex items-center justify-center mb-4 gap-2">
-        <fa-icon class="text-primary text-2xl" [icon]="faCircleInfo"></fa-icon>
-        <h3 class="text-xl text-ink-light dark:text-ink-dark font-semibold">
+      <div class="flex items-center justify-center mb-6 gap-2">
+        <fa-icon class="text-primary-600 dark:text-primary-400 text-2xl" [icon]="faCircleInfo"></fa-icon>
+        <h3 class="text-xl text-gray-900 dark:text-gray-100 font-semibold">
           Información de su <span class="underline">{{ this.textoTitulo }}</span>
         </h3>
       </div>
 
       <!-- ===== PRIMERA FILA ===== -->
-      <div class="grid grid-cols-12 gap-6">
+      <div class="grid grid-cols-12 gap-6 mb-6">
 
         <!-- Órgano -->
         <div class="col-span-12 md:col-span-6">
-          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
-            <div class="border-b px-4 py-3 text-center">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div class="border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
               <h4 class="font-semibold">Órgano</h4>
             </div>
 
-            <div class="p-4">
+            <div class="p-5">
               <div formGroupName="organo" class="grid grid-cols-12 gap-4">
 
                 <div class="col-span-12">
@@ -36,43 +43,49 @@
 
                   <div class="relative" tabindex="0" (keydown)="onKeydown($event)">
                     <input #organoInput type="text"
-                      class="w-full dark:bg-primary-600 rounded-md border px-3 py-2 mb-2 focus:ring-2 focus:ring-primary"
+                      class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 mb-2 focus:ring-2 focus:ring-primary focus:border-primary"
+                      [class.border-red-500]="campoInvalido('organo.organo')"
+                      [class.dark:border-red-500]="campoInvalido('organo.organo')"
+                      [class.focus:ring-red-500]="campoInvalido('organo.organo')"
                       placeholder="Escriba para filtrar..." formControlName="organo"
                       (input)="onFiltroJuzgado($any($event.target).value)" (focus)="onFocusInput()"
                       (blur)="onBlurDropdown()" autocomplete="off" />
 
-                    <ul *ngIf="openDropdown && juzgadosFiltrados?.length"
-                      class="absolute z-50 w-full max-h-64 overflow-auto rounded-md border bg-white shadow">
+                    <ul *ngIf="openDropdown && juzgadosFiltrados.length"
+                      class="absolute z-50 w-full max-h-64 overflow-auto rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 dark:text-white shadow-lg">
                       <li *ngFor="let item of juzgadosFiltrados; let i = index" (mouseenter)="highlight(i)"
-                        (click)="chooseJuzgado(item)" class="px-3 py-2 cursor-pointer hover:bg-primary/10"
-                        [class.bg-primary]="i === highlightedIndex" [class.text-white]="i === highlightedIndex">
+                        (click)="chooseJuzgado(item)" class="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                        [class.bg-gray-200]="i === highlightedIndex" [class.dark:bg-gray-500]="i === highlightedIndex">
                         {{ item.juzgado || item }}
                       </li>
                     </ul>
                   </div>
 
-                  <div *ngIf="campoInvalido('organo.organo')" class="text-red-600 text-sm">
+                  <div *ngIf="campoInvalido('organo.organo')" class="text-red-600 dark:text-red-400 text-sm mt-1">
                     El órgano es obligatorio.
                   </div>
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Juzgado Interviniente</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2"
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
+                    [class.border-red-500]="campoInvalido('organo.juzgadoInterviniente')"
+                    [class.dark:border-red-500]="campoInvalido('organo.juzgadoInterviniente')"
+                    [class.focus:ring-red-500]="campoInvalido('organo.juzgadoInterviniente')"
                     formControlName="juzgadoInterviniente" />
-                  <div *ngIf="campoInvalido('organo.juzgadoInterviniente')" class="text-red-600 text-sm">
+                  <div *ngIf="campoInvalido('organo.juzgadoInterviniente')" class="text-red-600 dark:text-red-400 text-sm mt-1">
                     El Juzgado Interviniente es obligatorio.
                   </div>
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Juzgado / Tribunal</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="juzgadoTribunal" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" formControlName="juzgadoTribunal" />
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Dirección</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="direccionJuzgado" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" formControlName="direccionJuzgado" />
                 </div>
 
               </div>
@@ -82,44 +95,65 @@
 
         <!-- Domicilio requerido -->
         <div class="col-span-12 md:col-span-6">
-          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
-            <div class="border-b px-4 py-3 text-center">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div class="border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
               <h4 class="font-semibold">
                 Domicilio del <span class="underline">Requerido</span>
               </h4>
             </div>
 
-            <div class="p-4">
+            <div class="p-5">
               <div formGroupName="domicilioRequerido" class="grid grid-cols-12 gap-4">
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Localidad</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="localidad" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" 
+                    [class.border-red-500]="campoInvalido('domicilioRequerido.localidad')"
+                    [class.dark:border-red-500]="campoInvalido('domicilioRequerido.localidad')"
+                    [class.focus:ring-red-500]="campoInvalido('domicilioRequerido.localidad')"
+                    formControlName="localidad" />
+                  <div *ngIf="campoInvalido('domicilioRequerido.localidad')" class="text-red-600 dark:text-red-400 text-sm mt-1">
+                    La localidad es obligatoria.
+                  </div>
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Domicilio</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="domicilio" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" 
+                    [class.border-red-500]="campoInvalido('domicilioRequerido.domicilio')"
+                    [class.dark:border-red-500]="campoInvalido('domicilioRequerido.domicilio')"
+                    [class.focus:ring-red-500]="campoInvalido('domicilioRequerido.domicilio')"
+                    formControlName="domicilio" />
+                  <div *ngIf="campoInvalido('domicilioRequerido.domicilio')" class="text-red-600 dark:text-red-400 text-sm mt-1">
+                    El domicilio es obligatorio.
+                  </div>
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Nro</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="nro" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" 
+                    [class.border-red-500]="campoInvalido('domicilioRequerido.nro')"
+                    [class.dark:border-red-500]="campoInvalido('domicilioRequerido.nro')"
+                    [class.focus:ring-red-500]="campoInvalido('domicilioRequerido.nro')"
+                    formControlName="nro" />
+                  <div *ngIf="campoInvalido('domicilioRequerido.nro')" class="text-red-600 dark:text-red-400 text-sm mt-1">
+                    El número es obligatorio.
+                  </div>
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Piso</label>
-                  <input type="number" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="piso" />
+                  <input type="number" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" formControlName="piso" />
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Depto</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="depto" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" formControlName="depto" />
                 </div>
 
                 <div class="col-span-6">
                   <label class="block text-sm font-medium mb-1">Unidad</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="unidad" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" formControlName="unidad" />
                 </div>
 
               </div>
@@ -134,23 +168,30 @@
 
         <!-- Expediente -->
         <div class="col-span-12 md:col-span-6">
-          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
 
-            <div class="border-b px-4 py-3 text-center">
+            <div class="border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
               <h4 class="font-semibold">Expediente</h4>
             </div>
 
-            <div class="p-4">
+            <div class="p-5">
               <div formGroupName="expediente" class="grid grid-cols-12 gap-4">
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Tipo de diligencia</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="tipoDiligencia" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary" formControlName="tipoDiligencia" />
                 </div>
 
                 <div class="col-span-12">
                   <label class="block text-sm font-medium mb-1">Carátula del expediente</label>
-                  <input type="text" class="w-full dark:bg-primary-600 rounded-md border px-3 py-2" formControlName="caratulaExpediente" />
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
+                    [class.border-red-500]="campoInvalido('expediente.caratulaExpediente')"
+                    [class.dark:border-red-500]="campoInvalido('expediente.caratulaExpediente')"
+                    [class.focus:ring-red-500]="campoInvalido('expediente.caratulaExpediente')"
+                    formControlName="caratulaExpediente" />
+                  <div *ngIf="campoInvalido('expediente.caratulaExpediente')" class="text-red-600 dark:text-red-400 text-sm mt-1">
+                    La carátula del expediente es obligatoria.
+                  </div>
                 </div>
 
 
@@ -158,12 +199,13 @@
                 <div class="col-span-12">
                   <label class="inline-flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" formControlName="copiasTraslado" class="sr-only peer" />
-                    <div class="w-11 h-6  bg-white rounded-full relative
+                    <div class="w-11 h-6 bg-gray-300 dark:bg-gray-600 rounded-full relative
                         peer-checked:bg-blue-600
                         after:content-[''] after:absolute after:top-0.5 after:left-0.5
                         after:w-5 after:h-5 after:bg-white after:rounded-full
                         after:transition-all peer-checked:after:translate-x-5">
                     </div>
+                    <span class="text-sm font-medium">Con copias para el traslado</span>
                   </label>
                 </div>
               </div>
@@ -175,12 +217,12 @@
         <div class="col-span-12 md:col-span-6 space-y-6">
 
           <!-- Carácter -->
-          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
-            <div class="border-b px-4 py-3 text-center">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div class="border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
               <h4 class="font-semibold">Carácter</h4>
             </div>
 
-            <div class="p-4">
+            <div class="p-5">
               <div formGroupName="caracter" class="grid grid-cols-12 gap-4">
 
                 <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
@@ -218,12 +260,12 @@
           </div>
 
           <!-- Tipo domicilio -->
-          <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
-            <div class="border-b px-4 py-3 text-center">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div class="border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
               <h4 class="font-semibold">Tipo de Domicilio</h4>
             </div>
 
-            <div class="p-4">
+            <div class="p-5">
               <div formGroupName="tipoDomicilio" class="grid grid-cols-12 gap-4">
 
                 <label class="col-span-12 md:col-span-6 inline-flex items-center gap-3 cursor-pointer">
@@ -255,16 +297,16 @@
 
 
       <!-- ===== FACULTADES ===== -->
-      <div *ngIf="esMandamiento()" class="mt-6">
-        <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
+      <div *ngIf="esMandamiento()" class="mt-8 mb-8">
+        <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
 
           <!-- Header -->
-          <div class="border-b px-4 py-3 flex items-center justify-center">
+          <div class="border-b px-4 py-3 flex items-center justify-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
             <h4 class="font-semibold">Facultades y atribuciones</h4>
           </div>
 
           <!-- Body -->
-          <div class="p-4">
+          <div class="p-5">
             <div formGroupName="facultadesAtribuciones" class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
               <!-- Allanamiento -->
@@ -354,11 +396,11 @@
 
 
       <!-- ===== TEXTO MANDAMIENTO ===== -->
-      <div *ngIf="esMandamiento()" class="mt-6">
-        <div class="dark:bg-primary-600  bg-white text-ink-light dark:text-ink-dark rounded-lg border shadow">
+      <div *ngIf="esMandamiento()" class="mt-8 mb-8">
+        <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
 
           <!-- Header -->
-          <div class="border-b px-4 py-3 flex items-center justify-center">
+          <div class="border-b px-4 py-3 flex items-center justify-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
             <h4>
               Contenido de su <span class="underline">Mandamiento</span>
             </h4>
@@ -366,7 +408,7 @@
 
           <!-- Body -->
           <div id="editable-text" formGroupName="textoContenido"
-            class="p-6 text-base md:text-lg leading-relaxed text-justify space-x-1">
+            class="p-6 sm:p-8 text-base md:text-lg leading-relaxed text-justify space-x-1">
             El Oficial de Justicia de la zona que corresponda, se constituirá, para la
             ejecución del presente en el domicilio de
 
@@ -409,7 +451,13 @@
 </div>
 
 <!-- Botón flotante -->
-<button *ngIf="!hideButton" type="submit" (click)="onSubmit()"
-  class="fixed bottom-6 right-6 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-  Generar <span class="font-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span>
-</button>
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex gap-3">
+    <button type="submit" (click)="onSubmit()" class="px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl font-medium shadow-xl transition-all duration-200 hover:scale-[1.02]" type="button">
+      <span >Generar <span class="font-bold">{{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}</span></span>
+    </button>
+    <button type="button" (click)="onReingresar()"
+      class="px-4 py-3 text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-xl shadow-xl transition-all duration-200 hover:scale-[1.02]"
+      title="Reingresar">
+      <fa-icon [icon]="faRepeat"></fa-icon>
+    </button>
+</div>
