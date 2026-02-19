@@ -7,6 +7,7 @@ import { faEye, faEyeSlash, faGavel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CoreConfigService } from '../../../../core/services/config.service';
 import { take } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginPageComponent {
         private formBuilder: FormBuilder,
         private authService: AuthService,
         private _coreConfigService: CoreConfigService,
+        private toastr: ToastrService,
         private readonly _router: Router
     ) {
         this.switchLayout(false);
@@ -37,7 +39,7 @@ export class LoginPageComponent {
 
     public onSubmit(): void {
         if (!this.loginForm.valid) {
-            // this._alertsService.showError('Los datos ingresados son erróneos. Por favor, revíselos y vuelva a ingresarlos.', '');
+            this.toastr.error('Los datos ingresados son erróneos. Por favor, revíselos y vuelva a intentar.', 'Error');
 
             return;
         }
@@ -47,12 +49,10 @@ export class LoginPageComponent {
     }
 
     public signIn(username: string, passwd: string): void {
-        // this.spinner.start('Iniciando sesión...');
-
         this.authService.login(username, passwd)
             .subscribe((result: any) => {
                 if (!result.success) {
-                    // this._alertsService.showError('Los datos ingresados son erróneos. Por favor, revíselos y vuelva a ingresarlos.', '');
+                    this.toastr.error('Los datos ingresados son erróneos. Por favor, revíselos y vuelva a intentar.', 'Error');
 
                     return;
                 }

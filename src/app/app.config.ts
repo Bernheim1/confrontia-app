@@ -11,6 +11,7 @@ import { CoreConfig } from './core/types';
 import { CORE_CUSTOM_CONFIG } from './core/services/config.service';
 import { jwtInterceptor } from './core/auth/interceptors/jwt.interceptor';
 import { provideToastr } from 'ngx-toastr';
+import { validTokenInterceptor } from './core/auth/interceptors/valid-token.interceptor';
 
 export function initApp(authConfigService: AuthService): () => void {
     return () => authConfigService.init();
@@ -63,7 +64,7 @@ export const appConfig: ApplicationConfig = {
   [ 
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes), 
-    provideHttpClient(withInterceptors([jwtInterceptor])),
+    provideHttpClient(withInterceptors([jwtInterceptor, validTokenInterceptor])),
     provideToastr(),
     provideAnimations(),
     importProvidersFrom([

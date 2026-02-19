@@ -441,6 +441,7 @@ export class SeleccionSalidaComponent implements OnInit {
     const command: CreateCasoCommand = {
       casos: [retorno]
     }
+    
     this._casoService.create(command).subscribe();
 
     this.salidaSeleccionada.emit({ salida: retorno, index: this.index });
