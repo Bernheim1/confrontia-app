@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CoreConfigService } from '../../app/core/services/config.service';
 import { Subject, takeUntil } from 'rxjs';
 import { RouterOutlet } from '@angular/router';
@@ -7,6 +7,7 @@ import { faGavel, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from '../../app/core/auth/service/auth.service';
 import { User } from '../../app/core/auth/models/user';
+import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-layout',
@@ -15,7 +16,7 @@ import { User } from '../../app/core/auth/models/user';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent {
+export class LayoutComponent implements AfterViewInit {
   faGavel = faGavel;
   faMoon = faMoon;
   faSun = faSun;
@@ -45,6 +46,11 @@ export class LayoutComponent {
     this.applyThemeClass();
 
     if (window.innerWidth < 640) this.sidebarOpen = false;      
+  }
+
+  ngAfterViewInit(): void {
+    // Inicializar Flowbite después de que la vista esté lista
+    initFlowbite();
   }
 
   applyThemeClass(): void {

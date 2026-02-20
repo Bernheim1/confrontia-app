@@ -15,3 +15,14 @@
   color: white;
   text-align: center;
 }
+
+// Asegurar que el router-outlet y sus componentes ocupen toda la altura
+router-outlet {
+  display: none;
+}
+
+router-outlet + * {
+  display: block;
+  height: 100%;
+  width: 100%;
+}

@@ -3,6 +3,8 @@ import { TipoSalidaEnum } from "../enums/tipo-salida-enum";
 // shared/models/salida.ts
 export class Salida {
   // --- metadatos / control ---
+  id?: number; // ID del caso en el sistema
+  numeroExpediente?: string; // Número de expediente
   tipoSalida: TipoSalidaEnum = TipoSalidaEnum.SinAsignar;
 
   // --- organo ---

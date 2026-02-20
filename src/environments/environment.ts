@@ -1,4 +1,5 @@
 export const environment = {
+    production: false,
     // @ts-ignore
     basePath: window.env?.apiUrl || 'https://localhost:7193/',
     // @ts-ignore

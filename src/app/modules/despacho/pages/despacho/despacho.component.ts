@@ -1,15 +1,15 @@
 import { Component, ViewChildren, QueryList } from '@angular/core';
-import { TipoSalidaEnum, TipoMandamientoEnum, TipoCedulaEnum } from '../../shared/enums/tipo-salida-enum';
+import { TipoSalidaEnum, TipoMandamientoEnum, TipoCedulaEnum } from '../../../../../shared/enums/tipo-salida-enum';
 import { faGavel, faRepeat } from '@fortawesome/free-solid-svg-icons';
-import { TipoStepEnum } from '../../shared/enums/tipo-step-enum';
-import { Salida } from '../../shared/models/salida';
+import { TipoStepEnum } from '../../../../../shared/enums/tipo-step-enum';
+import { Salida } from '../../../../../shared/models/salida';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { IngresoDespachoComponent } from '../../components/ingreso-despacho/ingreso-despacho.component';
-import { MostrarSalidaComponent } from '../../components/mostrar-salida/mostrar-salida.component';
-import { SeleccionSalidaComponent } from '../../components/seleccion-salida/seleccion-salida.component';
-import { DespachoService } from '../../shared/services/despacho/despacho.service';
+import { IngresoDespachoComponent } from '../../../../../components/ingreso-despacho/ingreso-despacho.component';
+import { MostrarSalidaComponent } from '../../../../../components/mostrar-salida/mostrar-salida.component';
+import { SeleccionSalidaComponent } from '../../../../../components/seleccion-salida/seleccion-salida.component';
+import { DespachoService } from '../../../../../shared/services/despacho/despacho.service';
 
 @Component({
   selector: 'app-despacho',

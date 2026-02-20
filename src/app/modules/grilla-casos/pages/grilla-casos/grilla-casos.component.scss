@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+// Animaciones personalizadas
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+table tbody tr {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+// Estilos adicionales para mejorar la tabla
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+// Sticky header
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+// Scroll suave personalizado
+.overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 4px;
+    
+    &:hover {
+      background-color: rgba(156, 163, 175, 0.7);
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  table {
+    font-size: 0.75rem;
+  }
+}

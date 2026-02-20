@@ -1,0 +1,207 @@
+<div class="h-full flex items-center justify-center p-4">
+  <div class="w-full max-w-5xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden" style="height: 90vh;">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center h-full">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="px-6 py-8 text-center h-full flex flex-col items-center justify-center">
+      <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
+      <button (click)="volver()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+        Volver a la lista
+      </button>
+    </div>
+
+    <!-- Detalle del Caso -->
+    <div *ngIf="caso && !loading && !error" class="h-full flex flex-col">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <button 
+          (click)="volver()"
+          class="mb-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors flex items-center gap-2">
+          <fa-icon [icon]="faArrowLeft"></fa-icon> Volver a la lista
+        </button>
+        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Detalle del Caso</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Expediente N° {{ caso.numeroExpediente }}</p>
+      </div>
+
+      <!-- Content con scroll -->
+      <div class="flex-1 overflow-auto px-6 py-4">
+        <div class="space-y-6">
+          
+          <!-- Información General -->
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Información General</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo de Salida</label>
+                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full"
+                      [ngClass]="{
+                        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': caso.tipoSalida === 1,
+                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': caso.tipoSalida === 2
+                      }">
+                  {{ getTipoSalidaTexto(caso.tipoSalida) }}
+                </span>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Estado</label>
+                <span *ngIf="caso.urgente" class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                  Urgente
+                </span>
+                <span *ngIf="!caso.urgente" class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                  Normal
+                </span>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Carátula</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.caratulaExpediente }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Datos del Órgano Judicial -->
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Órgano Judicial</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Órgano</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.organo }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Juzgado Interviniente</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.juzgadoInterviniente }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tribunal</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.juzgadoTribunal }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Dirección del Juzgado</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.direccionJuzgado }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo de Diligencia</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.tipoDiligencia }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Domicilio -->
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Domicilio</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Calle</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.domicilio }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Número</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.nro }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Piso</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.piso || 'N/A' }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Depto</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.depto || 'N/A' }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Localidad</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ caso.localidad }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Características -->
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Características</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.urgente ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.urgente ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Urgente</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.habilitacionDiaHora ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.habilitacionDiaHora ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Habilitación Día/Hora</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.bajoResponsabilidad ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.bajoResponsabilidad ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Bajo Responsabilidad</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.allanamiento ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.allanamiento ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Allanamiento</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.auxilioFuerzaPublica ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.auxilioFuerzaPublica ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Auxilio Fuerza Pública</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.conCerrajero ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.conCerrajero ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Con Cerrajero</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.denunciado ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.denunciado ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Denunciado</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm" [ngClass]="caso.constituido ? 'text-green-600 dark:text-green-400' : 'text-gray-400'">
+                  {{ caso.constituido ? '✓' : '✗' }}
+                </span>
+                <span class="text-sm text-gray-900 dark:text-white">Constituido</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenido -->
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Contenido</h3>
+            <div class="space-y-4">
+              <div *ngIf="caso.textoRequerido">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto Requerido</label>
+                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ caso.textoRequerido }}</p>
+              </div>
+              <div *ngIf="caso.textoNotificacion">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto de Notificación</label>
+                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ caso.textoNotificacion }}</p>
+              </div>
+              <div *ngIf="caso.textoDespacho">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto del Despacho</label>
+                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ caso.textoDespacho }}</p>
+              </div>
+              <div *ngIf="caso.montoCapitalTexto || caso.montoCapitalNumerico" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div *ngIf="caso.montoCapitalTexto">
+                  <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Monto Capital (Texto)</label>
+                  <p class="text-sm text-gray-900 dark:text-white">{{ caso.montoCapitalTexto }}</p>
+                </div>
+                <div *ngIf="caso.montoCapitalNumerico">
+                  <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Monto Capital (Numérico)</label>
+                  <p class="text-sm text-gray-900 dark:text-white font-mono">$ {{ caso.montoCapitalNumerico }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
