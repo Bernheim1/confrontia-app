@@ -101,6 +101,7 @@ export class SeleccionSalidaComponent implements OnInit {
         unidad: ['']
       }),
       expediente: this.fb.group({
+        numeroExpediente: [''],
         tipoDiligencia: ['', [Validators.required]],
         caratulaExpediente: ['', [Validators.required]],
         copiasTraslado: [false, [Validators.required]]
@@ -156,6 +157,7 @@ export class SeleccionSalidaComponent implements OnInit {
         direccionJuzgado: datos.organo.direccionJuzgado
       },
       expediente: {
+        numeroExpediente: datos.expediente.numeroExpediente || '',
         tipoDiligencia: datos.expediente.tipoDiligencia,
         caratulaExpediente: datos.expediente.caratulaExpediente,
         copiasTraslado: datos.expediente.copiasTraslado
@@ -425,12 +427,35 @@ export class SeleccionSalidaComponent implements OnInit {
         this.hasError = false;
       }, 3000);
       
-      Object.keys(this.formulario.controls).forEach(key => {
-        const control = this.formulario.get(key);
-        if (control?.invalid) {
-          console.log(`Campo inválido: ${key}`, control.errors);
+      // Log detallado de campos inválidos
+      console.log('=== FORMULARIO INVÁLIDO ===');
+      console.log('Valores del formulario:', this.formulario.value);
+      
+      Object.keys(this.formulario.controls).forEach(groupKey => {
+        const group = this.formulario.get(groupKey);
+        if (group?.invalid) {
+          console.log(`\n❌ Grupo inválido: ${groupKey}`);
+          console.log('   Errores del grupo:', group.errors);
+          
+          // Si es un FormGroup, revisar cada campo individual
+          if (group instanceof FormGroup) {
+            Object.keys((group as FormGroup).controls).forEach(fieldKey => {
+              const field = group.get(fieldKey);
+              if (field?.invalid) {
+                console.log(`   ❌ Campo: ${groupKey}.${fieldKey}`);
+                console.log(`      Valor actual: "${field.value}"`);
+                console.log(`      Errores:`, field.errors);
+              } else {
+                console.log(`   ✅ Campo: ${groupKey}.${fieldKey} = "${field?.value}"`);
+              }
+            });
+          }
+        } else {
+          console.log(`\n✅ Grupo válido: ${groupKey}`);
         }
       });
+      console.log('=============================\n');
+      
       return;
     }
     
@@ -488,6 +513,7 @@ export class SeleccionSalidaComponent implements OnInit {
     retorno.depto = this.formulario.get('domicilioRequerido.depto')?.value || '';
     retorno.unidad = this.formulario.get('domicilioRequerido.unidad')?.value || '';
 
+    retorno.numeroExpediente = this.formulario.get('expediente.numeroExpediente')?.value || '';
     retorno.tipoDiligencia = this.formulario.get('expediente.tipoDiligencia')?.value || '';
     retorno.caratulaExpediente = this.formulario.get('expediente.caratulaExpediente')?.value || '';
     retorno.copiasTraslado = !!this.formulario.get('expediente.copiasTraslado')?.value;

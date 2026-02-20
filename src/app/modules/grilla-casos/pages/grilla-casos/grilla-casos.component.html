@@ -1,139 +1,137 @@
 <div class="h-full flex items-center justify-center p-4">
-  <div class="w-full max-w-7xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col" style="height: 88vh;">
+  <div class="w-full max-w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col" style="height: calc(100vh - 9rem);">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-      <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Mis Casos</h1>
-      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ rangoMostrado }} casos</p>
+    <div class="px-4 py-2.5 border-b border-gray-200 dark:border-gray-700">
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Mis Casos</h1>
+      <p class="text-xs text-gray-600 dark:text-gray-400">{{ rangoMostrado }} casos</p>
     </div>
 
     <!-- Filtros -->
-    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
         <div class="col-span-1">
-          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
             Nº Expediente
           </label>
           <input 
             type="text" 
             [(ngModel)]="filtroNumeroExpediente"
             (input)="aplicarFiltros()"
-            placeholder="Buscar por expediente..."
-            class="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            placeholder="Buscar..."
+            class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
         </div>
         <div class="col-span-1">
-          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
             Carátula
           </label>
           <input 
             type="text" 
             [(ngModel)]="filtroCaratula"
             (input)="aplicarFiltros()"
-            placeholder="Buscar por carátula..."
-            class="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            placeholder="Buscar..."
+            class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
         </div>
         <div class="col-span-1 flex items-end">
           <button 
             (click)="limpiarFiltros()"
-            class="w-full px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            Limpiar Filtros
+            class="w-full px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-primary-500">
+            Limpiar
           </button>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div *ngIf="loading" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="error && !loading" class="px-6 py-8 text-center">
-      <p class="text-red-600 dark:text-red-400">{{ error }}</p>
+    <div *ngIf="error && !loading" class="px-4 py-6 text-center">
+      <p class="text-red-600 dark:text-red-400 text-sm">{{ error }}</p>
     </div>
 
     <!-- Table -->
-    <div *ngIf="!loading && !error" class="flex-1">
+    <div *ngIf="!loading && !error" class="flex-1 overflow-auto">
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-900">
+        <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0">
           <tr>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Nº Expediente
+            <th class="px-3 py-1.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell w-40">
+              Nº Exp.
             </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Tipo
-            </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <th class="px-3 py-1.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Carátula
             </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <th class="px-3 py-1.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
               Juzgado
             </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
-              Diligencia
+            <th class="px-3 py-1.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden xl:table-cell w-40">
+              Tipo Diligencia
             </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden xl:table-cell">
+            <th class="px-3 py-1.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell w-64">
               Domicilio
             </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Estado
+            <th class="px-3 py-1.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden xl:table-cell">
+              Ingreso
             </th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <th class="px-3 py-1.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Acciones
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-          <tr *ngFor="let caso of casosPaginados" 
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700/50">
+          <tr *ngFor="let caso of casos" 
               class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <td class="px-4 py-3 whitespace-nowrap">
-              <div class="text-sm font-mono text-gray-900 dark:text-white">
-                {{ caso.numeroExpediente }}
+            <td class="px-3 py-1.5 hidden md:table-cell w-40">
+              <div class="text-xs font-mono text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                {{ caso.nroExpediente || '-' }}
               </div>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    [ngClass]="{
-                      'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': caso.tipoSalida === 1,
-                      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': caso.tipoSalida === 2
-                    }">
-                {{ getTipoSalidaTexto(caso.tipoSalida) }}
-              </span>
-            </td>
-            <td class="px-4 py-3">
-              <div class="text-sm text-gray-900 dark:text-white">
-                {{ caso.caratulaExpediente }}
+            <td class="px-3 py-1.5">
+              <div class="text-sm text-gray-900 dark:text-white leading-tight">
+                <span *ngIf="caso.nroExpediente" class="md:hidden text-xs font-mono text-gray-500 dark:text-gray-400 block">
+                  {{ caso.nroExpediente }}
+                </span>
+                <div class="line-clamp-2">{{ caso.caratulaExpediente }}</div>
+                <span *ngIf="caso.urgente" class="inline-flex items-center text-xs text-red-600 dark:text-red-400">
+                  <span class="w-1 h-1 bg-red-600 dark:bg-red-400 rounded-full mr-1"></span>
+                  Urgente
+                </span>
               </div>
             </td>
-            <td class="px-4 py-3">
-              <div class="text-sm text-gray-900 dark:text-white">
+            <td class="px-3 py-1.5 hidden lg:table-cell">
+              <div class="text-sm text-gray-900 dark:text-white line-clamp-2">
                 {{ caso.juzgadoInterviniente }}
               </div>
             </td>
-            <td class="px-4 py-3 hidden lg:table-cell">
-              <div class="text-sm text-gray-900 dark:text-white">
-                {{ caso.tipoDiligencia }}
+            <td class="px-3 py-1.5 hidden xl:table-cell w-40">
+              <div class="relative inline-block group">
+                <span [ngClass]="getTipoDiligenciaClasses(caso.tipoDiligencia)"
+                      class="px-2.5 py-1 inline-flex text-xs leading-4 font-semibold rounded-full cursor-help">
+                  {{ getTipoDiligenciaCorto(caso.tipoDiligencia) }}
+                </span>
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg whitespace-nowrap">
+                  {{ caso.tipoDiligencia }}
+                  <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
+                </div>
               </div>
             </td>
-            <td class="px-4 py-3 hidden xl:table-cell">
-              <div class="text-sm text-gray-900 dark:text-white">
-                {{ caso.domicilio }}, {{ caso.localidad }}
+            <td class="px-3 py-1.5 hidden lg:table-cell w-64">
+              <div class="text-sm text-gray-700 dark:text-gray-300 leading-tight">
+                <div class="font-medium">{{ caso.domicilio }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{ caso.localidad }}</div>
               </div>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <span *ngIf="caso.urgente" 
-                    class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                Urgente
-              </span>
-              <span *ngIf="!caso.urgente"
-                    class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                Normal
-              </span>
+            <td class="px-3 py-1.5 hidden xl:table-cell">
+              <div class="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                {{ caso.createdAt | date:'dd/MM/yy HH:mm' }}
+              </div>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap">
+            <td class="px-3 py-1.5 text-center whitespace-nowrap">
               <button 
-                (click)="verCaso(caso.id!)"
-                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none">
-                Ver detalle
+                (click)="verCaso(caso.id)"
+                class="px-2.5 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-600 dark:bg-primary-700 dark:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors focus:outline-none">
+                Ver
               </button>
             </td>
           </tr>
@@ -141,36 +139,36 @@
       </table>
 
       <!-- Empty State -->
-      <div *ngIf="casosPaginados.length === 0" class="text-center py-12">
-        <p class="text-gray-500 dark:text-gray-400">No hay casos para mostrar</p>
+      <div *ngIf="casos.length === 0" class="text-center py-8">
+        <p class="text-gray-500 dark:text-gray-400 text-sm">No hay casos para mostrar</p>
       </div>
     </div>
 
     <!-- Pagination -->
     <div *ngIf="!loading && !error && totalPaginas > 0" 
-         class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900">
+         class="px-4 py-1.5 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900">
       <div class="flex-1 flex justify-between sm:hidden">
         <button (click)="paginaAnterior()" 
-                [disabled]="paginaActual === 1"
-                class="relative inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                [disabled]="!hasPreviousPage"
+                class="relative inline-flex items-center px-2 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Anterior
         </button>
         <button (click)="paginaSiguiente()" 
-                [disabled]="paginaActual === totalPaginas"
-                class="ml-3 relative inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                [disabled]="!hasNextPage"
+                class="ml-2 relative inline-flex items-center px-2 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Siguiente
         </button>
       </div>
       <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p class="text-xs text-gray-700 dark:text-gray-300">
-            Mostrando <span class="font-medium">{{ rangoMostrado }}</span> resultados
+            <span class="font-medium">{{ rangoMostrado }}</span>
           </p>
         </div>
         <div>
           <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button (click)="paginaAnterior()" 
-                    [disabled]="paginaActual === 1"
+                    [disabled]="!hasPreviousPage"
                     class="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
               <span class="sr-only">Anterior</span>
               &#8249;
@@ -179,7 +177,7 @@
             <button *ngFor="let pagina of [].constructor(totalPaginas); let i = index"
                     (click)="irAPagina(i + 1)"
                     [ngClass]="{
-                      'z-10 bg-blue-600 border-blue-600 text-white': paginaActual === i + 1,
+                      'z-10 bg-primary-600 border-primary-600 text-white': paginaActual === i + 1,
                       'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700': paginaActual !== i + 1
                     }"
                     class="relative inline-flex items-center px-3 py-1 border text-xs font-medium">
@@ -187,7 +185,7 @@
             </button>
             
             <button (click)="paginaSiguiente()" 
-                    [disabled]="paginaActual === totalPaginas"
+                    [disabled]="!hasNextPage"
                     class="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
               <span class="sr-only">Siguiente</span>
               &#8250;

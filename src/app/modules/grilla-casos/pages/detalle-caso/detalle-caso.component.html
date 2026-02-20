@@ -178,22 +178,14 @@
                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto Requerido</label>
                 <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ caso.textoRequerido }}</p>
               </div>
-              <div *ngIf="caso.textoNotificacion">
-                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto de Notificación</label>
-                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ caso.textoNotificacion }}</p>
-              </div>
-              <div *ngIf="caso.textoDespacho">
-                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto del Despacho</label>
-                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ caso.textoDespacho }}</p>
-              </div>
-              <div *ngIf="caso.montoCapitalTexto || caso.montoCapitalNumerico" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div *ngIf="caso.montoCapitalTexto || caso.montoCapitalNumero" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div *ngIf="caso.montoCapitalTexto">
                   <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Monto Capital (Texto)</label>
                   <p class="text-sm text-gray-900 dark:text-white">{{ caso.montoCapitalTexto }}</p>
                 </div>
-                <div *ngIf="caso.montoCapitalNumerico">
+                <div *ngIf="caso.montoCapitalNumero">
                   <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Monto Capital (Numérico)</label>
-                  <p class="text-sm text-gray-900 dark:text-white font-mono">$ {{ caso.montoCapitalNumerico }}</p>
+                  <p class="text-sm text-gray-900 dark:text-white font-mono">$ {{ caso.montoCapitalNumero }}</p>
                 </div>
               </div>
             </div>

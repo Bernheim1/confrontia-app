@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Salida } from '../../../../../shared/models/salida';
 import { CasoService } from '../../../../../services/caso/caso.service';
-import { TipoSalidaEnum } from '../../../../../shared/enums/tipo-salida-enum';
+import { CasoListDto } from '../../../../../shared/models/caso-list-dto';
 
 @Component({
   selector: 'app-grilla-casos',
@@ -14,21 +13,21 @@ import { TipoSalidaEnum } from '../../../../../shared/enums/tipo-salida-enum';
   styleUrls: ['./grilla-casos.component.scss']
 })
 export class GrillaCasosComponent implements OnInit {
-  casos: Salida[] = [];
-  casosFiltrados: Salida[] = [];
-  casosPaginados: Salida[] = [];
+  casos: CasoListDto[] = [];
   
-  // Configuración de paginado
+  // Configuración de paginado (ahora del servidor)
   paginaActual: number = 1;
-  itemsPorPagina: number = 10;
+  itemsPorPagina: number = 15;
   totalPaginas: number = 0;
   totalItems: number = 0;
+  hasPreviousPage: boolean = false;
+  hasNextPage: boolean = false;
 
   // Estado de carga
   loading: boolean = false;
   error: string | null = null;
 
-  // Filtros
+  // Filtros (por ahora en cliente, luego se pueden mover al backend)
   filtroNumeroExpediente: string = '';
   filtroCaratula: string = '';
 
@@ -45,59 +44,31 @@ export class GrillaCasosComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    // Por ahora, datos de ejemplo hasta que tengamos el backend
-    // Cuando tengas el endpoint del backend, descomentar esto:
-    // this.casoService.getCasos().subscribe({
-    //   next: (casos) => {
-    //     this.casos = casos;
-    //     this.casosFiltrados = [...this.casos];
-    //     this.totalItems = this.casosFiltrados.length;
-    //     this.calcularPaginacion();
-    //     this.actualizarPaginaActual();
-    //     this.loading = false;
-    //   },
-    //   error: (err) => {
-    //     this.error = 'Error al cargar los casos';
-    //     this.loading = false;
-    //   }
-    // });
+    // Calcular offset basado en la página actual
+    const offset = (this.paginaActual - 1) * this.itemsPorPagina;
     
-    setTimeout(() => {
-      // Datos de ejemplo
-      this.casos = this.generarCasosEjemplo();
-      this.casosFiltrados = [...this.casos];
-      this.totalItems = this.casosFiltrados.length;
-      this.calcularPaginacion();
-      this.actualizarPaginaActual();
-      this.loading = false;
-    }, 500);
-  }
-
-  calcularPaginacion(): void {
-    this.totalPaginas = Math.ceil(this.totalItems / this.itemsPorPagina);
-  }
-
-  actualizarPaginaActual(): void {
-    const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
-    const fin = inicio + this.itemsPorPagina;
-    this.casosPaginados = this.casosFiltrados.slice(inicio, fin);
+    this.casoService.getCasos(offset, this.itemsPorPagina).subscribe({
+      next: (result) => {
+        this.casos = result.items;
+        this.totalItems = result.totalCount;
+        this.totalPaginas = result.totalPages;
+        this.hasPreviousPage = result.hasPreviousPage;
+        this.hasNextPage = result.hasNextPage;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar los casos:', err);
+        this.error = 'Error al cargar los casos';
+        this.loading = false;
+      }
+    });
   }
 
   aplicarFiltros(): void {
-    this.casosFiltrados = this.casos.filter(caso => {
-      const cumpleNumeroExpediente = !this.filtroNumeroExpediente || 
-        caso.numeroExpediente?.toLowerCase().includes(this.filtroNumeroExpediente.toLowerCase());
-      
-      const cumpleCaratula = !this.filtroCaratula || 
-        caso.caratulaExpediente?.toLowerCase().includes(this.filtroCaratula.toLowerCase());
-      
-      return cumpleNumeroExpediente && cumpleCaratula;
-    });
-    
-    this.totalItems = this.casosFiltrados.length;
-    this.paginaActual = 1; // Resetear a la primera página
-    this.calcularPaginacion();
-    this.actualizarPaginaActual();
+    // Por ahora, los filtros se aplican en el cliente
+    // TODO: Implementar filtros en el backend cuando sea necesario
+    this.paginaActual = 1;
+    this.cargarCasos();
   }
 
   limpiarFiltros(): void {
@@ -106,28 +77,28 @@ export class GrillaCasosComponent implements OnInit {
     this.aplicarFiltros();
   }
 
-  verCaso(id: number): void {
+  verCaso(id: string): void {
     this.router.navigate(['/casos/detalle', id]);
   }
 
   irAPagina(pagina: number): void {
     if (pagina >= 1 && pagina <= this.totalPaginas) {
       this.paginaActual = pagina;
-      this.actualizarPaginaActual();
+      this.cargarCasos();
     }
   }
 
   paginaAnterior(): void {
-    if (this.paginaActual > 1) {
+    if (this.hasPreviousPage) {
       this.paginaActual--;
-      this.actualizarPaginaActual();
+      this.cargarCasos();
     }
   }
 
   paginaSiguiente(): void {
-    if (this.paginaActual < this.totalPaginas) {
+    if (this.hasNextPage) {
       this.paginaActual++;
-      this.actualizarPaginaActual();
+      this.cargarCasos();
     }
   }
 
@@ -138,43 +109,25 @@ export class GrillaCasosComponent implements OnInit {
     return `${inicio} - ${fin} de ${this.totalItems}`;
   }
 
-  getTipoSalidaTexto(tipo: TipoSalidaEnum): string {
-    switch (tipo) {
-      case TipoSalidaEnum.Cedula:
-        return 'Cédula';
-      case TipoSalidaEnum.Mandamiento:
-        return 'Mandamiento';
-      default:
-        return 'Sin Asignar';
+  getTipoDiligenciaCorto(tipoDiligencia: string): string {
+    if (!tipoDiligencia) return '-';
+    const tipoLower = tipoDiligencia.toLowerCase();
+    if (tipoLower.includes('mandamiento')) {
+      return 'Mandamiento';
+    } else if (tipoLower.includes('cédula') || tipoLower.includes('cedula')) {
+      return 'Cédula';
     }
+    return tipoDiligencia; // Si no coincide con ninguno, devuelve el original
   }
 
-  // Método temporal para generar casos de ejemplo
-  private generarCasosEjemplo(): Salida[] {
-    const ejemplos: Salida[] = [];
-    const tiposExpediente = ['Embargo', 'Desalojo', 'Notificación', 'Ejecución', 'Medida Cautelar'];
-    const juzgados = ['Juzgado Civil N° 1', 'Juzgado Civil N° 2', 'Juzgado Comercial N° 5', 'Juzgado Laboral N° 4'];
-    const localidades = ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata'];
-    
-    for (let i = 1; i <= 50; i++) {
-      const anio = 2024 + (i % 3);
-      const salida = new Salida({
-        id: i,
-        numeroExpediente: `EXP-${anio}-${String(i).padStart(5, '0')}`,
-        tipoSalida: i % 2 === 0 ? TipoSalidaEnum.Cedula : TipoSalidaEnum.Mandamiento,
-        organo: `Organo ${i}`,
-        juzgadoInterviniente: juzgados[i % juzgados.length],
-        juzgadoTribunal: 'Tribunal',
-        tipoDiligencia: tiposExpediente[i % tiposExpediente.length],
-        caratulaExpediente: `${['García', 'Rodríguez', 'Fernández', 'Martínez', 'López'][i % 5]} c/ ${['Pérez', 'González', 'Sánchez', 'Romero', 'Torres'][i % 5]} s/ ${tiposExpediente[i % tiposExpediente.length]}`,
-        domicilio: `${['Av. Rivadavia', 'Calle Corrientes', 'Av. Belgrano', 'Calle Florida', 'Av. 9 de Julio'][i % 5]} ${1000 + i * 10}`,
-        localidad: localidades[i % localidades.length],
-        urgente: i % 4 === 0,
-        textoRequerido: `Contenido del caso ${i}`
-      });
-      ejemplos.push(salida);
+  getTipoDiligenciaClasses(tipoDiligencia: string): string {
+    if (!tipoDiligencia) return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+    const tipoLower = tipoDiligencia.toLowerCase();
+    if (tipoLower.includes('mandamiento')) {
+      return 'bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-100';
+    } else if (tipoLower.includes('cédula') || tipoLower.includes('cedula')) {
+      return 'bg-primary-200 text-primary-800 dark:bg-primary-700 dark:text-primary-50';
     }
-    
-    return ejemplos;
+    return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
   }
 }
