@@ -17,7 +17,7 @@ export class GrillaCasosComponent implements OnInit {
   
   // Configuración de paginado (ahora del servidor)
   paginaActual: number = 1;
-  itemsPorPagina: number = 15;
+  itemsPorPagina: number = 10;
   totalPaginas: number = 0;
   totalItems: number = 0;
   hasPreviousPage: boolean = false;
