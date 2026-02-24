@@ -14,7 +14,7 @@ export class CasoService {
     public constructor(private http: HttpClient) { }
 
     protected basePath: string = environment.basePath;
-    protected controller = 'caso';
+    protected controller = 'v1/caso';
 
     public create(command: CreateCasoCommand): Observable<string[]> {
         const url = `${this.basePath}${this.controller}`;
