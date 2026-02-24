@@ -18,7 +18,7 @@ export function initApp(authConfigService: AuthService): () => void {
 }
 
 export function tokenGetter() {
-  return localStorage.getItem('access_token'); 
+  return localStorage.getItem('access_token');
 }
 
 export const coreConfig: CoreConfig = {
@@ -60,10 +60,10 @@ export const coreConfig: CoreConfig = {
 
 
 export const appConfig: ApplicationConfig = {
-  providers: 
-  [ 
-    provideZoneChangeDetection({ eventCoalescing: true }), 
-    provideRouter(routes), 
+  providers:
+  [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
     provideHttpClient(withInterceptors([jwtInterceptor, validTokenInterceptor])),
     provideToastr(),
     provideAnimations(),

@@ -14,7 +14,7 @@ export class CasoService {
     public constructor(private http: HttpClient) { }
 
     protected basePath: string = environment.basePath;
-    protected controller = 'v1/caso';
+    protected controller = 'caso';
 
     public create(command: CreateCasoCommand): Observable<string[]> {
         const url = `${this.basePath}${this.controller}`;
@@ -25,18 +25,18 @@ export class CasoService {
     // Método para obtener la lista paginada de casos
     public getCasos(offset: number = 0, limit: number = 10): Observable<PagedResult<CasoListDto>> {
         const url = `${this.basePath}${this.controller}`;
-        
+
         const params = new HttpParams()
             .set('offset', offset.toString())
             .set('limit', limit.toString());
-        
+
         return this.http.get<PagedResult<CasoListDto>>(url, { params });
     }
 
     // Método para obtener un caso por ID
     public getCasoById(id: string): Observable<CasoDto> {
         const url = `${this.basePath}${this.controller}/${id}`;
-        
+
         return this.http.get<CasoDto>(url);
     }
 }
