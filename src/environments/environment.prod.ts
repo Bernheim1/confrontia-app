@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
   // @ts-ignore
-  apiUrl: window.env?.apiUrl || 'http://76.13.229.224/api/',
+  apiUrl: window.env?.apiUrl || 'https://confrontia.com.ar/api/',
   // @ts-ignore
-  basePath: window.env?.apiUrl || 'http://76.13.229.224/api/',
+  basePath: window.env?.apiUrl || 'https://confrontia.com.ar/api/',
   // @ts-ignore
   debug: window.env?.debug || false,
   // @ts-ignore
