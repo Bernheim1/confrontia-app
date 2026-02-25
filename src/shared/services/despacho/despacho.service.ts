@@ -650,7 +650,10 @@ export class DespachoService {
 
   // ---------------- Expediente ----------------
   private extraerExpediente(texto: string): ExpedienteInfo {
-    const numeroExpedienteMatch = texto.match(/(?:EXPEDIENTE|Número):\s*([A-Z0-9\-]+)/i);
+    // Busca variantes: EXPEDIENTE, EXPEDIENTE Nº, EXPEDIENTE N°, Número, con o sin dos puntos, salto de línea, etc.
+    const numeroExpedienteMatch = texto.match(/(?:EXPEDIENTE\s*(?:N[º°]?)?|N[úu]mero)\s*[:\-]?\s*([A-Z]{2,}-\d{4,}-\d{4})/i)
+      || texto.match(/EXPEDIENTE\s*[:\-]?\s*([A-Z]{2,}-\d{4,}-\d{4})/i)
+      || texto.match(/([A-Z]{2,}-\d{4,}-\d{4})/);
     const numeroExpediente = numeroExpedienteMatch ? numeroExpedienteMatch[1].trim() : '';
 
     const caratulaMatch =

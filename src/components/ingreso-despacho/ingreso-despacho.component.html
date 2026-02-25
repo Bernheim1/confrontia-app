@@ -3,7 +3,7 @@
   [id]="'despacho-' + i"
   class="w-full max-w-6xl mx-auto px-6 py-8 mb-6
          bg-white dark:bg-gray-800
-         rounded-xl border shadow-sm
+         rounded-xl border shadow-md dark:shadow-lg
          animate-scale-up transition-all duration-300"
   [class.border-red-500]="errorIndex === i"
   [class.border-gray-200]="errorIndex !== i"
@@ -40,9 +40,9 @@
   <!-- Editor -->
   <div class="bg-white dark:bg-gray-700 border rounded-xl overflow-hidden transition-colors duration-300"
        [class.border-red-400]="errorIndex === i"
-       [class.border-gray-300]="errorIndex !== i"
+       [class.border-gray-200]="errorIndex !== i"
        [class.dark:border-red-400]="errorIndex === i"
-       [class.dark:border-gray-600]="errorIndex !== i">
+       [class.dark:border-gray-700]="errorIndex !== i">
     <div class="px-4 py-2.5 border-b text-sm font-medium bg-gray-50 dark:bg-gray-800 transition-colors duration-300"
          [class.border-red-400]="errorIndex === i"
          [class.text-red-700]="errorIndex === i"
@@ -134,7 +134,7 @@
 </div>
 
 <!-- Floating container para modo MASIVO -->
-<div *ngIf="masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-xl rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+<div *ngIf="masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-md dark:shadow-lg rounded-xl p-4 border border-gray-200 dark:border-gray-700">
   <div class="flex items-center gap-3">
     <!-- Botón agregar ingreso -->
     <button 

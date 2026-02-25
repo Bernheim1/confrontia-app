@@ -23,6 +23,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   @Input() salida?: Salida;
   @Input() textoDespacho?: string;
   @Input() masivo?: boolean = false;
+  @Input() showCopyButton?: boolean = false; // Muestra botón arriba sin título (para modo preview)
 
   faCheck = faCheck;
   faRepeat = faRepeat;

@@ -1,6 +1,5 @@
 .viewer-root {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  margin: 16px;
 }
 
 .controls {
@@ -85,6 +84,7 @@
 /* Dark mode: ya no necesitamos filtro porque aplicamos estilos inline */
 :host-context(.dark) .preview {
   /* Los estilos se aplican via JS ahora */
+  color: #000;
 }
 
 /* Tablas */
