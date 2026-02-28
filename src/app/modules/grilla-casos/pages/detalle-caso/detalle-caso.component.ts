@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { CasoService } from '../../../../../services/caso/caso.service';
+import { CasoService } from '../../../../services/caso/caso.service';
 import { CasoDto } from '../../../../../shared/models/caso-dto';
 import { TipoSalidaEnum } from '../../../../../shared/enums/tipo-salida-enum';
 import { Salida } from '../../../../../shared/models/salida';

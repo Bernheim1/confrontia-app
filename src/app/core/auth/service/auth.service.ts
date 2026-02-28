@@ -114,7 +114,7 @@ export class AuthService {
             username: decoded?.unique_name,
             fullName: decoded?.name,
             email: decoded?.email,
-            perfil: decoded?.perfil 
+            perfil: +decoded?.perfil 
         };
 
         this.currentUserSubject$.next(this._user);

@@ -1,0 +1,65 @@
+<div class="p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-xl border shadow-sm mb-6 overflow-hidden transition-all duration-300">
+  <form [formGroup]="usuarioForm">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-12 gap-6 mb-6">
+        <div class="col-span-12">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div class="border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+              <h4 class="font-semibold">{{createAction ? 'Crear' : 'Modificar'}} Usuario</h4>
+            </div>
+
+            <div class="p-5">
+              <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-4">
+                  <label class="block text-sm font-medium mb-1">Nombre de Usuario</label>
+                  <div class="relative" tabindex="0" >
+                    <input #usernameInput type="text"
+                      class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 mb-2 focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="Nombre de Usuario" formControlName="username" />
+                  </div>
+                </div>
+
+                <div class="col-span-4">
+                  <label class="block text-sm font-medium mb-1">Nombre</label>
+                  <input type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
+                    placeholder="Nombre" formControlName="nombre" />
+                </div>
+
+                <div class="col-span-4">
+                  <label for="perfiles" class="block text-sm font-medium mb-1">Perfil</label>
+                    <select placeholder="Perfil" formControlName="perfil" id="perfiles" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option  value="">Seleccione</option>
+                        @for (item of perfilesCollection; track $index) {
+                            <option value="{{item.value}}">{{item.label}}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-span-6">
+                  <label for="estudios" class="block text-sm font-medium mb-1">Estudio</label>
+                    <select placeholder="Estudio" formControlName="estudioId" id="estudios" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="" >Seleccione</option>
+                        @for (item of estudiosCollection; track $index) {
+                            <option value="{{item.id}}">{{item.nombre}}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-span-6">
+                  <label class="block text-sm font-medium mb-1">Email</label>
+                  <input  formControlName="email"  placeholder="Email" type="text" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button 
+      type="submit"
+      (click)="createAction ? create() : update()"
+      class="bg-primary-600 float-right hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-5 rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] whitespace-nowrap min-w-[120px]">
+      {{createAction ? 'Crear' : 'Modificar'}}
+    </button>
+  </form>
+</div>

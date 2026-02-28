@@ -11,8 +11,8 @@ import { ContenteditableValueAccessorDirective } from '../../shared/directives/c
 import { TextoMonedaANumeroPipe } from '../../shared/pipes/textoMonedaANumero.pipe';
 import { HttpClient } from '@angular/common/http';
 import Papa from 'papaparse';
-import { CasoService } from '../../services/caso/caso.service';
-import { CreateCasoCommand } from '../../services/caso/commands/create-caso-command';
+import { CasoService } from '../../app/services/caso/caso.service';
+import { CreateCasoCommand } from '../../app/services/caso/commands/create-caso-command';
 
 @Component({
   selector: 'app-seleccion-salida',

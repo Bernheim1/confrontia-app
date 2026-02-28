@@ -1,11 +1,11 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { environment } from "../../environments/environment";
+import { environment } from "../../../environments/environment";
 import { CreateCasoCommand } from "./commands/create-caso-command";
-import { PagedResult } from "../../shared/models/paged-result";
-import { CasoListDto } from "../../shared/models/caso-list-dto";
-import { CasoDto } from "../../shared/models/caso-dto";
+import { PagedResult } from "../../../shared/models/paged-result";
+import { CasoListDto } from "../../../shared/models/caso-list-dto";
+import { CasoDto } from "../../../shared/models/caso-dto";
 
 @Injectable({
   providedIn: 'root'

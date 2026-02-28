@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from '../../app/core/auth/service/auth.service';
 import { User } from '../../app/core/auth/models/user';
 import { initFlowbite } from 'flowbite';
+import { Perfiles } from '../../app/services/user/contracts/perfiles-enum';
 
 @Component({
   selector: 'app-layout',
@@ -31,6 +32,7 @@ export class LayoutComponent implements AfterViewInit {
   }
   public coreConfig: any;
   public currentUser: User | undefined;
+  public perfiles = Perfiles;
 
   public ngOnInit(): void {
     this._coreConfigService.config.pipe(takeUntil(this._unsubscribeAll$)).subscribe((config: any) => {

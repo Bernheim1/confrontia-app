@@ -21,6 +21,7 @@
     "@auth0/angular-jwt": "^5.2.0",
     "@fortawesome/angular-fontawesome": "^0.15.0",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@ng-select/ng-select": "^13.9.1",
     "flowbite": "^4.0.1",
     "lodash": "^4.17.21",
     "ngx-toastr": "^19.1.0",
