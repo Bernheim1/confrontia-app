@@ -30,7 +30,7 @@ export class UsuariosTablePageComponent implements OnInit {
     error: string | null = null;
   
     // Filtros (por ahora en cliente, luego se pueden mover al backend)
-    filtroUsername: string = '';
+    filtroUsername: string | undefined = undefined;
 
     perfilesCollection = perfilesList;
   
