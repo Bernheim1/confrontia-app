@@ -13,8 +13,7 @@ import { MostrarSalidaComponent } from '../../../../../components/mostrar-salida
   selector: 'app-detalle-caso',
   standalone: true,
   imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent],
-  templateUrl: './detalle-caso.component.html',
-  styleUrls: ['./detalle-caso.component.scss']
+  templateUrl: './detalle-caso.component.html'
 })
 export class DetalleCasoComponent implements OnInit {
   faArrowLeft = faArrowLeft;

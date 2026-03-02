@@ -34,6 +34,10 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/configuracion/usuarios/usuarios.module').then(m => m.UsuariosModule)
       },
       {
+        path: 'estudios',
+        loadChildren: () => import('./modules/configuracion/estudios/estudios.module').then(m => m.EstudiosModule)
+      },
+      {
         path: 'change-password',
         component: ChangePasswordComponent
       }

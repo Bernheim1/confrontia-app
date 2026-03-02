@@ -1,7 +1,7 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { CoreConfigService } from '../../app/core/services/config.service';
 import { Subject, takeUntil } from 'rxjs';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { faGavel, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -9,6 +9,7 @@ import { AuthService } from '../../app/core/auth/service/auth.service';
 import { User } from '../../app/core/auth/models/user';
 import { initFlowbite } from 'flowbite';
 import { Perfiles } from '../../app/services/user/contracts/perfiles-enum';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-layout',
@@ -17,7 +18,7 @@ import { Perfiles } from '../../app/services/user/contracts/perfiles-enum';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent implements AfterViewInit {
+export class LayoutComponent implements AfterViewInit, OnDestroy {
   faGavel = faGavel;
   faMoon = faMoon;
   faSun = faSun;
@@ -26,8 +27,11 @@ export class LayoutComponent implements AfterViewInit {
   isDark = false;
   private _unsubscribeAll$: Subject<any>;
 
-  public constructor(private _coreConfigService: CoreConfigService,
-    private _auth: AuthService) {
+  public constructor(
+    private _coreConfigService: CoreConfigService,
+    private _auth: AuthService,
+    private router: Router
+  ) {
     this._unsubscribeAll$ = new Subject();
   }
   public coreConfig: any;
@@ -47,12 +51,27 @@ export class LayoutComponent implements AfterViewInit {
     else this.isDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false;
     this.applyThemeClass();
 
-    if (window.innerWidth < 640) this.sidebarOpen = false;      
+    if (window.innerWidth < 640) this.sidebarOpen = false;
+
+    // Reinicializar Flowbite en cada navegación
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this._unsubscribeAll$)
+      )
+      .subscribe(() => {
+        setTimeout(() => initFlowbite(), 100);
+      });
   }
 
   ngAfterViewInit(): void {
     // Inicializar Flowbite después de que la vista esté lista
-    initFlowbite();
+    setTimeout(() => initFlowbite(), 100);
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll$.next(null);
+    this._unsubscribeAll$.complete();
   }
 
   applyThemeClass(): void {
