@@ -5,10 +5,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TipoSalidaEnum } from '../../shared/enums/tipo-salida-enum';
-import { Salida } from '../../shared/models/salida';
 import { faRepeat } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
+import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
+import { Salida } from '../../../../shared/models/salida';
+import { HtmlHelper } from '../../../../shared/helpers/html-helper';
 
 @Component({
   selector: 'app-mostrar-salida',
@@ -109,7 +110,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
       this.applySalidaToFormData(changes['salida'].currentValue as Salida);
       // si la plantilla ya está cargada, forzamos re-reemplazo ahora mismo
       if (this.rawHtml) {
-        this.replacePlaceholders(this.formData);
+        this.applyProcessedHtml(HtmlHelper.replacePlaceholders(this.formData, this.rawHtml));
       }
     }
     
@@ -204,7 +205,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
 
     // si la plantilla ya está cargada, reemplazamos ahora
     if (this.rawHtml) {
-      this.replacePlaceholders(this.formData);
+      this.applyProcessedHtml(HtmlHelper.replacePlaceholders(this.formData, this.rawHtml));
     }
   }
 
@@ -223,7 +224,7 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
       next: (text) => {
         this.rawHtml = text;
         // Si ya tenemos salida/formData, reemplazamos. Si no, usamos defaults vacíos.
-        this.replacePlaceholders(this.formData);
+        this.applyProcessedHtml(HtmlHelper.replacePlaceholders(this.formData, this.rawHtml));
         this.loading = false;
       },
       error: (err) => {
@@ -231,28 +232,6 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
         this.loading = false;
       }
     });
-  }
-
-  // Reemplaza placeholders {{campo}} con valores desde data.
-  // Además elimina comentarios tipo {{# ... }} y limpia los placeholders sin valor.
-  replacePlaceholders(data: Record<string, string>) {
-    let result = this.rawHtml || '';
-
-    // 1) eliminar comentarios Handlebars del tipo {{# ... }} o {{!-- ... --}} si existen
-    result = result.replace(/{{#.*?}}/gs, '');
-    result = result.replace(/{{!--[\s\S]*?--}}/gs, '');
-
-    // 2) reemplazar claves explícitas
-    for (const [key, value] of Object.entries(data)) {
-      const safeKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp(`{{\\s*${safeKey}\\s*}}`, 'g');
-      result = result.replace(re, value ?? '');
-    }
-
-    // 3) Limpiar cualquier placeholder restante: los dejamos vacíos en lugar de mostrar {{...}}
-    result = result.replace(/{{\s*[^}]+\s*}}/g, '');
-
-    this.applyProcessedHtml(result);
   }
 
   private applyProcessedHtml(html: string) {

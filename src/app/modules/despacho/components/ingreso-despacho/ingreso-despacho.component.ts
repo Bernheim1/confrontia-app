@@ -3,8 +3,8 @@ import { Component, EventEmitter, HostListener, Output, output } from '@angular/
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
-import { TipoCedulaEnum, TipoCedulaTexto, TipoMandamientoEnum, TipoMandamientoTexto, TipoSalidaEnum, TipoSalidaTexto } from '../../shared/enums/tipo-salida-enum';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { TipoCedulaEnum, TipoCedulaTexto, TipoMandamientoEnum, TipoMandamientoTexto, TipoSalidaEnum, TipoSalidaTexto } from '../../../../shared/enums/tipo-salida-enum';
 
 
 @Component({

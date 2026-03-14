@@ -3,16 +3,16 @@ import { Component, EventEmitter, Input, Output, SimpleChanges, OnInit, ViewChil
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowRight, faCircleInfo, faRepeat, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { Salida } from '../../shared/models/salida';
-import { TipoCedulaEnum, TipoCedulaTexto, TipoMandamientoEnum, TipoMandamientoTexto, TipoSalidaEnum, TipoSalidaTexto } from '../../shared/enums/tipo-salida-enum';
-import { PreventEnterDirective } from '../../shared/directives/prevent-enter.directive';
-import { DespachoService } from '../../shared/services/despacho/despacho.service';
-import { ContenteditableValueAccessorDirective } from '../../shared/directives/content-editable-model.directive';
-import { TextoMonedaANumeroPipe } from '../../shared/pipes/textoMonedaANumero.pipe';
 import { HttpClient } from '@angular/common/http';
 import Papa from 'papaparse';
-import { CasoService } from '../../app/services/caso/caso.service';
-import { CreateCasoCommand } from '../../app/services/caso/commands/create-caso-command';
+import { CasoService } from '../../../../services/caso/caso.service';
+import { CreateCasoCommand } from '../../../../services/caso/commands/create-caso-command';
+import { PreventEnterDirective } from '../../../../shared/directives/prevent-enter.directive';
+import { ContenteditableValueAccessorDirective } from '../../../../shared/directives/content-editable-model.directive';
+import { Salida } from '../../../../shared/models/salida';
+import { TextoMonedaANumeroPipe } from '../../../../shared/pipes/textoMonedaANumero.pipe';
+import { DespachoService } from '../../../../shared/services/despacho/despacho.service';
+import { TipoCedulaEnum, TipoMandamientoEnum, TipoSalidaEnum, TipoSalidaTexto } from '../../../../shared/enums/tipo-salida-enum';
 
 @Component({
   selector: 'app-seleccion-salida',

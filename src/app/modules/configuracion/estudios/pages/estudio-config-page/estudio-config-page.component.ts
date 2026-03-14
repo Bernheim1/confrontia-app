@@ -5,17 +5,21 @@ import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreateEstudioCommand } from '../../../../../services/estudio/commands/create-estudio-command';
 import { UpdateEstudioCommand } from '../../../../../services/estudio/commands/update-estudio-command';
+import { concatMap, Observable, of } from 'rxjs';
+import { FirmaAbogadoConfigComponent } from '../../componentes/firma-abogado-config/firma-abogado-config.component';
+import { UpdateFirmaAbogadoCommand } from '../../../../../services/estudio/commands/update-firma-abogado-command';
+import { FirmaAbogadoDto } from '../../../../../services/estudio/contracts/firma-abogado-dto';
 
 @Component({
   selector: 'app-estudio-config-page',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule, FirmaAbogadoConfigComponent],
   templateUrl: './estudio-config-page.component.html',
   styleUrl: './estudio-config-page.component.scss'
 })
 export class EstudioConfigPageComponent implements OnInit {
 
-  private estudioId: string = '';
+  public estudioId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -38,6 +42,7 @@ export class EstudioConfigPageComponent implements OnInit {
   }
 
   public estudioForm: FormGroup;
+  public firmaForm!: FormGroup;
   public createAction: boolean = true;
 
   public create(): void {
@@ -50,20 +55,43 @@ export class EstudioConfigPageComponent implements OnInit {
       email: formValue.email
     }
 
-    this.estudioService.create(command).subscribe({
-      next: (estudioId: string) => {
-        // Si MEV está habilitado, configurarlo
-        if (formValue.mevEnabled && estudioId) {
-          this.configurarMevParaEstudio(estudioId, formValue.mevEnabled, formValue.mevUsername, formValue.mevPassword);
-        } else {
-          this.toastr.success('Estudio creado correctamente!', 'Exito');
+    of(undefined).pipe(
+      concatMap(() => {
+        return this.estudioService.create(command);
+      }),
+      concatMap(() => {
+        if (formValue.mevEnabled) {
+          return this.configurarMevParaEstudio(this.estudioId, formValue.mevEnabled, formValue.mevUsername, formValue.mevPassword);
+        } 
+        
+        return of(undefined);
+      }),
+      concatMap(() => {
+        return this.updateFirma();
+      })
+    )
+    .subscribe({
+      next: () => {
+        this.toastr.success('Estudio creado correctamente!', 'Exito');
           this.router.navigate(['/estudios']);
-        }
       },
       error: () => {
-        this.toastr.error('Ocurrio un error.', 'Error')
+        this.toastr.error('Ocurrio un error.', 'Error');
       }
-    })
+    });
+  }
+
+  public updateFirma(): Observable<void> {
+    const firma: FirmaAbogadoDto = {
+      ...this.firmaForm.getRawValue()
+    }
+    const command: UpdateFirmaAbogadoCommand = 
+    {
+      firma: this.firmaForm.controls['firmaEnabled'].value ? firma : undefined,
+      estudioId: this.estudioId
+    };
+    
+    return this.estudioService.updateFirmaAbogado(this.estudioId, command);
   }
 
   public update(): void {
@@ -77,29 +105,28 @@ export class EstudioConfigPageComponent implements OnInit {
       email: formValue.email
     }
 
-    this.estudioService.update(this.estudioId, command).subscribe({
-      next: () => {
-        // Actualizar configuración MEV
+    of(undefined).pipe(
+      concatMap(() => {return this.estudioService.update(this.estudioId, command);}),
+      concatMap(() => {
         if (formValue.mevEnabled) {
-          this.configurarMevParaEstudio(this.estudioId, formValue.mevEnabled, formValue.mevUsername, formValue.mevPassword);
+          return this.configurarMevParaEstudio(this.estudioId, formValue.mevEnabled, formValue.mevUsername, formValue.mevPassword);
         } else {
-          // Si MEV está deshabilitado, eliminarlo
-          this.estudioService.eliminarMev(this.estudioId).subscribe({
-            next: () => {
-              this.toastr.success('Estudio modificado correctamente!', 'Exito');
-              this.router.navigate(['/estudios']);
-            },
-            error: () => {
-              this.toastr.success('Estudio modificado correctamente!', 'Exito');
-              this.router.navigate(['/estudios']);
-            }
-          });
+          return this.estudioService.eliminarMev(this.estudioId);
         }
+      }),
+      concatMap(() => {
+        return this.updateFirma();
+      })
+    )
+    .subscribe({
+      next: () => {
+        this.toastr.success('Estudio modificado correctamente!', 'Exito');
+        this.router.navigate(['/estudios']);
       },
       error: () => {
-        this.toastr.error('Ocurrio un error.', 'Error')
+        this.toastr.error('Ocurrio un error.', 'Error');
       }
-    })
+    });
   }
 
   private getEstudio(): void {
@@ -120,7 +147,7 @@ export class EstudioConfigPageComponent implements OnInit {
       })
   }
 
-  private configurarMevParaEstudio(estudioId: string, enabled: boolean, username?: string, password?: string): void {
+  private configurarMevParaEstudio(estudioId: string, enabled: boolean, username?: string, password?: string): Observable<void> {
     const mevCommand = {
       id: estudioId,
       enabled: enabled,
@@ -128,16 +155,7 @@ export class EstudioConfigPageComponent implements OnInit {
       password: password || ''
     };
 
-    this.estudioService.configurarMev(estudioId, mevCommand).subscribe({
-      next: () => {
-        this.toastr.success('Estudio y configuración MEV guardados correctamente!', 'Exito');
-        this.router.navigate(['/estudios']);
-      },
-      error: () => {
-        this.toastr.warning('Estudio creado pero hubo un error al configurar MEV.', 'Advertencia');
-        this.router.navigate(['/estudios']);
-      }
-    });
+    return this.estudioService.configurarMev(estudioId, mevCommand);
   }
 
   private initEstudioForm(): FormGroup {

@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from "@angular/forms";
 import { CoreConfigService } from './core/services/config.service';
 import { Subject, takeUntil } from 'rxjs';
+import { ModalService } from './shared/services/modal.service';
 
 
 @Component({
@@ -12,7 +13,8 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [RouterOutlet, CommonModule, FontAwesomeModule, FormsModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  providers: [ModalService]
 })
 export class AppComponent {
 }

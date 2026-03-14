@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CasoService } from '../../../../services/caso/caso.service';
-import { CasoListDto } from '../../../../../shared/models/caso-list-dto';
+import { CasoListDto } from '../../../../shared/models/caso-list-dto';
 
 @Component({
   selector: 'app-grilla-casos',

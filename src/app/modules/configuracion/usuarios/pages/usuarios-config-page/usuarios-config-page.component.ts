@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { perfilesList } from '../../../../../services/user/contracts/perfiles-enum';
-import { DropdownItem } from "../../../../../../shared/models/dropdown-item";
 import { EstudioService } from '../../../../../services/estudio/estudio.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreateUsuarioCommand } from '../../../../../services/user/commands/create-usuario-command';
@@ -8,6 +7,7 @@ import { UserService } from '../../../../../services/user/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
 import { UpdateUsuarioCommand } from '../../../../../services/user/commands/update-usuario-command';
+import { DropdownItem } from '../../../../../shared/models/dropdown-item';
 
 @Component({
   selector: 'app-usuarios-config-page',
@@ -60,8 +60,6 @@ export class UsuariosConfigPageComponent implements OnInit {
         }
       },
       error: (err) => {
-        var a = err;
-        debugger
         this.toastr.error('Ocurrio un error.', 'Error')
       }
     })

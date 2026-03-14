@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { perfilesList } from '../../../../../services/user/contracts/perfiles-enum';
-import { GetFromCollectionPipe } from '../../../../../../shared/pipes/get-from-collection.pipe';
+import { GetFromCollectionPipe } from '../../../../../shared/pipes/get-from-collection.pipe';
 
 @Component({
   selector: 'app-usuarios-table-page',

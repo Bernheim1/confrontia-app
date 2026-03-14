@@ -314,5 +314,10 @@
         </app-mostrar-salida>
       </div>
 
+      @if(firma){
+        <div class="mt-2">
+          <app-show-escritos [firma]="firma" [caso]="caso"></app-show-escritos>
+        </div>
+      }
     </div>
 </div>

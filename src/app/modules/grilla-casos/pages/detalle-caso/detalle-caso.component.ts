@@ -4,15 +4,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { CasoService } from '../../../../services/caso/caso.service';
-import { CasoDto } from '../../../../../shared/models/caso-dto';
-import { TipoSalidaEnum } from '../../../../../shared/enums/tipo-salida-enum';
-import { Salida } from '../../../../../shared/models/salida';
-import { MostrarSalidaComponent } from '../../../../../components/mostrar-salida/mostrar-salida.component';
+import { ShowEscritosComponent } from '../../components/show-escritos/show-escritos.component';
+import { MostrarSalidaComponent } from '../../../despacho/components/mostrar-salida/mostrar-salida.component';
+import { CasoDto } from '../../../../shared/models/caso-dto';
+import { Salida } from '../../../../shared/models/salida';
+import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
+import { EstudioService } from '../../../../services/estudio/estudio.service';
+import { FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
 
 @Component({
   selector: 'app-detalle-caso',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent],
+  imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent, ShowEscritosComponent],
   templateUrl: './detalle-caso.component.html'
 })
 export class DetalleCasoComponent implements OnInit {
@@ -22,11 +25,13 @@ export class DetalleCasoComponent implements OnInit {
   loading: boolean = false;
   error: string | null = null;
   salida?: Salida;
-
+  public firma: FirmaAbogadoDto | undefined;
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private casoService: CasoService
+    private casoService: CasoService,
+    private _estudioService: EstudioService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +40,15 @@ export class DetalleCasoComponent implements OnInit {
       this.casoId = params['id'];
       this.cargarCaso();
     });
+  }
+
+  private getFirma(estudioId: string): void {
+    this._estudioService.getFirmaAbogado(estudioId).subscribe({
+      next: (response) => {
+        if (response) {
+          this.firma = response;
+        }
+      }});
   }
 
   cargarCaso(): void {
@@ -48,6 +62,11 @@ export class DetalleCasoComponent implements OnInit {
         this.caso = caso;
         // Convertir CasoDto a Salida para el componente mostrar-salida
         this.salida = this.convertirCasoASalida(caso);
+
+        if(caso.estudioId) {
+          this.getFirma(caso.estudioId);
+        }
+        
         this.loading = false;
       },
       error: (err) => {

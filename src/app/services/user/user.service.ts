@@ -3,11 +3,11 @@ import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { Observable } from "rxjs";
 import { ChangePasswordCommand } from "./commands/change-password-command";
-import { PagedResult } from "../../../shared/models/paged-result";
 import { UserDto } from "./contracts/user-dto";
 import { UpdateUsuarioCommand } from "./commands/update-usuario-command";
 import { CreateUsuarioCommand } from "./commands/create-usuario-command";
 import { ConfigurarMevCommand, MevConfigDto } from "./contracts/mev-config-dto";
+import { PagedResult } from "../../shared/models/paged-result";
 
 @Injectable({
   providedIn: 'root'

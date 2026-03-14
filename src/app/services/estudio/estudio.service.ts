@@ -2,12 +2,14 @@ import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { DropdownItem } from "../../../shared/models/dropdown-item";
+import { DropdownItem } from "../../shared/models/dropdown-item";
 import { EstudioDto } from "./contracts/estudio-dto";
 import { CreateEstudioCommand } from "./commands/create-estudio-command";
 import { UpdateEstudioCommand } from "./commands/update-estudio-command";
 import { ConfigurarMevEstudioCommand } from "./commands/configurar-mev-estudio-command";
 import { MevConfigDto } from "../user/contracts/mev-config-dto";
+import { UpdateFirmaAbogadoCommand } from "./commands/update-firma-abogado-command";
+import { FirmaAbogadoDto } from "./contracts/firma-abogado-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +42,16 @@ export class EstudioService {
       const url = `${this.basePath}${this.controller}/${estudioId}`;
 
       return this.http.get<EstudioDto>(url);
+    }
+
+    public updateFirmaAbogado(estudioId: string, command: UpdateFirmaAbogadoCommand): Observable<void> {
+      const url = `${this.basePath}${this.controller}/${estudioId}/firma`;
+      return this.http.put<void>(url, command);
+    }
+
+    public getFirmaAbogado(estudioId: string): Observable<FirmaAbogadoDto | undefined> {
+      const url = `${this.basePath}${this.controller}/${estudioId}/firma`;
+      return this.http.get<FirmaAbogadoDto | undefined>(url);
     }
 
     public configurarMev(estudioId: string, command: ConfigurarMevEstudioCommand): Observable<void> {

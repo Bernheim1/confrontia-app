@@ -2,6 +2,7 @@ import { TipoSalidaEnum } from "../enums/tipo-salida-enum";
 
 export interface CasoDto {
   id: string;
+  estudioId: string;
   numeroExpediente?: string;
   tipoSalida: TipoSalidaEnum;
   

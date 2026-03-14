@@ -93,6 +93,14 @@
             </div>
           </div>
         </div>
+
+        <div class="col-span-12">
+          <app-firma-abogado-config
+            [estudioId]="estudioId"
+            (componentFormInstance)="firmaForm = $event">
+          </app-firma-abogado-config>
+        </div>
+        
       </div>
     </div>
     <button 

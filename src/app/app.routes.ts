@@ -1,10 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginPageComponent } from './modules/login/pages/login/login.component';
-import { LayoutComponent } from '../components/layout/layout.component';
 import { ChangePasswordComponent } from './modules/login/pages/change-password/change-password.component';
 import { AuthGuard } from './core/auth/guards/auth.guards';
-import { Perfiles } from './services/user/contracts/perfiles-enum';
-import { RolesGuard } from './core/auth/guards/roles.guard';
+import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Routes = [
   {
