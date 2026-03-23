@@ -8,4 +8,6 @@ export interface FirmaAbogadoDto {
     domicilio: string;
     domicilioElectronico: string;
     categoriaFiscal: CategoriaFiscal;
+    nroLegajo: string;
+    nroCajaPrevisoria: string;
 }

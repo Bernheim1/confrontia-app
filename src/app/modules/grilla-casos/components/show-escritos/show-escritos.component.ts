@@ -59,7 +59,9 @@ export class ShowEscritosComponent {
       domicilioAbogado: this.firma?.domicilio ?? '',
       domicilioElectronicoAbogado: this.firma?.domicilioElectronico ?? '',
       parteRepresentada: 'parteRepresentada',
-      nombreExpediente: this.caso?.caratulaExpediente ?? ''
+      nombreExpediente: this.caso?.caratulaExpediente ?? '',
+      nroLegajo: this.firma?.nroLegajo ?? '',
+      nroCajaPrevisoria: this.firma?.nroCajaPrevisoria ?? ''
     }
 
     return escrito;

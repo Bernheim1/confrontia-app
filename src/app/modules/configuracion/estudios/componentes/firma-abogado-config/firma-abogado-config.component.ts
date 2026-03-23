@@ -82,6 +82,18 @@ export class FirmaAbogadoConfigComponent implements OnInit {
             updateOn: 'change',
             validators: [Validators.required]
           }
+        ],
+        nroLegajo: [
+          undefined, {
+            updateOn: 'change',
+            validators: [Validators.required]
+          }
+        ],
+        nroCajaPrevisoria: [
+          undefined, {
+            updateOn: 'change',
+            validators: [Validators.required]
+          }
         ]
       });
   
