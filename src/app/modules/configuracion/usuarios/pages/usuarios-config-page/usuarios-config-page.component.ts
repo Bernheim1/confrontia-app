@@ -113,8 +113,27 @@ export class UsuariosConfigPageComponent implements OnInit {
           mevUsername: res.mev?.username,
           mevPassword: res.mev?.password
         });
+
+        // Si el DTO no trajo la config MEV, consultarla por separado
+        if (!res.mev) {
+          this.cargarMevConfig();
+        }
       }
     })
+  }
+
+  private cargarMevConfig(): void {
+    this.usuarioService.getMev(this.userId).subscribe({
+      next: (mevConfig) => {
+        if (mevConfig) {
+          this.usuarioForm.patchValue({
+            mevEnabled: mevConfig.enabled,
+            mevUsername: mevConfig.username,
+            mevPassword: mevConfig.password
+          });
+        }
+      }
+    });
   }
 
   private configurarMevParaUsuario(userId: string, enabled: boolean, username?: string, password?: string): void {

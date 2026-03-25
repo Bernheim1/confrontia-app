@@ -1,4 +1,5 @@
 import { TipoSalidaEnum } from "../enums/tipo-salida-enum";
+import { CasoMevMetadataDto, CasoNotificacionDto } from './notificacion-caso-dto';
 
 export interface CasoDto {
   id: string;
@@ -56,4 +57,9 @@ export interface CasoDto {
   
   createdAt?: string;
   updatedAt?: string;
+
+  // MEV
+  mevMetadata?: CasoMevMetadataDto | null;
+  notificaciones?: CasoNotificacionDto[];
+  tieneNotificacionesNoLeidas: boolean;
 }

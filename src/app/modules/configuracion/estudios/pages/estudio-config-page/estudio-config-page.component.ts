@@ -143,8 +143,27 @@ export class EstudioConfigPageComponent implements OnInit {
             mevUsername: res.mev?.username,
             mevPassword: res.mev?.password
           });
+
+          // Si el DTO no trajo la config MEV, consultarla por separado
+          if (!res.mev) {
+            this.cargarMevConfig();
+          }
         }
       })
+  }
+
+  private cargarMevConfig(): void {
+    this.estudioService.getMev(this.estudioId).subscribe({
+      next: (mevConfig) => {
+        if (mevConfig) {
+          this.estudioForm.patchValue({
+            mevEnabled: mevConfig.enabled,
+            mevUsername: mevConfig.username,
+            mevPassword: mevConfig.password
+          });
+        }
+      }
+    });
   }
 
   private configurarMevParaEstudio(estudioId: string, enabled: boolean, username?: string, password?: string): Observable<void> {

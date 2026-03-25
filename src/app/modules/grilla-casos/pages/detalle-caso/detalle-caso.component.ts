@@ -11,6 +11,7 @@ import { Salida } from '../../../../shared/models/salida';
 import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
 import { EstudioService } from '../../../../services/estudio/estudio.service';
 import { FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
+import { CasoNotificacionDto, CasoMevMetadataDto } from '../../../../shared/models/notificacion-caso-dto';
 
 @Component({
   selector: 'app-detalle-caso',
@@ -26,6 +27,11 @@ export class DetalleCasoComponent implements OnInit {
   error: string | null = null;
   salida?: Salida;
   public firma: FirmaAbogadoDto | undefined;
+
+  // MEV sync
+  sincronizando: boolean = false;
+  syncMessage: string | null = null;
+  syncError: boolean = false;
   
   constructor(
     private route: ActivatedRoute,
@@ -117,6 +123,42 @@ export class DetalleCasoComponent implements OnInit {
 
   volver(): void {
     this.router.navigate(['/casos']);
+  }
+
+  sincronizarMev(): void {
+    this.sincronizando = true;
+    this.syncMessage = null;
+    this.syncError = false;
+
+    this.casoService.sincronizarMevCaso(this.casoId).subscribe({
+      next: (response) => {
+        this.sincronizando = false;
+        if (response.sincronizado) {
+          const msg = response.notificacionesNuevas > 0
+            ? `Se encontraron ${response.notificacionesNuevas} notificación(es) nueva(s)`
+            : 'Sincronizado. No hay notificaciones nuevas';
+          this.syncMessage = msg;
+          this.syncError = false;
+          // Recargar el caso para obtener las notificaciones actualizadas
+          this.cargarCaso();
+        } else {
+          this.syncMessage = response.encontradoEnMev
+            ? 'No se pudo sincronizar completamente'
+            : 'Caso no encontrado en MEV';
+          this.syncError = !response.encontradoEnMev;
+        }
+        if (response.error) {
+          this.syncMessage = response.error;
+          this.syncError = true;
+        }
+      },
+      error: (err) => {
+        console.error('Error al sincronizar con MEV:', err);
+        this.sincronizando = false;
+        this.syncMessage = 'Error al sincronizar con MEV';
+        this.syncError = true;
+      }
+    });
   }
 
   getTipoSalidaTexto(tipo: TipoSalidaEnum): string {

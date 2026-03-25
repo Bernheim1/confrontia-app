@@ -1,0 +1,163 @@
+<div class="h-full flex items-center justify-center p-4">
+  <div class="w-full max-w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col" style="height: calc(100vh - 9rem);">
+
+    <!-- Filtros -->
+    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-2.5">
+        <div class="col-span-1">
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
+            Fecha Desde
+          </label>
+          <input 
+            type="date" 
+            [(ngModel)]="fechaDesde"
+            class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div class="col-span-1">
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
+            Fecha Hasta
+          </label>
+          <input 
+            type="date" 
+            [(ngModel)]="fechaHasta"
+            class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div class="col-span-1 flex items-end">
+          <button 
+            (click)="buscarNotificaciones()"
+            [disabled]="loading"
+            class="w-full px-3 py-1 text-sm font-medium text-white bg-primary-600 border border-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            {{ loading ? 'Buscando...' : 'Buscar en MEV' }}
+          </button>
+        </div>
+        <div class="col-span-1 flex items-end">
+          <!-- Resumen -->
+          <div *ngIf="resumen" class="text-xs text-gray-600 dark:text-gray-400 space-y-0.5">
+            <div>Total: <span class="font-semibold text-gray-900 dark:text-white">{{ resumen.total }}</span></div>
+            <div>Asociadas: <span class="font-semibold">{{ resumen.asociadas }}</span> · Nuevas: <span class="font-semibold text-green-600 dark:text-green-400">{{ resumen.nuevas }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex-1 flex flex-col justify-center items-center py-8 gap-3">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Buscando notificaciones en MEV... esto puede tardar unos minutos</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="px-4 py-6 text-center">
+      <p class="text-red-600 dark:text-red-400 text-sm">{{ error }}</p>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!loading && !error && buscado" class="flex-1 overflow-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
+        <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0">
+          <tr>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-36">
+              Fecha
+            </th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-44">
+              Expediente
+            </th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
+              Organismo
+            </th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
+              Carátula
+            </th>
+            <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
+              Estado
+            </th>
+            <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700/50">
+          <ng-container *ngFor="let notif of notificaciones; let i = index">
+            <tr 
+              class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors align-top"
+              style="height: 62px;">
+              <td class="px-3 py-1 w-36">
+                <div class="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  {{ notif.fecha | date:'dd/MM/yy HH:mm' }}
+                </div>
+              </td>
+              <td class="px-3 py-1 w-44">
+                <div class="text-xs font-mono text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  {{ notif.expediente || '-' }}
+                </div>
+              </td>
+              <td class="px-3 py-1 hidden md:table-cell">
+                <div class="text-sm text-gray-900 dark:text-white line-clamp-2">
+                  {{ notif.organismo || '-' }}
+                </div>
+              </td>
+              <td class="px-3 py-1 hidden lg:table-cell">
+                <div class="text-sm text-gray-900 dark:text-white line-clamp-2">
+                  {{ notif.caratula || '-' }}
+                </div>
+              </td>
+              <td class="px-3 py-1 text-center w-28">
+                <span [ngClass]="getEstadoClasses(notif)"
+                      class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full">
+                  {{ getEstadoTexto(notif) }}
+                </span>
+              </td>
+              <td class="px-3 py-1 text-center whitespace-nowrap w-32">
+                <div class="inline-flex items-center gap-1">
+                  <button *ngIf="notif.casoId"
+                    (click)="verCaso(notif.casoId!)"
+                    class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-600 dark:bg-primary-700 dark:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors focus:outline-none">
+                    Ver Caso
+                  </button>
+                  <button *ngIf="!notif.casoId"
+                    (click)="crearCaso()"
+                    class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-amber-50 text-amber-600 dark:bg-amber-700 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-600 transition-colors focus:outline-none">
+                    Crear Caso
+                  </button>
+                  <a *ngIf="notif.url"
+                     [href]="notif.url" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    MEV
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+          <!-- Relleno de filas vacías -->
+          <ng-container *ngFor="let empty of [].constructor(notificaciones.length < 10 ? 10 - notificaciones.length : 0)">
+            <tr style="height: 62px;">
+              <td class="px-3 py-1 w-36">&nbsp;</td>
+              <td class="px-3 py-1 w-44">&nbsp;</td>
+              <td class="px-3 py-1 hidden md:table-cell">&nbsp;</td>
+              <td class="px-3 py-1 hidden lg:table-cell">&nbsp;</td>
+              <td class="px-3 py-1 text-center w-28">&nbsp;</td>
+              <td class="px-3 py-1 text-center whitespace-nowrap w-32">&nbsp;</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="notificaciones.length === 0" class="text-center py-8">
+        <p class="text-gray-500 dark:text-gray-400 text-sm">No se encontraron notificaciones para el rango de fechas seleccionado</p>
+      </div>
+    </div>
+
+    <!-- Initial State (before first search) -->
+    <div *ngIf="!loading && !error && !buscado" class="flex-1 flex flex-col justify-center items-center py-8">
+      <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.133 12.632v-1.8a5.406 5.406 0 0 0-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175ZM8.823 19a3.453 3.453 0 0 0 6.354 0H8.823Z"/>
+      </svg>
+      <p class="text-gray-500 dark:text-gray-400 text-sm">Seleccioná un rango de fechas y presioná "Buscar en MEV"</p>
+      <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Se buscarán todas las notificaciones del usuario en MEV para el período indicado</p>
+    </div>
+
+  </div>
+</div>
