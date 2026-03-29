@@ -14,9 +14,7 @@ import { forkJoin } from 'rxjs';
   styleUrl: './estudio-table-page.component.scss'
 })
 export class EstudioTablePageComponent implements OnInit {
-    estudios: EstudioDto[] = [];
-    estudiosFiltrados: EstudioDto[] = [];
-    
+    estudios: EstudioDto[] = [];    
     // Configuración de paginado (lado cliente)
     paginaActual: number = 1;
     itemsPorPagina: number = 10;
@@ -43,32 +41,14 @@ export class EstudioTablePageComponent implements OnInit {
       this.loading = true;
       this.error = null;
       
-      this.estudioService.getDropdown().subscribe({
-        next: (result) => {
-          if (result.length === 0) {
-            this.estudios = [];
-            this.aplicarFiltros();
-            this.loading = false;
-            return;
-          }
+      const offset = (this.paginaActual - 1) * this.itemsPorPagina;
 
-          // Cargar los datos completos de cada estudio
-          const observables = result.map(item => 
-            this.estudioService.getById(item.id)
-          );
-          
-          forkJoin(observables).subscribe({
-            next: (estudios) => {
-              this.estudios = estudios;
-              this.aplicarFiltros();
-              this.loading = false;
-            },
-            error: (err) => {
-              console.error('Error al cargar los detalles de estudios:', err);
-              this.error = 'Error al cargar los estudios';
-              this.loading = false;
-            }
-          });
+      this.estudioService.getAll(offset, this.itemsPorPagina, this.filtroNombre).subscribe({
+        next: (result) => {
+            this.estudios = result.items;
+            this.totalItems = result.totalCount;
+            this.totalPaginas = result.totalPages;
+            this.loading = false;
         },
         error: (err) => {
           console.error('Error al cargar los estudios:', err);
@@ -78,34 +58,10 @@ export class EstudioTablePageComponent implements OnInit {
       });
     }
 
-    aplicarFiltros(): void {
-      this.estudiosFiltrados = this.estudios;
-
-      if (this.filtroNombre) {
-        this.estudiosFiltrados = this.estudiosFiltrados.filter(estudio =>
-          estudio.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase())
-        );
-      }
-
-      this.totalItems = this.estudiosFiltrados.length;
-      this.totalPaginas = Math.ceil(this.totalItems / this.itemsPorPagina);
-      this.paginaActual = 1;
-    }
-
-    get estudiosPaginados(): EstudioDto[] {
-      const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
-      const fin = inicio + this.itemsPorPagina;
-      return this.estudiosFiltrados.slice(inicio, fin);
-    }
-  
     limpiarFiltros(): void {
       this.filtroNombre = '';
       this.paginaActual = 1;
-      this.aplicarFiltros();
-    }
-
-    buscar(): void {
-      this.aplicarFiltros();
+      this.cargarEstudios();
     }
   
     irAPagina(pagina: number): void {

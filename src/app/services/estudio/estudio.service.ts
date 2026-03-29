@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { DropdownItem } from "../../shared/models/dropdown-item";
 import { EstudioDto } from "./contracts/estudio-dto";
@@ -10,6 +10,7 @@ import { ConfigurarMevEstudioCommand } from "./commands/configurar-mev-estudio-c
 import { MevConfigDto } from "../user/contracts/mev-config-dto";
 import { UpdateFirmaAbogadoCommand } from "./commands/update-firma-abogado-command";
 import { FirmaAbogadoDto } from "./contracts/firma-abogado-dto";
+import { PagedResult } from "../../shared/models/paged-result";
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,17 @@ export class EstudioService {
       const url = `${this.basePath}${this.controller}/${estudioId}`;
 
       return this.http.get<EstudioDto>(url);
+    }
+
+    public getAll(offset: number = 0, limit: number = 10, nombre: string = ''): Observable<PagedResult<EstudioDto>> {
+      const url = `${this.basePath}${this.controller}`;
+
+      const params = new HttpParams()
+                  .set('offset', offset.toString())
+                  .set('nombre', nombre)
+                  .set('limit', limit.toString());
+                  
+      return this.http.get<PagedResult<EstudioDto>>(url, { params });
     }
 
     public updateFirmaAbogado(estudioId: string, command: UpdateFirmaAbogadoCommand): Observable<void> {

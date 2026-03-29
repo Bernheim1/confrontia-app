@@ -8,6 +8,8 @@ import { HtmlHelper } from '../../../../shared/helpers/html-helper';
 import { FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
 import { categoriaFiscalCollection } from '../../../../services/estudio/contracts/categorias-ficales-dto';
 import { ToastrService } from 'ngx-toastr';
+import { DialogService } from '../../../../shared/services/modal/modal.service';
+import { HtmlViewerComponent } from '../../../../shared/components/html-viewer/html-viewer.component';
 
 @Component({
   selector: 'app-show-escritos',
@@ -21,7 +23,7 @@ export class ShowEscritosComponent {
   @Input() caso: CasoDto | undefined;
   @Input() firma: FirmaAbogadoDto | undefined;
   
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+  constructor(private http: HttpClient, private toastr: ToastrService, private dialogService: DialogService) {}
 
   faDownload = faDownload;
   pathEscritos = PathEscritos;
@@ -33,18 +35,11 @@ export class ShowEscritosComponent {
 
         var result = HtmlHelper.replacePlaceholders(recordObject, html);
 
-        this.copyToClipboard(result);
+        const ref = this.dialogService.open(HtmlViewerComponent, { data: result});
       },
       error: (err) => {
         
       }
-    });
-  }
-
-  public copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text).then(() => {
-        const message = `El escrito fue copiado correctamente`
-        this.toastr.success(message, 'Exito');
     });
   }
 
