@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { PathEscritos } from '../../../../../assets/templates/escritos/path-escritos';
@@ -10,11 +11,14 @@ import { categoriaFiscalCollection } from '../../../../services/estudio/contract
 import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../../../../shared/services/modal/modal.service';
 import { HtmlViewerComponent } from '../../../../shared/components/html-viewer/html-viewer.component';
+import { SalidaModalComponent } from '../../../../shared/components/salida-modal/salida-modal.component';
+import { Salida } from '../../../../shared/models/salida';
+import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
 
 @Component({
   selector: 'app-show-escritos',
   standalone: true,
-  imports: [FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './show-escritos.component.html',
   styleUrl: './show-escritos.component.scss'
 })
@@ -22,11 +26,20 @@ export class ShowEscritosComponent {
 
   @Input() caso: CasoDto | undefined;
   @Input() firma: FirmaAbogadoDto | undefined;
+  @Input() salida: Salida | undefined;
+  @Input() tipoSalida: TipoSalidaEnum = TipoSalidaEnum.SinAsignar;
   
   constructor(private http: HttpClient, private toastr: ToastrService, private dialogService: DialogService) {}
 
   faDownload = faDownload;
   pathEscritos = PathEscritos;
+
+  verSalidaEnviada(): void {
+    if (!this.salida) return;
+    this.dialogService.open(SalidaModalComponent, {
+      data: { salida: this.salida, tipoSalida: this.tipoSalida }
+    });
+  }
   
   public getEscrito(path: string) {
     this.http.get(path, { responseType: 'text' }).subscribe({

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, ViewEncapsulation, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faArrowRight, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,7 +16,8 @@ import { HtmlHelper } from '../../../../shared/helpers/html-helper';
   standalone: true,
   imports: [FontAwesomeModule, CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './mostrar-salida.component.html',
-  styleUrl: './mostrar-salida.component.scss'
+  styleUrl: './mostrar-salida.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class MostrarSalidaComponent implements OnInit, OnChanges {
   @Input() tipoSalida : TipoSalidaEnum = TipoSalidaEnum.Mandamiento;
