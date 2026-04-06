@@ -7,6 +7,7 @@ import { CasoListDto } from "../../shared/models/caso-list-dto";
 import { PagedResult } from "../../shared/models/paged-result";
 import { CasoDto } from "../../shared/models/caso-dto";
 import { SincronizarMevCasoResponse, SincronizarMevMasivoResponse } from "./contracts/sincronizar-mev-response";
+import { MevBusquedaCommand } from "../mev/commands/mev-busqueda-command";
 
 @Injectable({
   providedIn: 'root'
@@ -49,13 +50,9 @@ export class CasoService {
     }
 
     // Búsqueda masiva de notificaciones MEV
-    public sincronizarMevMasivo(fechaDesde?: string, fechaHasta?: string): Observable<SincronizarMevMasivoResponse> {
+    public sincronizarMevMasivo(command: MevBusquedaCommand = {}): Observable<SincronizarMevMasivoResponse> {
         const url = `${this.basePath}${this.controller}/sincronizar-mev`;
 
-        let params = new HttpParams();
-        if (fechaDesde) params = params.set('fechaDesde', fechaDesde);
-        if (fechaHasta) params = params.set('fechaHasta', fechaHasta);
-
-        return this.http.post<SincronizarMevMasivoResponse>(url, null, { params });
+        return this.http.post<SincronizarMevMasivoResponse>(url, command);
     }
 }

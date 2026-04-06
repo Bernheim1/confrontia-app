@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { CoreConfigService } from '../../app/core/services/config.service';
 import { Subject, takeUntil } from 'rxjs';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { faGavel, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -14,7 +14,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FontAwesomeModule],
+  imports: [RouterOutlet, RouterLink, CommonModule, FontAwesomeModule],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })

@@ -17,7 +17,8 @@ import { CasoNotificacionDto, CasoMevMetadataDto } from '../../../../shared/mode
   selector: 'app-detalle-caso',
   standalone: true,
   imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent, ShowEscritosComponent],
-  templateUrl: './detalle-caso.component.html'
+  templateUrl: './detalle-caso.component.html',
+  styleUrl: './detalle-caso.component.scss'
 })
 export class DetalleCasoComponent implements OnInit {
   faArrowLeft = faArrowLeft;

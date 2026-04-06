@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faArrowRight, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,8 +16,7 @@ import { HtmlHelper } from '../../../../shared/helpers/html-helper';
   standalone: true,
   imports: [FontAwesomeModule, CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './mostrar-salida.component.html',
-  styleUrl: './mostrar-salida.component.scss',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './mostrar-salida.component.scss'
 })
 export class MostrarSalidaComponent implements OnInit, OnChanges {
   @Input() tipoSalida : TipoSalidaEnum = TipoSalidaEnum.Mandamiento;
@@ -235,19 +234,39 @@ export class MostrarSalidaComponent implements OnInit, OnChanges {
   }
 
   private applyProcessedHtml(html: string) {
-    this.processedHtml = html; // guardamos el HTML limpio
+    this.processedHtml = html; // guardamos el HTML completo para copiar
+    
+    // Strip <style> tags and document wrapper to prevent global style pollution
+    const displayHtml = this.stripDocumentWrapper(html);
     
     // Detectar si estamos en dark mode
     const isDarkMode = document.documentElement.classList.contains('dark');
     
     if (isDarkMode) {
       // Agregar estilos inline para dark mode
-      this.processedHtmlForDisplay = this.applyDarkModeStyles(html);
+      this.processedHtmlForDisplay = this.applyDarkModeStyles(displayHtml);
     } else {
-      this.processedHtmlForDisplay = html;
+      this.processedHtmlForDisplay = displayHtml;
     }
     
     this.processedHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.processedHtmlForDisplay);
+  }
+
+  /**
+   * Removes <style> tags and extracts only the <body> content from a full HTML document.
+   * Uses regex to avoid injecting styles into the live DOM via innerHTML.
+   */
+  private stripDocumentWrapper(html: string): string {
+    // Remove all <style>...</style> blocks before touching the DOM
+    let cleaned = html.replace(/<style[\s\S]*?<\/style>/gi, '');
+
+    // Extract <body> content if present
+    const bodyMatch = cleaned.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    if (bodyMatch) {
+      cleaned = bodyMatch[1];
+    }
+
+    return cleaned.trim();
   }
   
   private applyDarkModeStyles(html: string): string {
