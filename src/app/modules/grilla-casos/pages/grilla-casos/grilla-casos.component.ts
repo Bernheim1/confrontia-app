@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CasoService } from '../../../../services/caso/caso.service';
-import { CasoListDto } from '../../../../../shared/models/caso-list-dto';
+import { CasoListDto } from '../../../../shared/models/caso-list-dto';
+import { GridStateService } from '../../../../shared/services/grid-state.service';
 
 @Component({
   selector: 'app-grilla-casos',
@@ -12,7 +13,9 @@ import { CasoListDto } from '../../../../../shared/models/caso-list-dto';
   templateUrl: './grilla-casos.component.html',
   styleUrls: ['./grilla-casos.component.scss']
 })
-export class GrillaCasosComponent implements OnInit {
+export class GrillaCasosComponent implements OnInit, OnDestroy {
+  private static readonly GRID_KEY = 'casos';
+
   casos: CasoListDto[] = [];
   
   // Configuración de paginado (ahora del servidor)
@@ -33,11 +36,49 @@ export class GrillaCasosComponent implements OnInit {
 
   constructor(
     private casoService: CasoService,
-    private router: Router
+    private router: Router,
+    private gridState: GridStateService
   ) {}
 
   ngOnInit(): void {
-    this.cargarCasos();
+    const cached = this.gridState.restore<any, CasoListDto[]>(GrillaCasosComponent.GRID_KEY);
+    if (cached) {
+      this.filtroNumeroExpediente = cached.filters.filtroNumeroExpediente;
+      this.filtroCaratula = cached.filters.filtroCaratula;
+      this.casos = cached.data;
+      if (cached.pagination) {
+        this.paginaActual = cached.pagination.page;
+        this.itemsPorPagina = cached.pagination.pageSize;
+        this.totalItems = cached.pagination.totalItems;
+        this.totalPaginas = cached.pagination.totalPages;
+        this.hasPreviousPage = cached.extras?.['hasPreviousPage'] ?? false;
+        this.hasNextPage = cached.extras?.['hasNextPage'] ?? false;
+      }
+    } else {
+      this.cargarCasos();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.casos.length > 0 && !this.error) {
+      this.gridState.save(GrillaCasosComponent.GRID_KEY, {
+        filters: {
+          filtroNumeroExpediente: this.filtroNumeroExpediente,
+          filtroCaratula: this.filtroCaratula,
+        },
+        data: this.casos,
+        pagination: {
+          page: this.paginaActual,
+          pageSize: this.itemsPorPagina,
+          totalItems: this.totalItems,
+          totalPages: this.totalPaginas,
+        },
+        extras: {
+          hasPreviousPage: this.hasPreviousPage,
+          hasNextPage: this.hasNextPage,
+        },
+      });
+    }
   }
 
   cargarCasos(): void {

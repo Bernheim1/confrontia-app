@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { perfilesList } from '../../../../../services/user/contracts/perfiles-enum';
-import { DropdownItem } from "../../../../../../shared/models/dropdown-item";
 import { EstudioService } from '../../../../../services/estudio/estudio.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreateUsuarioCommand } from '../../../../../services/user/commands/create-usuario-command';
@@ -8,6 +7,7 @@ import { UserService } from '../../../../../services/user/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
 import { UpdateUsuarioCommand } from '../../../../../services/user/commands/update-usuario-command';
+import { DropdownItem } from '../../../../../shared/models/dropdown-item';
 
 @Component({
   selector: 'app-usuarios-config-page',
@@ -41,33 +41,57 @@ export class UsuariosConfigPageComponent implements OnInit {
   public createAction: boolean = true;
 
   public create(): void {
+    const formValue = this.usuarioForm.getRawValue();
     const command: CreateUsuarioCommand = {
-      ...this.usuarioForm.getRawValue(),
-      estudioId: this.usuarioForm.controls['estudioId'].value !== '' ? this.usuarioForm.controls['estudioId'].value: undefined
+      username: formValue.username,
+      nombre: formValue.nombre,
+      email: formValue.email,
+      perfil: formValue.perfil,
+      estudioId: formValue.estudioId !== '' ? formValue.estudioId : undefined
     }
 
     this.usuarioService.create(command).subscribe({
-      next: () => {
-        this.toastr.success('Usuario creado correctamente!', 'Exito')
+      next: (userId: string) => {
+        // Si MEV está habilitado, configurarlo
+        if (formValue.mevEnabled && userId) {
+          this.configurarMevParaUsuario(userId, formValue.mevEnabled, formValue.mevUsername, formValue.mevPassword);
+        } else {
+          this.toastr.success('Usuario creado correctamente!', 'Exito');
+        }
       },
       error: (err) => {
-        var a = err;
-        debugger
         this.toastr.error('Ocurrio un error.', 'Error')
       }
     })
   }
 
   public update(): void {
+    const formValue = this.usuarioForm.getRawValue();
     const command: UpdateUsuarioCommand = {
-      ...this.usuarioForm.getRawValue(),
-      estudioId: this.usuarioForm.controls['estudioId'].value !== '' ? this.usuarioForm.controls['estudioId'].value: undefined,
-      id: this.userId
+      id: this.userId,
+      username: formValue.username,
+      nombre: formValue.nombre,
+      email: formValue.email,
+      perfil: formValue.perfil,
+      estudioId: formValue.estudioId !== '' ? formValue.estudioId : undefined
     }
 
     this.usuarioService.update(this.userId, command).subscribe({
       next: () => {
-        this.toastr.success('Usuario modificado correctamente!', 'Exito')
+        // Actualizar configuración MEV
+        if (formValue.mevEnabled) {
+          this.configurarMevParaUsuario(this.userId, formValue.mevEnabled, formValue.mevUsername, formValue.mevPassword);
+        } else {
+          // Si MEV está deshabilitado, eliminarlo
+          this.usuarioService.eliminarMev(this.userId).subscribe({
+            next: () => {
+              this.toastr.success('Usuario modificado correctamente!', 'Exito');
+            },
+            error: () => {
+              this.toastr.success('Usuario modificado correctamente!', 'Exito');
+            }
+          });
+        }
       },
       error: () => {
         this.toastr.error('Ocurrio un error.', 'Error')
@@ -79,9 +103,55 @@ export class UsuariosConfigPageComponent implements OnInit {
     this.usuarioService.getById(this.userId)
     .subscribe({
       next: (res) => {
-        this.usuarioForm.patchValue(res);
+        this.usuarioForm.patchValue({
+          username: res.username,
+          nombre: res.nombre,
+          email: res.email,
+          perfil: res.perfil,
+          estudioId: res.estudioId,
+          mevEnabled: res.mev?.enabled || false,
+          mevUsername: res.mev?.username,
+          mevPassword: res.mev?.password
+        });
+
+        // Si el DTO no trajo la config MEV, consultarla por separado
+        if (!res.mev) {
+          this.cargarMevConfig();
+        }
       }
     })
+  }
+
+  private cargarMevConfig(): void {
+    this.usuarioService.getMev(this.userId).subscribe({
+      next: (mevConfig) => {
+        if (mevConfig) {
+          this.usuarioForm.patchValue({
+            mevEnabled: mevConfig.enabled,
+            mevUsername: mevConfig.username,
+            mevPassword: mevConfig.password
+          });
+        }
+      }
+    });
+  }
+
+  private configurarMevParaUsuario(userId: string, enabled: boolean, username?: string, password?: string): void {
+    const mevCommand = {
+      id: userId,
+      enabled: enabled,
+      username: username,
+      password: password
+    };
+
+    this.usuarioService.configurarMev(userId, mevCommand).subscribe({
+      next: () => {
+        this.toastr.success('Usuario y configuración MEV guardados correctamente!', 'Exito');
+      },
+      error: () => {
+        this.toastr.warning('Usuario creado pero hubo un error al configurar MEV.', 'Advertencia');
+      }
+    });
   }
 
   private initUsuarioForm(): FormGroup {
@@ -111,6 +181,24 @@ export class UsuariosConfigPageComponent implements OnInit {
         }
       ],
       estudioId: [
+        undefined, {
+          updateOn: 'change',
+          validators: []
+        }
+      ],
+      mevEnabled: [
+        false, {
+          updateOn: 'change',
+          validators: []
+        }
+      ],
+      mevUsername: [
+        undefined, {
+          updateOn: 'change',
+          validators: []
+        }
+      ],
+      mevPassword: [
         undefined, {
           updateOn: 'change',
           validators: []

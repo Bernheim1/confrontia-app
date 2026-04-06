@@ -1,5 +1,11 @@
+import { MevConfigDto } from "../../user/contracts/mev-config-dto";
+
 export interface EstudioDto {
-    nombre: string;
-    direccion: string;
     id: string;
+    nombre: string;
+    cuit: string;
+    direccion: string;
+    telefono: string;
+    email: string;
+    mev?: MevConfigDto;
 }

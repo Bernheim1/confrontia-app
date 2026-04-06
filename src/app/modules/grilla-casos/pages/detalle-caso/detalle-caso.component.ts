@@ -4,17 +4,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { CasoService } from '../../../../services/caso/caso.service';
-import { CasoDto } from '../../../../../shared/models/caso-dto';
-import { TipoSalidaEnum } from '../../../../../shared/enums/tipo-salida-enum';
-import { Salida } from '../../../../../shared/models/salida';
-import { MostrarSalidaComponent } from '../../../../../components/mostrar-salida/mostrar-salida.component';
+import { ShowEscritosComponent } from '../../components/show-escritos/show-escritos.component';
+import { MostrarSalidaComponent } from '../../../despacho/components/mostrar-salida/mostrar-salida.component';
+import { CasoDto } from '../../../../shared/models/caso-dto';
+import { Salida } from '../../../../shared/models/salida';
+import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
+import { EstudioService } from '../../../../services/estudio/estudio.service';
+import { FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
+import { CasoNotificacionDto, CasoMevMetadataDto } from '../../../../shared/models/notificacion-caso-dto';
 
 @Component({
   selector: 'app-detalle-caso',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent],
+  imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent, ShowEscritosComponent],
   templateUrl: './detalle-caso.component.html',
-  styleUrls: ['./detalle-caso.component.scss']
+  styleUrl: './detalle-caso.component.scss'
 })
 export class DetalleCasoComponent implements OnInit {
   faArrowLeft = faArrowLeft;
@@ -23,11 +27,18 @@ export class DetalleCasoComponent implements OnInit {
   loading: boolean = false;
   error: string | null = null;
   salida?: Salida;
+  public firma: FirmaAbogadoDto | undefined;
 
+  // MEV sync
+  sincronizando: boolean = false;
+  syncMessage: string | null = null;
+  syncError: boolean = false;
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private casoService: CasoService
+    private casoService: CasoService,
+    private _estudioService: EstudioService
   ) {}
 
   ngOnInit(): void {
@@ -36,6 +47,15 @@ export class DetalleCasoComponent implements OnInit {
       this.casoId = params['id'];
       this.cargarCaso();
     });
+  }
+
+  private getFirma(estudioId: string): void {
+    this._estudioService.getFirmaAbogado(estudioId).subscribe({
+      next: (response) => {
+        if (response) {
+          this.firma = response;
+        }
+      }});
   }
 
   cargarCaso(): void {
@@ -49,6 +69,11 @@ export class DetalleCasoComponent implements OnInit {
         this.caso = caso;
         // Convertir CasoDto a Salida para el componente mostrar-salida
         this.salida = this.convertirCasoASalida(caso);
+
+        if(caso.estudioId) {
+          this.getFirma(caso.estudioId);
+        }
+        
         this.loading = false;
       },
       error: (err) => {
@@ -99,6 +124,42 @@ export class DetalleCasoComponent implements OnInit {
 
   volver(): void {
     this.router.navigate(['/casos']);
+  }
+
+  sincronizarMev(): void {
+    this.sincronizando = true;
+    this.syncMessage = null;
+    this.syncError = false;
+
+    this.casoService.sincronizarMevCaso(this.casoId).subscribe({
+      next: (response) => {
+        this.sincronizando = false;
+        if (response.sincronizado) {
+          const msg = response.notificacionesNuevas > 0
+            ? `Se encontraron ${response.notificacionesNuevas} notificación(es) nueva(s)`
+            : 'Sincronizado. No hay notificaciones nuevas';
+          this.syncMessage = msg;
+          this.syncError = false;
+          // Recargar el caso para obtener las notificaciones actualizadas
+          this.cargarCaso();
+        } else {
+          this.syncMessage = response.encontradoEnMev
+            ? 'No se pudo sincronizar completamente'
+            : 'Caso no encontrado en MEV';
+          this.syncError = !response.encontradoEnMev;
+        }
+        if (response.error) {
+          this.syncMessage = response.error;
+          this.syncError = true;
+        }
+      },
+      error: (err) => {
+        console.error('Error al sincronizar con MEV:', err);
+        this.sincronizando = false;
+        this.syncMessage = 'Error al sincronizar con MEV';
+        this.syncError = true;
+      }
+    });
   }
 
   getTipoSalidaTexto(tipo: TipoSalidaEnum): string {

@@ -1,0 +1,39 @@
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-md dark:shadow-lg">
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Escritos</h3>
+    <div>
+        <button *ngIf="salida" (click)="verSalidaEnviada()" class="px-4 w-full mb-2 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-xl text-sm font-medium transition-colors" type="button">
+            <fa-icon class="float-left" [icon]="faDownload">&nbsp;</fa-icon>
+            &nbsp;
+            &nbsp;
+            <span>{{ tipoSalida === 1 ? 'CÉDULA' : 'MANDAMIENTO' }} GENERADO</span>
+        </button>
+
+        <button (click)="getEscrito(pathEscritos.oficinaNotificaciones)" class="px-4 w-full mb-2 py-2 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-600 dark:hover:text-white rounded-xl text-sm font-medium transition-colors" type="button"  title="Copiar documento">
+            <fa-icon class="float-left" [icon]="faDownload">&nbsp;</fa-icon>
+            &nbsp;
+            &nbsp;
+            <span>INFORME ELECTRONICO A OFICINA DE MANDAMIENTOS Y NOTIFICACIONES</span>
+        </button>
+
+        <button (click)="getEscrito(pathEscritos.diasInhabiles)" class="px-4 w-full mb-2 py-2 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-600 dark:hover:text-white rounded-xl text-sm font-medium transition-colors" type="button"  title="Copiar documento">
+            <fa-icon class="float-left" [icon]="faDownload">&nbsp;</fa-icon>
+            &nbsp;
+            &nbsp;
+            <span>NUEVO MANDAMIENTO DE INTIMACIÓN DE PAGO CON HABILITACIÓN DE DÍAS Y HORAS INHÁBILES</span>
+        </button>
+
+        <button (click)="getEscrito(pathEscritos.parteActora)" class="px-4 w-full mb-2 py-2 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-600 dark:hover:text-white rounded-xl text-sm font-medium transition-colors" type="button"  title="Copiar documento">
+            <fa-icon class="float-left" [icon]="faDownload">&nbsp;</fa-icon>
+            &nbsp;
+            &nbsp;
+            <span>NUEVO MANDAMIENTO DE INTIMACIÓN DE PAGO CON HABILITACIÓN DE DÍAS Y HORAS INHÁBILES Y BAJO RESPONSABILIDAD DE LA PARTE ACTORA</span>
+        </button>
+
+        <button (click)="getEscrito(pathEscritos.dicteSentencia)" class="px-4 w-full mb-2 py-2 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-600 dark:hover:text-white rounded-xl text-sm font-medium transition-colors" type="button"  title="Copiar documento">
+            <fa-icon class="float-left" [icon]="faDownload">&nbsp;</fa-icon>
+            &nbsp;
+            &nbsp;
+            <span>DICTE SENTENCIA</span>
+        </button>
+    </div>
+</div>

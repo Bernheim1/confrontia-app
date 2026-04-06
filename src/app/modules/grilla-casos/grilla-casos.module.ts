@@ -16,8 +16,11 @@ const routes: Routes = [
 ];
 
 @NgModule({
+  declarations: [],
   imports: [
     CommonModule,
+    GrillaCasosComponent,
+    DetalleCasoComponent,
     RouterModule.forChild(routes)
   ]
 })
