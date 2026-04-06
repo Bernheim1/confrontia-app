@@ -1,0 +1,69 @@
+<div class="col-span-12" [formGroup]="firmaForm">
+          <div class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div class="flex border-b px-4 py-3 text-center bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-600 items-center justify-center">
+                <label class="flex cursor-pointer">
+                    <input type="checkbox" formControlName="firmaEnabled" 
+                      class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                    <span class="ml-2 text-sm font-medium">Utiliza Firma</span>
+                </label>
+            </div>
+
+            @if(firmaForm.controls['firmaEnabled'].value) {
+                <div class="p-5">
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">Nombre</label>
+                        <input type="text" formControlName="nombre" placeholder="Nombre del Abogado" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">CUIT</label>
+                        <input type="text" formControlName="cuit" placeholder="CUIT del Abogado" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">CUIL</label>
+                        <input type="text" formControlName="cuil" placeholder="CUIL del Abogado" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+
+                        <div class="col-span-6">
+                        <label for="categoriaFiscal" class="block text-sm font-medium mb-1">Categoria fiscal</label>
+                            <select placeholder="Categoria fiscal" formControlName="categoriaFiscal" id="categoriaFiscal" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option  value="">Seleccione</option>
+                                @for (item of categoriaFiscalCollection; track $index) {
+                                    <option value="{{item.id}}">{{item.description}}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">Domicilio</label>
+                        <input type="text" formControlName="domicilio" placeholder="Domicilio del Abogado" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">Domicilio Electronico</label>
+                        <input type="text" formControlName="domicilioElectronico" placeholder="Domicilio Electronico del Abogado" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">Nro. Legajo</label>
+                        <input type="text" formControlName="nroLegajo" placeholder="Legajo" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+
+                        <div class="col-span-6">
+                        <label class="block text-sm font-medium mb-1">Caja previsoria</label>
+                        <input type="text" formControlName="nroCajaPrevisoria" placeholder="Caja Prev. de abogados" 
+                            class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                        </div>
+                    </div>
+                </div>
+            }
+          </div>
+        </div>

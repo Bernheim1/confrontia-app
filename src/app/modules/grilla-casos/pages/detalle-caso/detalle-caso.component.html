@@ -1,5 +1,4 @@
-<div class="flex items-center justify-center p-4">
-  <div class="w-full max-w-7xl">
+<div class="w-full max-w-7xl mx-auto">
     
     <!-- Loading State -->
     <div *ngIf="loading" class="flex justify-center items-center py-20">
@@ -151,7 +150,7 @@
             <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
               <input type="checkbox" [checked]="caso.urgente" disabled class="sr-only peer" />
               <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                    peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                    peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                     after:content-[''] after:absolute after:top-0.5 after:left-0.5
                     after:w-5 after:h-5 after:bg-white after:rounded-full
                     after:transition-all peer-checked:after:translate-x-5">
@@ -163,7 +162,7 @@
             <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
               <input type="checkbox" [checked]="caso.habilitacionDiaHora" disabled class="sr-only peer" />
               <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                    peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                    peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                     after:content-[''] after:absolute after:top-0.5 after:left-0.5
                     after:w-5 after:h-5 after:bg-white after:rounded-full
                     after:transition-all peer-checked:after:translate-x-5">
@@ -175,7 +174,7 @@
             <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
               <input type="checkbox" [checked]="caso.bajoResponsabilidad" disabled class="sr-only peer" />
               <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                    peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                    peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                     after:content-[''] after:absolute after:top-0.5 after:left-0.5
                     after:w-5 after:h-5 after:bg-white after:rounded-full
                     after:transition-all peer-checked:after:translate-x-5">
@@ -195,7 +194,7 @@
             <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75 py-1">
               <input type="checkbox" [checked]="caso.denunciado" disabled class="sr-only peer" />
               <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                    peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                    peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                     after:content-[''] after:absolute after:top-0.5 after:left-0.5
                     after:w-5 after:h-5 after:bg-white after:rounded-full
                     after:transition-all peer-checked:after:translate-x-5">
@@ -207,7 +206,7 @@
             <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75 py-1">
               <input type="checkbox" [checked]="caso.constituido" disabled class="sr-only peer" />
               <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                    peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                    peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                     after:content-[''] after:absolute after:top-0.5 after:left-0.5
                     after:w-5 after:h-5 after:bg-white after:rounded-full
                     after:transition-all peer-checked:after:translate-x-5">
@@ -229,7 +228,7 @@
               <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
                 <input type="checkbox" [checked]="caso.allanamiento" disabled class="sr-only peer" />
                 <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                      peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                      peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
                       after:w-5 after:h-5 after:bg-white after:rounded-full
                       after:transition-all peer-checked:after:translate-x-5">
@@ -241,7 +240,7 @@
               <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
                 <input type="checkbox" [checked]="caso.allanamientoDomicilioSinOcupantes" disabled class="sr-only peer" />
                 <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                      peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                      peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
                       after:w-5 after:h-5 after:bg-white after:rounded-full
                       after:transition-all peer-checked:after:translate-x-5">
@@ -253,7 +252,7 @@
               <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
                 <input type="checkbox" [checked]="caso.auxilioFuerzaPublica" disabled class="sr-only peer" />
                 <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                      peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                      peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
                       after:w-5 after:h-5 after:bg-white after:rounded-full
                       after:transition-all peer-checked:after:translate-x-5">
@@ -265,7 +264,7 @@
               <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
                 <input type="checkbox" [checked]="caso.conCerrajero" disabled class="sr-only peer" />
                 <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                      peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                      peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
                       after:w-5 after:h-5 after:bg-white after:rounded-full
                       after:transition-all peer-checked:after:translate-x-5">
@@ -277,7 +276,7 @@
               <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
                 <input type="checkbox" [checked]="caso.denunciaOtroDomicilio" disabled class="sr-only peer" />
                 <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                      peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                      peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
                       after:w-5 after:h-5 after:bg-white after:rounded-full
                       after:transition-all peer-checked:after:translate-x-5">
@@ -289,7 +288,7 @@
               <label class="inline-flex items-center gap-3 cursor-not-allowed opacity-75">
                 <input type="checkbox" [checked]="caso.denunciaBienes" disabled class="sr-only peer" />
                 <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative
-                      peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500
+                      peer-checked:bg-primary-600 dark:peer-checked:bg-primary-500
                       after:content-[''] after:absolute after:top-0.5 after:left-0.5
                       after:w-5 after:h-5 after:bg-white after:rounded-full
                       after:transition-all peer-checked:after:translate-x-5">
@@ -300,21 +299,130 @@
             </div>
           </div>
 
-          <!-- Componente Mostrar Salida -->
-      <div *ngIf="salida" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-md dark:shadow-lg">
-        <h3 class="text-lg font-bold text-primary-600 dark:text-primary-400 mb-4 flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      @if(firma){
+        <div class="mt-2">
+          <app-show-escritos [firma]="firma" [caso]="caso" [salida]="salida" [tipoSalida]="caso!.tipoSalida"></app-show-escritos>
+        </div>
+      }
+
+      <!-- MEV Metadata -->
+      <div *ngIf="caso.mevMetadata?.encontradoEnMev" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 border-l-4 border-l-primary-500 shadow-md dark:shadow-lg">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+          <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          {{ getTipoSalidaTexto(caso.tipoSalida) }} enviado
+          Datos MEV
         </h3>
-        <app-mostrar-salida 
-          [tipoSalida]="caso.tipoSalida"
-          [salida]="salida"
-          [showCopyButton]="true">
-        </app-mostrar-salida>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div *ngIf="caso.mevMetadata?.numeroCausaMev">
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nº Causa MEV</label>
+            <p class="text-sm text-gray-900 dark:text-white font-mono">{{ caso.mevMetadata!.numeroCausaMev }}</p>
+          </div>
+          <div *ngIf="caso.mevMetadata?.organismoMev">
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Organismo MEV</label>
+            <p class="text-sm text-gray-900 dark:text-white">{{ caso.mevMetadata!.organismoMev }}</p>
+          </div>
+          <div *ngIf="caso.mevMetadata?.caratulaMev">
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Carátula MEV</label>
+            <p class="text-sm text-gray-900 dark:text-white">{{ caso.mevMetadata!.caratulaMev }}</p>
+          </div>
+          <div *ngIf="caso.mevMetadata?.ultimaBusquedaMev">
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Última búsqueda</label>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ caso.mevMetadata!.ultimaBusquedaMev! | date:'dd/MM/yy HH:mm' }}</p>
+          </div>
+        </div>
       </div>
 
+      <!-- Notificaciones MEV -->
+      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-md dark:shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.133 12.632v-1.8a5.406 5.406 0 0 0-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175ZM8.823 19a3.453 3.453 0 0 0 6.354 0H8.823Z"/>
+            </svg>
+            Notificaciones MEV
+          </h3>
+          <button 
+            (click)="sincronizarMev()"
+            [disabled]="sincronizando"
+            class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <svg [ngClass]="{'animate-spin': sincronizando}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            {{ sincronizando ? 'Sincronizando...' : 'Sincronizar con MEV' }}
+          </button>
+        </div>
+
+        <!-- Sync message -->
+        <div *ngIf="syncMessage" class="mb-3 px-3 py-2 rounded-md text-sm"
+             [ngClass]="{
+               'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400': syncError,
+               'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400': !syncError
+             }">
+          {{ syncMessage }}
+        </div>
+
+        <!-- Tabla de notificaciones -->
+        <div *ngIf="caso.notificaciones && caso.notificaciones.length > 0" class="overflow-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-900">
+              <tr>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Fecha
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Organismo
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
+                  Texto
+                </th>
+                <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
+                  Estado
+                </th>
+                <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
+                  MEV
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700/50">
+              <tr *ngFor="let notif of caso.notificaciones" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <td class="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  {{ notif.fecha | date:'dd/MM/yy HH:mm' }}
+                </td>
+                <td class="px-3 py-2 text-sm text-gray-900 dark:text-white">
+                  {{ notif.organismo || '-' }}
+                </td>
+                <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hidden md:table-cell">
+                  <div class="line-clamp-2">{{ notif.texto || '-' }}</div>
+                </td>
+                <td class="px-3 py-2 text-center w-24">
+                  <span *ngIf="notif.leida"
+                        class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                    Leída
+                  </span>
+                  <span *ngIf="!notif.leida"
+                        class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-700 dark:bg-primary-800 dark:text-primary-100">
+                    Nueva
+                  </span>
+                </td>
+                <td class="px-3 py-2 text-center w-24">
+                  <a *ngIf="notif.url" 
+                     [href]="notif.url" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-600 dark:bg-primary-700 dark:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors">
+                    Ver
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!caso.notificaciones || caso.notificaciones.length === 0" class="text-center py-4">
+          <p class="text-gray-500 dark:text-gray-400 text-sm">No hay notificaciones para este caso</p>
+        </div>
+      </div>
     </div>
-  </div>
 </div>
