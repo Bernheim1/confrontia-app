@@ -11,3 +11,9 @@ export interface FirmaAbogadoDto {
     nroLegajo: string;
     nroCajaPrevisoria: string;
 }
+
+export interface DataEscritosDto extends FirmaAbogadoDto {
+    categoriaFiscal: number;
+    nombreExpediente: string;
+    parteRepresentada: string;
+}

@@ -1,0 +1,97 @@
+<div id="default-modal" tabindex="-1" aria-hidden="true" class="overflow-y-auto fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full ">
+    <div class="mx-auto top relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white dark:bg-gray-800 border border-default rounded-base shadow-sm p-4 md:p-6">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between border-b border-default pb-4 md:pb-5">
+                <h3 class="text-lg text-gray-900 dark:text-white font-medium text-heading">
+                    Escrito
+                </h3>
+                <button (click)="close()" type="button" class=" text-gray-900 dark:text-white text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="default-modal">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="space-y-4 md:space-y-6 py-4 md:py-6 text-gray-900 dark:text-white">
+                <div class="col-span-12" [formGroup]="firmaForm">
+                    <div class="text-gray-900 dark:text-gray-100 rounded-xl  shadow-sm overflow-hidden">
+                        <div class="p-5">
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Nombre</label>
+                                <input type="text" formControlName="nombre" placeholder="Nombre del Abogado" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">CUIT</label>
+                                <input type="text" formControlName="cuit" placeholder="CUIT del Abogado" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">CUIL</label>
+                                <input type="text" formControlName="cuil" placeholder="CUIL del Abogado" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label for="categoriaFiscal" class="block text-sm font-medium mb-1">Categoria fiscal</label>
+                                    <select placeholder="Categoria fiscal" formControlName="categoriaFiscal" id="categoriaFiscal" class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <option  value="">Seleccione</option>
+                                        @for (item of categoriaFiscalCollection; track $index) {
+                                            <option value="{{item.id}}">{{item.description}}</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Domicilio</label>
+                                <input type="text" formControlName="domicilio" placeholder="Domicilio del Abogado" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Domicilio Electronico</label>
+                                <input type="text" formControlName="domicilioElectronico" placeholder="Domicilio Electronico del Abogado" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Nro. Legajo</label>
+                                <input type="text" formControlName="nroLegajo" placeholder="Legajo" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Caja previsoria</label>
+                                <input type="text" formControlName="nroCajaPrevisoria" placeholder="Caja Prev. de abogados" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Parte representada</label>
+                                <input type="text" formControlName="parteRepresentada" placeholder="Parte representada" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+
+                                <div class="col-span-6">
+                                <label class="block text-sm font-medium mb-1">Expediente</label>
+                                <input type="text" formControlName="nombreExpediente" placeholder="Expediente" 
+                                    class="w-full dark:bg-gray-600 dark:text-white rounded-md border border-gray-300 dark:border-gray-500 px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center border-t border-default space-x-4 pt-4 md:pt-5">
+                <button (click)="generar()" data-modal-hide="default-modal" type="button" class="text-gray-900 dark:text-white text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">
+                    Generar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
