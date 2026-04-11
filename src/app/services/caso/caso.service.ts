@@ -8,6 +8,8 @@ import { PagedResult } from "../../shared/models/paged-result";
 import { CasoDto } from "../../shared/models/caso-dto";
 import { SincronizarMevCasoResponse, SincronizarMevMasivoResponse } from "./contracts/sincronizar-mev-response";
 import { MevBusquedaCommand } from "../mev/commands/mev-busqueda-command";
+import { GetGrillaCasosQuery } from "./queries/get-grilla-casos-query";
+import { QueryStringHelper } from "../../shared/helpers/query-string.helper";
 
 @Injectable({
   providedIn: 'root'
@@ -25,14 +27,12 @@ export class CasoService {
     }
 
     // Método para obtener la lista paginada de casos
-    public getCasos(offset: number = 0, limit: number = 10): Observable<PagedResult<CasoListDto>> {
+    public getCasos(request: GetGrillaCasosQuery): Observable<PagedResult<CasoListDto>> {
         const url = `${this.basePath}${this.controller}`;
 
-        const params = new HttpParams()
-            .set('offset', offset.toString())
-            .set('limit', limit.toString());
+        const queryString = QueryStringHelper.getFromObject(request);
 
-        return this.http.get<PagedResult<CasoListDto>>(url, { params });
+        return this.http.get<PagedResult<CasoListDto>>(`${url}${queryString}`);
     }
 
     // Método para obtener un caso por ID

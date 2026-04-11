@@ -3,39 +3,66 @@
     <!-- Header eliminado -->
 
     <!-- Filtros -->
-    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-        <div class="col-span-1">
-          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
-            Nº Expediente
-          </label>
-          <input 
-            type="text" 
-            [(ngModel)]="filtroNumeroExpediente"
-            (input)="aplicarFiltros()"
-            placeholder="Buscar..."
-            class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+     <form [formGroup]="tableFilterForm">
+      <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          <div class="col-span-1">
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
+              Nº Expediente
+            </label>
+            <input 
+              type="text" 
+              formControlName="nroExpediente"
+              placeholder="Expediente"
+              class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div class="col-span-1">
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
+              Carátula
+            </label>
+            <input 
+              type="text" 
+              formControlName="caratula"
+              placeholder="Carátula"
+              class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div class="col-span-1">
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
+              Fecha ingreso desde
+            </label>
+            <input 
+              type="date" 
+              formControlName="fechaIngresoDesde"
+              placeholder="Buscar..."
+              class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div class="col-span-1">
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
+              Fecha ingreso hasta
+            </label>
+            <input 
+              type="date" 
+              formControlName="fechaIngresoHasta"
+              placeholder="Buscar..."
+              class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div class="col-span-1 flex items-end"></div>
+          <div class="col-span-1 flex items-end">
+            <button 
+              (click)="aplicarFiltros()"
+              class="mr-1 w-full px-3 py-1 text-sm font-medium text-white bg-primary-600 border border-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              Buscar
+            </button>
+            <button 
+              (click)="limpiarFiltros()"
+              class="w-full px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-primary-500">
+              Limpiar
+            </button>
+          </div>
         </div>
-        <div class="col-span-1">
-          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
-            Carátula
-          </label>
-          <input 
-            type="text" 
-            [(ngModel)]="filtroCaratula"
-            (input)="aplicarFiltros()"
-            placeholder="Buscar..."
-            class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-primary-500 focus:border-transparent">
-        </div>
-        <div class="col-span-1 flex items-end">
-          <button 
-            (click)="limpiarFiltros()"
-            class="w-full px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-primary-500">
-            Limpiar
-          </button>
-        </div>
-      </div>
-    </div>
+      </div>     
+     </form>
+
 
     <!-- Loading State -->
     <div *ngIf="loading" class="flex justify-center items-center py-8">
@@ -76,7 +103,7 @@
           </tr>
         </thead>
         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700/50">
-          <ng-container *ngFor="let caso of casos; let i = index">
+          <ng-container *ngFor="let caso of casos.items; let i = index">
             <tr 
               class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors align-top"
               style="height: 62px;">
@@ -143,7 +170,7 @@
             </tr>
           </ng-container>
           <!-- Relleno de filas vacías para mantener altura -->
-          <ng-container *ngFor="let empty of [].constructor(10 - casos.length > 0 ? 10 - casos.length : 0)">
+          <ng-container *ngFor="let empty of [].constructor(10 - casos.items.length > 0 ? 10 - casos.items.length : 0)">
             <tr style="height: 62px;">
               <td class="px-3 py-1 hidden md:table-cell w-40">&nbsp;</td>
               <td class="px-3 py-1">&nbsp;</td>
@@ -158,13 +185,13 @@
       </table>
 
       <!-- Empty State -->
-      <div *ngIf="casos.length === 0" class="text-center py-8">
+      <div *ngIf="casos.items.length === 0" class="text-center py-8">
         <p class="text-gray-500 dark:text-gray-400 text-sm">No hay casos para mostrar</p>
       </div>
     </div>
 
     <!-- Footer con paginación y rangoMostrado -->
-    <div *ngIf="!loading && !error && totalPaginas > 0" 
+    <div *ngIf="!loading && !error && casos.totalPages > 0" 
          class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between bg-gray-50 dark:bg-gray-900 gap-2">
       <div class="text-xs text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
         <span class="font-medium">{{ rangoMostrado }}</span>
@@ -172,12 +199,12 @@
       <div class="flex-1 flex justify-between sm:justify-end w-full">
         <div class="flex flex-1 justify-between sm:hidden">
           <button (click)="paginaAnterior()" 
-                  [disabled]="!hasPreviousPage"
+                  [disabled]="!casos.hasPreviousPage"
                   class="relative inline-flex items-center px-2 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
             Anterior
           </button>
           <button (click)="paginaSiguiente()" 
-                  [disabled]="!hasNextPage"
+                  [disabled]="!casos.hasNextPage"
                   class="ml-2 relative inline-flex items-center px-2 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
             Siguiente
           </button>
@@ -185,22 +212,22 @@
         <div class="hidden sm:flex sm:items-center sm:justify-end">
           <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button (click)="paginaAnterior()" 
-                    [disabled]="!hasPreviousPage"
+                    [disabled]="!casos.hasPreviousPage"
                     class="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
               <span class="sr-only">Anterior</span>
               &#8249;
             </button>
-            <button *ngFor="let pagina of [].constructor(totalPaginas); let i = index"
+            <button *ngFor="let pagina of [].constructor(casos.totalPages); let i = index"
                     (click)="irAPagina(i + 1)"
                     [ngClass]="{
-                      'z-10 bg-primary-600 border-primary-600 text-white': paginaActual === i + 1,
-                      'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700': paginaActual !== i + 1
+                      'z-10 bg-primary-600 border-primary-600 text-white': casos.pageNumber === i + 1,
+                      'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700': casos.pageNumber !== i + 1
                     }"
                     class="relative inline-flex items-center px-3 py-1 border text-xs font-medium">
               {{ i + 1 }}
             </button>
             <button (click)="paginaSiguiente()" 
-                    [disabled]="!hasNextPage"
+                    [disabled]="!casos.hasNextPage"
                     class="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
               <span class="sr-only">Siguiente</span>
               &#8250;

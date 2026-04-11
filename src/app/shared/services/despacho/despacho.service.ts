@@ -378,7 +378,7 @@ export class DespachoService {
   private matchJuzgadoCatalogoFlexible(detectado: string, labelFlag: boolean = false): JuzgadoCatalogEntry | undefined {
     if (!this.catalogo?.length) {
       console.warn('⚠️ Catálogo vacío - cargar CSV antes');
-      return;
+      return undefined;
     }
 
     const detNorm = this.normalizarClaveJuzgado(detectado);
@@ -554,7 +554,7 @@ export class DespachoService {
     // ========== PASO 3: SELECCIÓN DEL MEJOR ==========
     if (!candidatos.length) {
       console.warn('❌ Sin candidatos');
-      return;
+      return undefined;
     }
 
     candidatos.sort((a, b) => b.puntos - a.puntos);
@@ -599,7 +599,7 @@ export class DespachoService {
         console.log('⚡ Aceptado con confianza media:', mejor.entry.juzgado);
         return mejor.entry;
       }
-      return;
+      return undefined;
     }
 
     console.log('✅ Match seleccionado:', mejor.entry.juzgado, '→', mejor.entry.direccion);

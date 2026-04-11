@@ -6,7 +6,7 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { PathEscritos } from '../../../../../assets/templates/escritos/path-escritos';
 import { CasoDto } from '../../../../shared/models/caso-dto';
 import { HtmlHelper } from '../../../../shared/helpers/html-helper';
-import { FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
+import { DataEscritosDto, FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
 import { categoriaFiscalCollection } from '../../../../services/estudio/contracts/categorias-ficales-dto';
 import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../../../../shared/services/modal/modal.service';
@@ -14,6 +14,7 @@ import { HtmlViewerComponent } from '../../../../shared/components/html-viewer/h
 import { SalidaModalComponent } from '../../../../shared/components/salida-modal/salida-modal.component';
 import { Salida } from '../../../../shared/models/salida';
 import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
+import { DataEscritosConfigDialogComponent } from '../data-escritos-config-dialog/data-escritos-config-dialog.component';
 
 @Component({
   selector: 'app-show-escritos',
@@ -42,31 +43,43 @@ export class ShowEscritosComponent {
   }
   
   public getEscrito(path: string) {
+    const recordObject = this.getEscritoDto();
+    const ref = this.dialogService.open(DataEscritosConfigDialogComponent, { data: recordObject});
+
+    (ref.componentInstance as DataEscritosConfigDialogComponent | undefined)
+      ?.generarEvent
+      .subscribe((escritoData: Record<string, string>) => {
+        this.showEscrito(path, escritoData);
+        ref.close();
+      });
+  }
+
+  private showEscrito(path: string, escritoData: Record<string, string>): void {
     this.http.get(path, { responseType: 'text' }).subscribe({
       next: (html) => {
-        const recordObject = this.getEscritoDto();
+        const categoria = categoriaFiscalCollection.find(c => c.id === +escritoData?.['categoriaFiscal'])?.description;
 
-        var result = HtmlHelper.replacePlaceholders(recordObject, html);
+        const updatedEscritoData = { ...escritoData, categoriaFiscal: categoria };
 
-        const ref = this.dialogService.open(HtmlViewerComponent, { data: result});
+        const result = HtmlHelper.replacePlaceholders(updatedEscritoData, html);
+        this.dialogService.open(HtmlViewerComponent, { data: result });
       },
-      error: (err) => {
-        
+      error: () => {
+        this.toastr.error('No fue posible generar el escrito.', 'Error');
       }
     });
   }
 
-  private getEscritoDto(): Record<string, string> {
-    const categoria = categoriaFiscalCollection.find(c => c.id === this.firma?.categoriaFiscal)?.description;
-
-    const escrito: Record<string, string> = {
-      nombreAbogado: this.firma?.nombre ?? '',
+  private getEscritoDto(): DataEscritosDto {
+    const escrito: DataEscritosDto = {
+      id: this.firma?.id,
+      nombre: this.firma?.nombre ?? '',
       cuit: this.firma?.cuit ?? '',
-      categoriaFiscal: categoria ?? '',
+      categoriaFiscal: this.firma?.categoriaFiscal,
       cuil: this.firma?.cuil ?? '',
-      domicilioAbogado: this.firma?.domicilio ?? '',
-      domicilioElectronicoAbogado: this.firma?.domicilioElectronico ?? '',
-      parteRepresentada: 'parteRepresentada',
+      domicilio: this.firma?.domicilio ?? '',
+      domicilioElectronico: this.firma?.domicilioElectronico ?? '',
+      parteRepresentada: this.caso.caratulaExpediente,
       nombreExpediente: this.caso?.caratulaExpediente ?? '',
       nroLegajo: this.firma?.nroLegajo ?? '',
       nroCajaPrevisoria: this.firma?.nroCajaPrevisoria ?? ''

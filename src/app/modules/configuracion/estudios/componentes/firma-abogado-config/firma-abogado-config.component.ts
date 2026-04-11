@@ -12,7 +12,8 @@ import { EstudioService } from '../../../../../services/estudio/estudio.service'
 })
 export class FirmaAbogadoConfigComponent implements OnInit {
 
-  public constructor(private readonly _formBuilder: FormBuilder, private readonly _estudioService: EstudioService) { this.firmaForm = this.initFirmaForm(); }
+  public constructor(private readonly _formBuilder: FormBuilder, private readonly _estudioService: EstudioService) 
+  { this.firmaForm = this.initFirmaForm(); }
 
   @Output() public readonly componentFormInstance = new EventEmitter<FormGroup>();
   

@@ -27,7 +27,7 @@ export class DialogService {
     const overlayRef = this.overlay.create({
       positionStrategy,
       hasBackdrop: true,
-      backdropClass: 'overlay-backdrop',
+      backdropClass: 'bg-black/40',
       panelClass: 'overlay-panel',
     });
 
@@ -45,7 +45,8 @@ export class DialogService {
 
     // Attach component portal to the overlay
     const portal = new ComponentPortal(component, null, injector);
-    overlayRef.attach(portal);
+    const componentRef = overlayRef.attach(portal);
+    dialogRef.setComponentInstance(componentRef.instance);
 
     return dialogRef;
   }

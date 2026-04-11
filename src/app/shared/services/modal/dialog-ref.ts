@@ -7,6 +7,7 @@ import { Subject, Observable } from 'rxjs';
  */
 export class DialogRef {
   private afterClosedSubject = new Subject<any>();
+  public componentInstance?: unknown;
 
   constructor(private overlayRef: OverlayRef) {}
 
@@ -17,6 +18,10 @@ export class DialogRef {
     this.overlayRef.dispose();
     this.afterClosedSubject.next(result);
     this.afterClosedSubject.complete();
+  }
+
+  public setComponentInstance(componentInstance: unknown) {
+    this.componentInstance = componentInstance;
   }
 
   /**
