@@ -177,7 +177,7 @@
             <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden xl:table-cell w-48">
               Trámite
             </th>
-            <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
+            <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-36">
               Acciones
             </th>
           </tr>
@@ -212,8 +212,12 @@
                   {{ notif.tipoTramiteDescripcion || '-' }}
                 </div>
               </td>
-              <td class="px-3 py-1 text-center whitespace-nowrap w-32">
+              <td class="px-3 py-1 text-center whitespace-nowrap w-36">
                 <div class="inline-flex items-center gap-1">
+                  <button (click)="abrirModalNotificacion(notif)"
+                    class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none">
+                    Ver
+                  </button>
                   <button *ngIf="notif.casoId"
                     (click)="verCaso(notif.casoId!)"
                     class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-600 dark:bg-primary-700 dark:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors focus:outline-none">
@@ -224,13 +228,6 @@
                     class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-amber-50 text-amber-600 dark:bg-amber-700 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-600 transition-colors focus:outline-none">
                     Crear Caso
                   </button>
-                  <a *ngIf="notif.url"
-                     [href]="notif.url" 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                    MEV
-                  </a>
                 </div>
               </td>
             </tr>
@@ -243,7 +240,7 @@
               <td class="px-3 py-1 hidden md:table-cell">&nbsp;</td>
               <td class="px-3 py-1 hidden lg:table-cell">&nbsp;</td>
               <td class="px-3 py-1 hidden xl:table-cell w-48">&nbsp;</td>
-              <td class="px-3 py-1 text-center whitespace-nowrap w-32">&nbsp;</td>
+              <td class="px-3 py-1 text-center whitespace-nowrap w-36">&nbsp;</td>
             </tr>
           </ng-container>
         </tbody>
@@ -264,5 +261,78 @@
       <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Se buscarán todas las notificaciones del usuario en MEV para el período indicado</p>
     </div>
 
+  </div>
+</div>
+
+<!-- Modal detalle notificación -->
+<div *ngIf="notificacionSeleccionada" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/50" (click)="cerrarModalNotificacion()"></div>
+  <!-- Modal -->
+  <div class="relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detalle de Notificación</h3>
+      <button (click)="cerrarModalNotificacion()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <!-- Body -->
+    <div class="px-5 py-4 overflow-auto flex-1 space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Fecha</label>
+          <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Expediente</label>
+          <p class="text-sm text-gray-900 dark:text-white font-mono">{{ notificacionSeleccionada.expediente || '-' }}</p>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Organismo</label>
+          <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.organismo || '-' }}</p>
+        </div>
+        <div *ngIf="notificacionSeleccionada.caratula" class="sm:col-span-2">
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Carátula</label>
+          <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.caratula }}</p>
+        </div>
+        <div *ngIf="notificacionSeleccionada.tipoTramiteDescripcion" class="sm:col-span-2">
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo de Trámite</label>
+          <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.tipoTramiteDescripcion }}</p>
+        </div>
+      </div>
+      <div *ngIf="notificacionSeleccionada.texto">
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto</label>
+        <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">{{ notificacionSeleccionada.texto }}</p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="px-5 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button *ngIf="notificacionSeleccionada.casoId"
+          (click)="cerrarModalNotificacion(); verCaso(notificacionSeleccionada!.casoId!)"
+          class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary-600 text-white hover:bg-primary-700 transition-colors">
+          Ver Caso
+        </button>
+        <button *ngIf="!notificacionSeleccionada.casoId && esPrimerDespacho(notificacionSeleccionada)"
+          (click)="cerrarModalNotificacion(); crearCasoDesdeNotificacion(notificacionSeleccionada!)"
+          class="px-3 py-1.5 text-xs font-semibold rounded-md bg-amber-500 text-white hover:bg-amber-600 transition-colors">
+          Crear Caso
+        </button>
+        <a *ngIf="notificacionSeleccionada.url" 
+           [href]="notificacionSeleccionada.url" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="px-3 py-1.5 text-xs font-semibold rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          Ver en MEV
+        </a>
+      </div>
+      <button (click)="cerrarModalNotificacion()"
+        class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+        Cerrar
+      </button>
+    </div>
   </div>
 </div>

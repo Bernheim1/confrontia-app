@@ -247,4 +247,15 @@ export class GrillaNotificacionesComponent implements OnInit, OnDestroy {
   esPrimerDespacho(notif: MevNotificacionBusquedaDto): boolean {
     return notif.tipoTramiteId === GrillaNotificacionesComponent.PRIMER_DESPACHO_ID;
   }
+
+  // Modal
+  notificacionSeleccionada: MevNotificacionBusquedaDto | null = null;
+
+  abrirModalNotificacion(notif: MevNotificacionBusquedaDto): void {
+    this.notificacionSeleccionada = notif;
+  }
+
+  cerrarModalNotificacion(): void {
+    this.notificacionSeleccionada = null;
+  }
 }
