@@ -57,6 +57,7 @@ export class GrillaNotificacionesComponent implements OnInit, OnDestroy {
   private filtrosSub: Subscription | null = null;
 
   private static readonly GRID_KEY = 'notificaciones';
+  private static readonly PRIMER_DESPACHO_ID = 544;
 
   constructor(
     private casoService: CasoService,
@@ -237,23 +238,13 @@ export class GrillaNotificacionesComponent implements OnInit, OnDestroy {
     this.router.navigate(['/casos/detalle', casoId]);
   }
 
-  crearCaso(): void {
-    this.router.navigate(['/despacho']);
+  crearCasoDesdeNotificacion(notif: MevNotificacionBusquedaDto): void {
+    this.router.navigate(['/notificaciones/despacho'], {
+      state: { notificacion: notif }
+    });
   }
 
-  getEstadoClasses(notif: MevNotificacionBusquedaDto): string {
-    if (notif.casoId && !notif.yaExistente) {
-      return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
-    }
-    if (notif.casoId && notif.yaExistente) {
-      return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
-    }
-    return 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300';
-  }
-
-  getEstadoTexto(notif: MevNotificacionBusquedaDto): string {
-    if (notif.casoId && !notif.yaExistente) return 'Nueva';
-    if (notif.casoId && notif.yaExistente) return 'Existente';
-    return 'Sin caso';
+  esPrimerDespacho(notif: MevNotificacionBusquedaDto): boolean {
+    return notif.tipoTramiteId === GrillaNotificacionesComponent.PRIMER_DESPACHO_ID;
   }
 }

@@ -26,6 +26,18 @@ table {
   border-spacing: 0;
 }
 
+table tbody tr.notif-unread td:first-child {
+  box-shadow: inset 3px 0 0 0 #334b70;
+}
+
+table tbody tr.notif-unread td {
+  background-color: rgba(51, 75, 112, 0.06);
+}
+
+:host-context(.dark) table tbody tr.notif-unread td {
+  background-color: rgba(51, 75, 112, 0.15);
+}
+
 // Sticky header
 thead {
   position: sticky;

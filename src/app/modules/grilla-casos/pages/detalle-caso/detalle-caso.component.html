@@ -305,42 +305,27 @@
         </div>
       }
 
-      <!-- MEV Metadata -->
-      <div *ngIf="caso.mevMetadata?.encontradoEnMev" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 border-l-4 border-l-primary-500 shadow-md dark:shadow-lg">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
-          <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          Datos MEV
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div *ngIf="caso.mevMetadata?.numeroCausaMev">
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nº Causa MEV</label>
-            <p class="text-sm text-gray-900 dark:text-white font-mono">{{ caso.mevMetadata!.numeroCausaMev }}</p>
-          </div>
-          <div *ngIf="caso.mevMetadata?.organismoMev">
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Organismo MEV</label>
-            <p class="text-sm text-gray-900 dark:text-white">{{ caso.mevMetadata!.organismoMev }}</p>
-          </div>
-          <div *ngIf="caso.mevMetadata?.caratulaMev">
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Carátula MEV</label>
-            <p class="text-sm text-gray-900 dark:text-white">{{ caso.mevMetadata!.caratulaMev }}</p>
-          </div>
-          <div *ngIf="caso.mevMetadata?.ultimaBusquedaMev">
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Última búsqueda</label>
-            <p class="text-sm text-gray-600 dark:text-gray-400">{{ caso.mevMetadata!.ultimaBusquedaMev! | date:'dd/MM/yy HH:mm' }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Notificaciones MEV -->
+      <!-- Notificaciones -->
       <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-md dark:shadow-lg">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
             <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.133 12.632v-1.8a5.406 5.406 0 0 0-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175ZM8.823 19a3.453 3.453 0 0 0 6.354 0H8.823Z"/>
             </svg>
-            Notificaciones MEV
+            Notificaciones
+            <span *ngIf="caso.notificaciones && caso.notificaciones.length > 0"
+              class="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+              {{ caso.notificaciones.length }}
+            </span>
+            <!-- Clickeable: filtra solo sin leer -->
+            <button *ngIf="getNotificacionesNoLeidas() > 0"
+              (click)="filtroSoloNoLeidas = !filtroSoloNoLeidas"
+              class="px-2 py-0.5 text-xs font-semibold rounded-full transition-colors cursor-pointer"
+              [ngClass]="filtroSoloNoLeidas
+                ? 'bg-primary-600 text-white dark:bg-primary-500'
+                : 'bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-700'">
+              {{ getNotificacionesNoLeidas() }} sin leer
+            </button>
           </h3>
           <button 
             (click)="sincronizarMev()"
@@ -363,37 +348,39 @@
         </div>
 
         <!-- Tabla de notificaciones -->
-        <div *ngIf="caso.notificaciones && caso.notificaciones.length > 0" class="overflow-auto">
+        <div *ngIf="notificacionesFiltradas.length > 0" class="overflow-auto">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
                   Fecha
                 </th>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Organismo
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
-                  Texto
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
+                  Trámite
                 </th>
                 <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
                   Estado
                 </th>
-                <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
-                  MEV
+                <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-36">
+                  Acciones
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700/50">
-              <tr *ngFor="let notif of caso.notificaciones" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <tr *ngFor="let notif of notificacionesFiltradas" 
+                  class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  [ngClass]="{'bg-primary-50': !notif.leida}">
                 <td class="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   {{ notif.fecha | date:'dd/MM/yy HH:mm' }}
                 </td>
                 <td class="px-3 py-2 text-sm text-gray-900 dark:text-white">
                   {{ notif.organismo || '-' }}
                 </td>
-                <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hidden md:table-cell">
-                  <div class="line-clamp-2">{{ notif.texto || '-' }}</div>
+                <td class="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 hidden lg:table-cell">
+                  <div class="line-clamp-2">{{ notif.tipoTramiteDescripcion || '-' }}</div>
                 </td>
                 <td class="px-3 py-2 text-center w-24">
                   <span *ngIf="notif.leida"
@@ -405,14 +392,20 @@
                     Nueva
                   </span>
                 </td>
-                <td class="px-3 py-2 text-center w-24">
-                  <a *ngIf="notif.url" 
-                     [href]="notif.url" 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-600 dark:bg-primary-700 dark:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors">
-                    Ver
-                  </a>
+                <td class="px-3 py-2 text-center w-36">
+                  <div class="inline-flex items-center gap-1">
+                    <button (click)="abrirModalNotificacion(notif)"
+                      class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-600 dark:bg-primary-700 dark:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors">
+                      Ver
+                    </button>
+                    <a *ngIf="notif.url" 
+                       [href]="notif.url" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                      MEV
+                    </a>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -420,8 +413,89 @@
         </div>
 
         <!-- Empty State -->
+        <div *ngIf="notificacionesFiltradas.length === 0 && caso.notificaciones && caso.notificaciones.length > 0" class="text-center py-4">
+          <p class="text-gray-500 dark:text-gray-400 text-sm">No hay notificaciones sin leer</p>
+          <button (click)="filtroSoloNoLeidas = false" class="mt-1 text-xs text-primary-600 dark:text-primary-400 hover:underline">Ver todas</button>
+        </div>
         <div *ngIf="!caso.notificaciones || caso.notificaciones.length === 0" class="text-center py-4">
           <p class="text-gray-500 dark:text-gray-400 text-sm">No hay notificaciones para este caso</p>
+          <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Presioná "Sincronizar con MEV" para buscar notificaciones</p>
+        </div>
+      </div>
+
+      <!-- Modal detalle notificación -->
+      <div *ngIf="notificacionSeleccionada" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-black/50" (click)="cerrarModalNotificacion()"></div>
+        <!-- Modal -->
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <!-- Header -->
+          <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detalle de Notificación</h3>
+            <button (click)="cerrarModalNotificacion()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Body -->
+          <div class="px-5 py-4 overflow-auto flex-1 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Fecha</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Estado</label>
+                <span *ngIf="notificacionSeleccionada.leida"
+                      class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                  Leída
+                </span>
+                <span *ngIf="!notificacionSeleccionada.leida"
+                      class="px-2 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-primary-50 text-primary-700 dark:bg-primary-800 dark:text-primary-100">
+                  Nueva
+                </span>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Organismo</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.organismo || '-' }}</p>
+              </div>
+              <div *ngIf="notificacionSeleccionada.caratula" class="sm:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Carátula</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.caratula }}</p>
+              </div>
+              <div *ngIf="notificacionSeleccionada.tipoTramiteDescripcion" class="sm:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo de Trámite</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ notificacionSeleccionada.tipoTramiteDescripcion }}</p>
+              </div>
+            </div>
+            <div *ngIf="notificacionSeleccionada.texto">
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Texto</label>
+              <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">{{ notificacionSeleccionada.texto }}</p>
+            </div>
+          </div>
+          <!-- Footer -->
+          <div class="px-5 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button *ngIf="!notificacionSeleccionada.leida"
+                (click)="marcarComoLeida(notificacionSeleccionada)"
+                [disabled]="marcandoLeida"
+                class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                {{ marcandoLeida ? 'Marcando...' : 'Marcar como leída' }}
+              </button>
+              <a *ngIf="notificacionSeleccionada.url" 
+                 [href]="notificacionSeleccionada.url" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 class="px-3 py-1.5 text-xs font-semibold rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                Ver en MEV
+              </a>
+            </div>
+            <button (click)="cerrarModalNotificacion()"
+              class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
     </div>

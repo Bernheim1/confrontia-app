@@ -30,4 +30,10 @@ export class NotificacionService {
 
     return this.http.get<CasoNotificacionDto[]>(url);
   }
+
+  public marcarComoLeida(idNotificacion: number): Observable<void> {
+    const url = `${this.basePath}${this.controller}/${idNotificacion}/marcar-leida`;
+
+    return this.http.post<void>(url, null);
+  }
 }

@@ -5,6 +5,8 @@ export interface CasoNotificacionDto {
   caratula?: string;
   texto?: string;
   url: string;
+  tipoTramiteId?: number;
+  tipoTramiteDescripcion?: string;
   createdAt: string;
   leida: boolean;
 }

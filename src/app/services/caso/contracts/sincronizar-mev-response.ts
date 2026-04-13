@@ -21,6 +21,8 @@ export interface MevNotificacionBusquedaDto {
   organismo?: string | null;
   caratula?: string | null;
   texto?: string | null;
+  tipoTramiteId?: number | null;
+  tipoTramiteDescripcion?: string | null;
   url: string;
   casoId?: string | null;
   yaExistente: boolean;

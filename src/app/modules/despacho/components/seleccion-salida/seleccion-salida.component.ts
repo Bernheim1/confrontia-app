@@ -44,6 +44,9 @@ export class SeleccionSalidaComponent implements OnInit {
   @Input() masivo: boolean = false;
   @Input() totalDespachos: number = 1;
   @Input() despachosCompletados: number = 0;
+  @Input() metaOrganismo?: string;
+  @Input() metaCaratula?: string;
+  @Input() metaExpediente?: string;
 
   formulario!: FormGroup;
   hasError: boolean = false;
@@ -148,6 +151,28 @@ export class SeleccionSalidaComponent implements OnInit {
     }
     
     const datos = await this.despachoService.procesarDespachoAsync(this.textoDespacho, this.tipoSalida, subtipoFinal);
+
+    // Usar metadatos de la notificación como fallback cuando el parsing no encuentra valores
+    if (this.metaOrganismo && !datos.organo.organo) {
+      const orgNorm = this.metaOrganismo;
+      datos.organo.organo = orgNorm;
+      datos.organo.juzgadoInterviniente = orgNorm;
+      datos.organo.juzgadoTribunal = orgNorm;
+      // Intentar buscar dirección en catálogo
+      const catalogoMatch = this.despachoService.matchDesdeMetadata(orgNorm);
+      if (catalogoMatch) {
+        datos.organo.organo = catalogoMatch.juzgado;
+        datos.organo.juzgadoInterviniente = catalogoMatch.juzgado;
+        datos.organo.juzgadoTribunal = catalogoMatch.juzgado;
+        datos.organo.direccionJuzgado = catalogoMatch.direccion || '';
+      }
+    }
+    if (this.metaCaratula && !datos.expediente.caratulaExpediente) {
+      datos.expediente.caratulaExpediente = this.metaCaratula;
+    }
+    if (this.metaExpediente && !datos.expediente.numeroExpediente) {
+      datos.expediente.numeroExpediente = this.metaExpediente;
+    }
 
     this.formulario.patchValue({
       organo: {
