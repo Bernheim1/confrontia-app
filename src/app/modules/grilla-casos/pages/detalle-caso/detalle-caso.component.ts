@@ -12,6 +12,7 @@ import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
 import { EstudioService } from '../../../../services/estudio/estudio.service';
 import { FirmaAbogadoDto } from '../../../../services/estudio/contracts/firma-abogado-dto';
 import { CasoNotificacionDto, CasoMevMetadataDto } from '../../../../shared/models/notificacion-caso-dto';
+import { NotificacionService } from '../../../../services/notificacion/notificacion.service';
 
 @Component({
   selector: 'app-detalle-caso',
@@ -33,11 +34,17 @@ export class DetalleCasoComponent implements OnInit {
   sincronizando: boolean = false;
   syncMessage: string | null = null;
   syncError: boolean = false;
+
+  // Notificaciones
+  filtroSoloNoLeidas: boolean = false;
+  notificacionSeleccionada: CasoNotificacionDto | null = null;
+  marcandoLeida: boolean = false;
   
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private casoService: CasoService,
+    private notificacionService: NotificacionService,
     private _estudioService: EstudioService
   ) {}
 
@@ -126,6 +133,40 @@ export class DetalleCasoComponent implements OnInit {
     this.router.navigate(['/casos']);
   }
 
+  getNotificacionesNoLeidas(): number {
+    return this.caso?.notificaciones?.filter(n => !n.leida).length ?? 0;
+  }
+
+  get notificacionesFiltradas(): CasoNotificacionDto[] {
+    if (!this.caso?.notificaciones) return [];
+    if (this.filtroSoloNoLeidas) return this.caso.notificaciones.filter(n => !n.leida);
+    return this.caso.notificaciones;
+  }
+
+  abrirModalNotificacion(notif: CasoNotificacionDto): void {
+    this.notificacionSeleccionada = notif;
+  }
+
+  cerrarModalNotificacion(): void {
+    this.notificacionSeleccionada = null;
+  }
+
+  marcarComoLeida(notif: CasoNotificacionDto): void {
+    this.marcandoLeida = true;
+    this.notificacionService.marcarComoLeida(notif.idNotificacion).subscribe({
+      next: () => {
+        notif.leida = true;
+        this.marcandoLeida = false;
+        if (this.caso) {
+          this.caso.tieneNotificacionesNoLeidas = this.caso.notificaciones?.some(n => !n.leida) ?? false;
+        }
+      },
+      error: () => {
+        this.marcandoLeida = false;
+      }
+    });
+  }
+
   sincronizarMev(): void {
     this.sincronizando = true;
     this.syncMessage = null;
@@ -140,8 +181,8 @@ export class DetalleCasoComponent implements OnInit {
             : 'Sincronizado. No hay notificaciones nuevas';
           this.syncMessage = msg;
           this.syncError = false;
-          // Recargar el caso para obtener las notificaciones actualizadas
-          this.cargarCaso();
+          // Recargar solo las notificaciones sin afectar scroll
+          this.recargarNotificaciones();
         } else {
           this.syncMessage = response.encontradoEnMev
             ? 'No se pudo sincronizar completamente'
@@ -158,6 +199,18 @@ export class DetalleCasoComponent implements OnInit {
         this.sincronizando = false;
         this.syncMessage = 'Error al sincronizar con MEV';
         this.syncError = true;
+      }
+    });
+  }
+
+  private recargarNotificaciones(): void {
+    this.casoService.getCasoById(this.casoId).subscribe({
+      next: (caso) => {
+        if (this.caso) {
+          this.caso.notificaciones = caso.notificaciones;
+          this.caso.mevMetadata = caso.mevMetadata;
+          this.caso.tieneNotificacionesNoLeidas = caso.tieneNotificacionesNoLeidas;
+        }
       }
     });
   }

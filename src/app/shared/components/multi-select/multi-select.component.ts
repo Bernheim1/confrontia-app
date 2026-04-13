@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MevFiltroOption } from '../../../services/mev/contracts/mev-filtros-response';
@@ -28,6 +28,7 @@ import { MevFiltroOption } from '../../../services/mev/contracts/mev-filtros-res
         <!-- Search -->
         <div class="p-1.5 border-b border-gray-200 dark:border-gray-700">
           <input
+            #searchInput
             type="text"
             [(ngModel)]="searchText"
             (input)="filterOptions()"
@@ -75,6 +76,8 @@ export class MultiSelectComponent implements OnInit, OnChanges {
   searchText = '';
   filteredOptions: MevFiltroOption[] = [];
 
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+
   constructor(private elRef: ElementRef) {}
 
   ngOnInit(): void {
@@ -108,6 +111,7 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     if (this.isOpen) {
       this.searchText = '';
       this.filteredOptions = this.options;
+      setTimeout(() => this.searchInput?.nativeElement?.focus(), 0);
     }
   }
 

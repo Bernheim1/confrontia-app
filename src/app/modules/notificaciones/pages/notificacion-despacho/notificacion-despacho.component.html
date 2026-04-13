@@ -1,0 +1,78 @@
+<div class="w-full">
+  <!-- Header con info de la notificación -->
+  <div class="mb-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Crear Caso desde Notificación</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <span class="font-medium">{{ notificacion?.expediente }}</span>
+          <span *ngIf="notificacion?.organismo"> · {{ notificacion.organismo }}</span>
+        </p>
+      </div>
+      <button (click)="volver()" type="button"
+        class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <fa-icon [icon]="faArrowLeft" class="mr-1"></fa-icon>
+        Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- Paso: Selección Salida -->
+  <div *ngIf="step === 1">
+    <app-seleccion-salida
+      (salidaSeleccionada)="onSalidaSeleccionada($event)"
+      (formularioCompletado)="onFormularioCompletado($event)"
+      (reingresar)="volver()"
+      [textoDespacho]="notificacion.texto || ''"
+      [tipoSalida]="tipoSalida"
+      [subtipoSalida]="subtipoSalida"
+      [index]="0"
+      [masivo]="false"
+      [totalDespachos]="1"
+      [despachosCompletados]="formulariosValidos.size"
+      [metaOrganismo]="notificacion.organismo || undefined"
+      [metaCaratula]="notificacion.caratula || undefined"
+      [metaExpediente]="notificacion.expediente || undefined">
+    </app-seleccion-salida>
+
+    <!-- Botón flotante -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex gap-3">
+      <button (click)="generarSalida()"
+        class="px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl font-medium shadow-xl transition-all duration-200 hover:scale-[1.02]"
+        type="button">
+        <span>Generar <span class="font-bold">{{ tipoSalida === 1 ? 'Cédula' : 'Mandamiento' }}</span></span>
+      </button>
+      <button (click)="volver()" type="button"
+        class="px-4 py-3 text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-xl shadow-xl transition-all duration-200 hover:scale-[1.02]"
+        title="Volver a notificaciones">
+        <fa-icon [icon]="faArrowLeft"></fa-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Paso: Mostrar Salida -->
+  <div *ngIf="step === 2">
+    <app-mostrar-salida
+      [tipoSalida]="tipoSalida"
+      [salida]="salida[0]"
+      [textoDespacho]="notificacion.texto || ''"
+      [masivo]="false"
+      [showCopyButton]="true">
+    </app-mostrar-salida>
+
+    <!-- Botones flotantes -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex gap-3">
+      <button (click)="copiarSalida()" type="button"
+        class="px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl font-medium shadow-xl transition-all duration-200 hover:scale-[1.02] inline-flex items-center gap-2">
+        <fa-icon [icon]="faCopy"></fa-icon>
+        <span *ngIf="!copiedOnce">Copiar {{ tipoSalida === 1 ? 'Cédula' : 'Mandamiento' }}</span>
+        <span *ngIf="copiedOnce">Copiado!</span>
+      </button>
+      <button (click)="volver()" type="button"
+        class="px-4 py-3 text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-xl shadow-xl transition-all duration-200 hover:scale-[1.02] inline-flex items-center gap-2">
+        <fa-icon [icon]="faArrowLeft"></fa-icon>
+        <span class="hidden sm:inline">Volver a Notificaciones</span>
+      </button>
+    </div>
+  </div>
+</div>

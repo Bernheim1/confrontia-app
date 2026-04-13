@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CasoService } from '../../../../services/caso/caso.service';
 import { CasoListDto } from '../../../../shared/models/caso-list-dto';
 import { GridStateService } from '../../../../shared/services/grid-state.service';
+import { DatepickerComponent } from '../../../../shared/components/datepicker/datepicker.component';
 import { GetGrillaCasosQuery, GetGrillaCasosQueryFilters } from '../../../../services/caso/queries/get-grilla-casos-query';
 import { CasoDto } from '../../../../shared/models/caso-dto';
 import { PagedResult } from '../../../../shared/models/paged-result';
@@ -13,7 +14,7 @@ import { IPagedRequest } from '../../../../shared/models/paged-request';
 @Component({
   selector: 'app-grilla-casos',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DatepickerComponent],
   templateUrl: './grilla-casos.component.html',
   styleUrls: ['./grilla-casos.component.scss']
 })
@@ -31,19 +32,30 @@ export class GrillaCasosComponent implements OnInit, OnDestroy {
   public tableFilterForm: FormGroup;
   filtroNumeroExpediente: string = '';
   filtroCaratula: string = '';
+  fechaIngresoDesde: string = '';
+  fechaIngresoHasta: string = '';
 
   constructor(
     private readonly _formBuilder: FormBuilder,
     private casoService: CasoService,
     private router: Router,
     private gridState: GridStateService
-  ) { this.tableFilterForm = this.initTableFilterForm(); }
+  ) {
+    this.tableFilterForm = this.initTableFilterForm();
+
+    const hoy = new Date();
+    const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    this.fechaIngresoHasta = hoy.toISOString().split('T')[0];
+    this.fechaIngresoDesde = primerDiaMes.toISOString().split('T')[0];
+  }
 
   ngOnInit(): void {
     const cached = this.gridState.restore<any, PagedResult<CasoListDto>>(GrillaCasosComponent.GRID_KEY);
     if (cached) {
       this.filtroNumeroExpediente = cached.filters.filtroNumeroExpediente;
       this.filtroCaratula = cached.filters.filtroCaratula;
+      this.fechaIngresoDesde = cached.filters.fechaIngresoDesde ?? '';
+      this.fechaIngresoHasta = cached.filters.fechaIngresoHasta ?? '';
       this.casos = cached.data;
     } else {
       this.cargarCasos();
@@ -58,6 +70,8 @@ export class GrillaCasosComponent implements OnInit, OnDestroy {
         filters: {
           filtroNumeroExpediente: this.filtroNumeroExpediente,
           filtroCaratula: this.filtroCaratula,
+          fechaIngresoDesde: this.fechaIngresoDesde,
+          fechaIngresoHasta: this.fechaIngresoHasta,
         },
         data: this.casos,
         pagination: {
@@ -80,7 +94,9 @@ export class GrillaCasosComponent implements OnInit, OnDestroy {
 
     const request: GetGrillaCasosQuery = {
       ...this.tableFilterForm.getRawValue(),
-      ...this._pagedRequest
+      ...this._pagedRequest,
+      ...(this.fechaIngresoDesde ? { fechaIngresoDesde: this.fechaIngresoDesde } : {}),
+      ...(this.fechaIngresoHasta ? { fechaIngresoHasta: this.fechaIngresoHasta } : {}),
     };
     
     this.casoService.getCasos(request).subscribe({
@@ -103,6 +119,10 @@ export class GrillaCasosComponent implements OnInit, OnDestroy {
 
   limpiarFiltros(): void {
     this.tableFilterForm.reset();
+    const hoy = new Date();
+    const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    this.fechaIngresoHasta = hoy.toISOString().split('T')[0];
+    this.fechaIngresoDesde = primerDiaMes.toISOString().split('T')[0];
     this.aplicarFiltros();
   }
 
@@ -174,18 +194,7 @@ export class GrillaCasosComponent implements OnInit, OnDestroy {
           updateOn: 'blur'
         }
       ],
-      fechaIngresoDesde: [
-        undefined, {
-          validators: [],
-          updateOn: 'blur'
-        }
-      ],
-      fechaIngresoHasta: [
-        undefined, {
-          validators: [],
-          updateOn: 'blur'
-        }
-      ]
+
     });
 
     return formGroup;

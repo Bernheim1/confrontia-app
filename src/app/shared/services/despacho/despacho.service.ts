@@ -76,6 +76,16 @@ export class DespachoService {
     }
   }
 
+  /**
+   * Busca un juzgado en el catálogo a partir del nombre de organismo de la notificación.
+   * Útil como fallback cuando el texto del despacho no contiene el juzgado.
+   */
+  matchDesdeMetadata(organismo: string): JuzgadoCatalogEntry | undefined {
+    if (!this.catalogo?.length || !organismo) return undefined;
+    const detectado = this.capitalizarFrase(organismo.replace(/\s+/g, ' ').trim());
+    return this.matchJuzgadoCatalogoFlexible(detectado, false);
+  }
+
   async procesarDespachoAsync(
     despachoTexto: string,
     tipoSalida: TipoSalidaEnum,
@@ -150,6 +160,15 @@ export class DespachoService {
   // ---------------- Normalización ----------------
   private normalizarTexto(raw: string): string {
     return raw
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/?(p|div|tr|li|h[1-6])\b[^>]*>/gi, '\n')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#?\w+;/g, ' ')
       .replace(/[^\n\rA-Z0-9ÁÉÍÓÚÑa-záéíóúñ\/.,:()"%-]/g, ' ')
       .replace(/\t+/g, ' ')
       .replace(/\r/g, '\n')
@@ -653,12 +672,15 @@ export class DespachoService {
     // Busca variantes: EXPEDIENTE, EXPEDIENTE Nº, EXPEDIENTE N°, Número, con o sin dos puntos, salto de línea, etc.
     const numeroExpedienteMatch = texto.match(/(?:EXPEDIENTE\s*(?:N[º°]?)?|N[úu]mero)\s*[:\-]?\s*([A-Z]{2,}-\d{4,}-\d{4})/i)
       || texto.match(/EXPEDIENTE\s*[:\-]?\s*([A-Z]{2,}-\d{4,}-\d{4})/i)
+      || texto.match(/Receptor[ií]a[\s-]*causa\s*[:\-]?\s*([A-Z]{2,}-\d{3,}-\d{4})/i)
+      || texto.match(/Expte\.?\s*(?:Interno)?\s*N[º°]?\s*[:\-]?\s*(\d{3,})/i)
       || texto.match(/([A-Z]{2,}-\d{4,}-\d{4})/);
     const numeroExpediente = numeroExpedienteMatch ? numeroExpedienteMatch[1].trim() : '';
 
     const caratulaMatch =
-      texto.match(/Carátula:\s*(.+?)\s*(?:Juzgado:|Número:|\n)/i) ||
-      texto.match(/AUTOS:"([^"]+)"/i);
+      texto.match(/Car[áa]tula:\s*"?(.*?)"?\s*(?:Juzgado:|Número:|Receptor[ií]a|\n)/i) ||
+      texto.match(/AUTOS:"([^"]+)"/i) ||
+      texto.match(/^"([^"]+)"\s*$/m);
 
     let caratulaExpediente = caratulaMatch ? caratulaMatch[1].trim() : '';
     caratulaExpediente = caratulaExpediente.replace(/"\.$/, '').replace(/"/g, '');
