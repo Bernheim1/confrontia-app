@@ -234,6 +234,63 @@ export class GrillaNotificacionesComponent implements OnInit, OnDestroy {
     return count;
   }
 
+  // --- Rango máximo de 6 meses entre Desde y Hasta ---
+
+  private addMonths(dateStr: string, months: number): string {
+    const parts = dateStr.split('-');
+    const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    d.setMonth(d.getMonth() + months);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  /** Fecha mínima permitida para "Hasta": igual a fechaDesde */
+  get minFechaHasta(): string {
+    return this.fechaDesde || '';
+  }
+
+  /** Fecha máxima permitida para "Hasta": fechaDesde + 6 meses */
+  get maxFechaHasta(): string {
+    return this.fechaDesde ? this.addMonths(this.fechaDesde, 6) : '';
+  }
+
+  /** Fecha máxima permitida para "Desde": igual a fechaHasta */
+  get maxFechaDesde(): string {
+    return this.fechaHasta || '';
+  }
+
+  /** Fecha mínima permitida para "Desde": fechaHasta - 6 meses */
+  get minFechaDesde(): string {
+    return this.fechaHasta ? this.addMonths(this.fechaHasta, -6) : '';
+  }
+
+  onFechaDesdeChange(value: string): void {
+    this.fechaDesde = value;
+    // Si la fecha hasta queda fuera del rango de 6 meses, ajustarla
+    if (this.fechaHasta && this.fechaDesde) {
+      const max = this.addMonths(this.fechaDesde, 6);
+      if (this.fechaHasta > max) {
+        this.fechaHasta = max;
+      }
+      if (this.fechaHasta < this.fechaDesde) {
+        this.fechaHasta = this.fechaDesde;
+      }
+    }
+  }
+
+  onFechaHastaChange(value: string): void {
+    this.fechaHasta = value;
+    // Si la fecha desde queda fuera del rango de 6 meses, ajustarla
+    if (this.fechaDesde && this.fechaHasta) {
+      const min = this.addMonths(this.fechaHasta, -6);
+      if (this.fechaDesde < min) {
+        this.fechaDesde = min;
+      }
+      if (this.fechaDesde > this.fechaHasta) {
+        this.fechaDesde = this.fechaHasta;
+      }
+    }
+  }
+
   verCaso(casoId: string): void {
     this.router.navigate(['/casos/detalle', casoId]);
   }

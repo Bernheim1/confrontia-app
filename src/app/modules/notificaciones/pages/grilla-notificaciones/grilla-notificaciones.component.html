@@ -11,8 +11,10 @@
           <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Desde</label>
           <app-datepicker
             [value]="fechaDesde"
-            (valueChange)="fechaDesde = $event"
+            (valueChange)="onFechaDesdeChange($event)"
             [disabled]="soloCasosPendientesHoy"
+            [minDate]="minFechaDesde"
+            [maxDate]="maxFechaDesde"
             placeholder="Desde">
           </app-datepicker>
         </div>
@@ -21,8 +23,10 @@
           <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Hasta</label>
           <app-datepicker
             [value]="fechaHasta"
-            (valueChange)="fechaHasta = $event"
+            (valueChange)="onFechaHastaChange($event)"
             [disabled]="soloCasosPendientesHoy"
+            [minDate]="minFechaHasta"
+            [maxDate]="maxFechaHasta"
             placeholder="Hasta">
           </app-datepicker>
         </div>

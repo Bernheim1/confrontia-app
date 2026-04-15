@@ -10,6 +10,7 @@ interface CalendarDay {
   currentMonth: boolean;
   today: boolean;
   selected: boolean;
+  disabled: boolean;
 }
 
 @Component({
@@ -84,13 +85,15 @@ interface CalendarDay {
           <button *ngFor="let day of calendarDays"
             type="button"
             (click)="selectDate(day); $event.stopPropagation()"
-            [disabled]="!day.currentMonth"
+            [disabled]="!day.currentMonth || day.disabled"
+            [title]="day.disabled && day.currentMonth ? 'Fuera del rango permitido' : ''"
             class="py-1.5 text-xs rounded-md transition-colors"
             [ngClass]="{
-              'text-gray-900 dark:text-white hover:bg-primary-50 dark:hover:bg-primary-900/30': day.currentMonth && !day.selected && !day.today,
-              'text-gray-300 dark:text-gray-600 cursor-default': !day.currentMonth,
+              'text-gray-900 dark:text-white hover:bg-primary-50 dark:hover:bg-primary-900/30': day.currentMonth && !day.selected && !day.today && !day.disabled,
+              'text-gray-300 dark:text-gray-600 cursor-not-allowed': !day.currentMonth || day.disabled,
+              'line-through opacity-40': day.disabled && day.currentMonth,
               'bg-primary-600 text-white hover:bg-primary-700 font-semibold': day.selected,
-              'text-primary-600 dark:text-primary-400 font-semibold': day.today && !day.selected && day.currentMonth
+              'text-primary-600 dark:text-primary-400 font-semibold': day.today && !day.selected && day.currentMonth && !day.disabled
             }">
             {{ day.day }}
           </button>
@@ -99,7 +102,11 @@ interface CalendarDay {
         <!-- Today button -->
         <div *ngIf="viewMode === 'days'" class="mt-2 border-t border-gray-200 dark:border-gray-700 pt-2">
           <button type="button" (click)="goToToday(); $event.stopPropagation()"
-            class="w-full text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium py-1">
+            [disabled]="isTodayDisabled"
+            class="w-full text-xs font-medium py-1"
+            [ngClass]="isTodayDisabled
+              ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+              : 'text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300'">
             Hoy
           </button>
         </div>
@@ -112,6 +119,8 @@ export class DatepickerComponent implements OnInit, OnChanges {
   @Input() value: string = ''; // yyyy-MM-dd
   @Input() placeholder: string = 'Seleccionar fecha';
   @Input() disabled: boolean = false;
+  @Input() minDate: string = ''; // yyyy-MM-dd
+  @Input() maxDate: string = ''; // yyyy-MM-dd
   @Output() valueChange = new EventEmitter<string>();
 
   isOpen = false;
@@ -147,6 +156,9 @@ export class DatepickerComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value']) {
       this.initFromValue();
+    }
+    if (changes['minDate'] || changes['maxDate']) {
+      this.buildCalendar();
     }
   }
 
@@ -217,7 +229,7 @@ export class DatepickerComponent implements OnInit, OnChanges {
   }
 
   selectDate(day: CalendarDay): void {
-    if (!day.currentMonth) return;
+    if (!day.currentMonth || day.disabled) return;
     this.value = day.date;
     this.displayValue = this.toDisplay(day.date);
     this.valueChange.emit(this.value);
@@ -226,6 +238,7 @@ export class DatepickerComponent implements OnInit, OnChanges {
   }
 
   goToToday(): void {
+    if (this.isTodayDisabled) return;
     const today = new Date();
     const y = today.getFullYear();
     const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -258,7 +271,7 @@ export class DatepickerComponent implements OnInit, OnChanges {
       const pm = this.viewMonth === 0 ? 12 : this.viewMonth;
       const py = this.viewMonth === 0 ? this.viewYear - 1 : this.viewYear;
       const dateStr = `${py}-${String(pm).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      days.push({ day: d, date: dateStr, currentMonth: false, today: false, selected: false });
+      days.push({ day: d, date: dateStr, currentMonth: false, today: false, selected: false, disabled: false });
     }
 
     // Current month
@@ -269,7 +282,8 @@ export class DatepickerComponent implements OnInit, OnChanges {
         date: dateStr,
         currentMonth: true,
         today: dateStr === todayStr,
-        selected: dateStr === this.value
+        selected: dateStr === this.value,
+        disabled: this.isDateDisabled(dateStr)
       });
     }
 
@@ -279,10 +293,22 @@ export class DatepickerComponent implements OnInit, OnChanges {
       const nm = this.viewMonth === 11 ? 1 : this.viewMonth + 2;
       const ny = this.viewMonth === 11 ? this.viewYear + 1 : this.viewYear;
       const dateStr = `${ny}-${String(nm).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      days.push({ day: d, date: dateStr, currentMonth: false, today: false, selected: false });
+      days.push({ day: d, date: dateStr, currentMonth: false, today: false, selected: false, disabled: false });
     }
 
     this.calendarDays = days;
+  }
+
+  private isDateDisabled(dateStr: string): boolean {
+    if (this.minDate && dateStr < this.minDate) return true;
+    if (this.maxDate && dateStr > this.maxDate) return true;
+    return false;
+  }
+
+  get isTodayDisabled(): boolean {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return this.isDateDisabled(todayStr);
   }
 
   private toDisplay(iso: string): string {
