@@ -1,6 +1,6 @@
 <div *ngFor="let item of items; let i = index;">
   <section
-  [id]="'despacho-' + i"
+  [id]="'oficio-' + i"
   class="w-full max-w-6xl mx-auto px-6 py-8 mb-6
          bg-white dark:bg-gray-800
          rounded-xl border shadow-md dark:shadow-lg
@@ -13,13 +13,12 @@
   [class.ring-red-200]="errorIndex === i"
   [class.dark:ring-red-900]="errorIndex === i"
 >
-  <!-- Header -->
   <header class="mb-6">
   <button
     *ngIf="masivo"
     type="button"
     aria-label="Eliminar"
-    (click)="deteleDespacho(i)"
+    (click)="deleteOficio(i)"
     class="absolute top-3 right-3 flex items-center justify-center
           w-8 h-8 rounded-full
           text-gray-500 hover:text-gray-800
@@ -28,16 +27,14 @@
     ✕
   </button>
     <h1 class="text-3xl md:text-4xl font-semibold text-ink-light dark:text-ink-dark tracking-tight">
-      Primer despacho
+      Primer proveído
     </h1>
 
     <p class="mt-2 max-w-3xl text-base text-ink-muted dark:text-primary-200" >
-      Ingrese el texto base del despacho. Luego podrá reutilizarlo para generar
-      cédulas, mandamientos y notificaciones procesales.
+      Ingrese el proveído y seleccione el tipo de oficio a generar. Luego podrá completar y corregir los datos variables identificados.
     </p>
   </header>
 
-  <!-- Editor -->
   <div class="bg-white dark:bg-gray-700 border rounded-xl overflow-hidden transition-colors duration-300"
        [class.border-red-400]="errorIndex === i"
        [class.border-gray-200]="errorIndex !== i"
@@ -53,14 +50,14 @@
          [class.dark:border-gray-600]="errorIndex !== i"
          [class.text-gray-700]="errorIndex !== i"
          [class.dark:text-gray-200]="errorIndex !== i">
-      Texto del despacho {{ errorIndex === i ? '(Requerido)' : '' }}
+      Texto del proveído {{ errorIndex === i ? '(Requerido)' : '' }}
     </div>
 
     <textarea
-      [(ngModel)]="item.primerDespacho"
+      [(ngModel)]="item.proveido"
       (input)="errorIndex === i ? errorIndex = null : null"
       rows="16"
-      placeholder="Escriba aquí el despacho…"
+      placeholder="Escriba aquí el proveído…"
       class="w-full px-4 py-4
              bg-transparent
              text-[15px] leading-relaxed
@@ -68,17 +65,15 @@
              placeholder:text-gray-400 dark:placeholder:text-gray-500
              resize-none border-none focus:outline-none"
     ></textarea>
-      
+
     </div>
   </section>
 </div>
 
-<!-- Botón flotante para modo NO masivo -->
 <div *ngIf="!masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-xl rounded-xl p-4 border border-gray-200 dark:border-gray-700">
   <div class="flex items-center gap-3">
-    <!-- Botón agregar ingreso -->
-    <button 
-      (click)="addDespacho()"
+    <button
+      (click)="addOficio()"
       title="Agregar ingreso"
       class="bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -86,59 +81,35 @@
       </svg>
     </button>
 
-    <!-- Separador -->
     <div class="h-10 w-px bg-gray-300 dark:bg-gray-600"></div>
 
-    <!-- Toggle Cédula/Mandamiento -->
-    <div class="flex gap-2">
-      <button 
-        type="button"
-        (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)"
-        [class.bg-primary-600]="tipoSalida === 1"
-        [class.text-white]="tipoSalida === 1"
-        [class.shadow-md]="tipoSalida === 1"
-        [class.bg-gray-100]="tipoSalida !== 1"
-        [class.dark:bg-gray-700]="tipoSalida !== 1"
-        [class.text-gray-700]="tipoSalida !== 1"
-        [class.dark:text-gray-300]="tipoSalida !== 1"
-        class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105">
-        Cédula
-      </button>
-      
-      <button 
-        type="button"
-        (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)"
-        [class.bg-primary-600]="tipoSalida === 2"
-        [class.text-white]="tipoSalida === 2"
-        [class.shadow-md]="tipoSalida === 2"
-        [class.bg-gray-100]="tipoSalida !== 2"
-        [class.dark:bg-gray-700]="tipoSalida !== 2"
-        [class.text-gray-700]="tipoSalida !== 2"
-        [class.dark:text-gray-300]="tipoSalida !== 2"
-        class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105">
-        Mandamiento
-      </button>
+    <div class="flex items-center gap-2 min-w-[520px]">
+      <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaSeleccionada()" class="w-52 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
+        <option value="">Categoría</option>
+        <option *ngFor="let categoria of categorias" [value]="categoria.code">{{ categoria.name }}</option>
+      </select>
+
+      <select [(ngModel)]="tipoOficioCodigo" class="flex-1 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600" [disabled]="!categoriaSeleccionada">
+        <option value="">Tipo de oficio</option>
+        <option *ngFor="let tipo of tiposDisponibles" [value]="tipo.code">{{ tipo.label }}</option>
+      </select>
     </div>
-    
-    <!-- Separador -->
+
     <div class="h-10 w-px bg-gray-300 dark:bg-gray-600"></div>
 
-    <!-- Botón Ingresar -->
-    <button 
+    <button
       type="submit"
       (click)="onSubmit()"
       class="bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-5 rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] whitespace-nowrap min-w-[120px]">
-      Ingresar
+      Continuar
     </button>
   </div>
 </div>
 
-<!-- Floating container para modo MASIVO -->
 <div *ngIf="masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-md dark:shadow-lg rounded-xl p-4 border border-gray-200 dark:border-gray-700">
   <div class="flex items-center gap-3">
-    <!-- Botón agregar ingreso -->
-    <button 
-      (click)="addDespacho()"
+    <button
+      (click)="addOficio()"
       title="Agregar ingreso"
       class="bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -146,51 +117,27 @@
       </svg>
     </button>
 
-    <!-- Separador -->
     <div class="h-10 w-px bg-gray-300 dark:bg-gray-600"></div>
 
-    <!-- Toggle Cédula/Mandamiento -->
-    <div class="flex gap-2">
-      <button 
-        type="button"
-        (click)="seleccionTipoSalida(0, tipoCedula.TrasladoDemanda)"
-        [class.bg-primary-600]="tipoSalida === 1"
-        [class.text-white]="tipoSalida === 1"
-        [class.shadow-md]="tipoSalida === 1"
-        [class.bg-gray-100]="tipoSalida !== 1"
-        [class.dark:bg-gray-700]="tipoSalida !== 1"
-        [class.text-gray-700]="tipoSalida !== 1"
-        [class.dark:text-gray-300]="tipoSalida !== 1"
-        class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105">
-        Cédula
-      </button>
-      
-      <button 
-        type="button"
-        (click)="seleccionTipoSalida(1, tipoMandamiento.IntimacionPago)"
-        [class.bg-primary-600]="tipoSalida === 2"
-        [class.text-white]="tipoSalida === 2"
-        [class.shadow-md]="tipoSalida === 2"
-        [class.bg-gray-100]="tipoSalida !== 2"
-        [class.dark:bg-gray-700]="tipoSalida !== 2"
-        [class.text-gray-700]="tipoSalida !== 2"
-        [class.dark:text-gray-300]="tipoSalida !== 2"
-        class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105">
-        Mandamiento
-      </button>
+    <div class="flex items-center gap-2 min-w-[520px]">
+      <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaSeleccionada()" class="w-52 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
+        <option value="">Categoría</option>
+        <option *ngFor="let categoria of categorias" [value]="categoria.code">{{ categoria.name }}</option>
+      </select>
+
+      <select [(ngModel)]="tipoOficioCodigo" class="flex-1 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600" [disabled]="!categoriaSeleccionada">
+        <option value="">Tipo de oficio</option>
+        <option *ngFor="let tipo of tiposDisponibles" [value]="tipo.code">{{ tipo.label }}</option>
+      </select>
     </div>
-    
-    <!-- Separador -->
+
     <div class="h-10 w-px bg-gray-300 dark:bg-gray-600"></div>
 
-    <!-- Botón Generar -->
-    <button 
+    <button
       type="submit"
       (click)="onSubmit()"
       class="bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-5 rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] whitespace-nowrap min-w-[180px]">
-      Generar {{ tipoSalida == 1 ? 'Cédula' : 'Mandamiento' }}
+      Continuar con el oficio
     </button>
   </div>
 </div>
-
-<!-- ################################################################################ -->

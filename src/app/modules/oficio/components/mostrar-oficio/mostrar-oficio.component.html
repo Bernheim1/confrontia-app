@@ -1,0 +1,36 @@
+<div class="viewer-root" *ngIf="documento">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm scale-up-ver-top overflow-hidden">
+    <div class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+      <div>
+        <h5 class="text-lg font-bold text-primary-600 dark:text-primary-200 m-0">{{ documento.tipoOficioNombre }}</h5>
+        <p class="text-sm text-gray-600 dark:text-gray-400 m-0">{{ documento.categoriaNombre }} · {{ documento.organismoDestino }}</p>
+      </div>
+      <button class="px-4 py-2 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-600 dark:hover:text-white rounded-xl text-sm font-medium transition-colors" type="button" (click)="copyRawText()" title="Copiar documento">
+        <fa-icon [icon]="faCheck" *ngIf="copiedOnce">&nbsp;</fa-icon>
+        <span *ngIf="!copiedOnce">Copiar</span>
+        <span *ngIf="copiedOnce">Copiado</span>
+      </button>
+    </div>
+
+    <div class="p-6 sm:p-8">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 mb-6">
+        <div class="text-xs font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-300 mb-2">Proveído</div>
+        <p class="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{{ documento.proveido }}</p>
+      </div>
+
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <div class="text-xs font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-300 mb-3">Texto generado</div>
+        <pre class="whitespace-pre-wrap break-words text-sm md:text-[15px] leading-relaxed text-gray-900 dark:text-gray-100 font-sans">{{ documento.textoGenerado }}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="documento && !masivo && !showCopyButton" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex gap-3">
+  <button class="px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl font-medium shadow-xl transition-all duration-200 hover:scale-[1.02]" type="button" (click)="copyRawText()">
+    Copiar oficio
+  </button>
+  <button *ngIf="canReingresar" class="px-4 py-3 text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-xl shadow-xl transition-all duration-200 hover:scale-[1.02]" type="button" (click)="onReingresar()" title="Reingresar">
+    <fa-icon [icon]="faRepeat"></fa-icon>
+  </button>
+</div>

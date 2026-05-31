@@ -24,6 +24,10 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/despacho/despacho.module').then(m => m.DespachoModule)
       },
       {
+        path: 'oficio',
+        loadChildren: () => import('./modules/oficio/oficio.module').then(m => m.OficioModule)
+      },
+      {
         path: 'notificaciones',
         loadChildren: () => import('./modules/notificaciones/notificaciones.module').then(m => m.NotificacionesModule)
       },

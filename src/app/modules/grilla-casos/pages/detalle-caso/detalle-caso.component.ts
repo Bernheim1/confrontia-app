@@ -2,10 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faFileLines } from '@fortawesome/free-solid-svg-icons';
 import { CasoService } from '../../../../services/caso/caso.service';
 import { ShowEscritosComponent } from '../../components/show-escritos/show-escritos.component';
-import { MostrarSalidaComponent } from '../../../despacho/components/mostrar-salida/mostrar-salida.component';
 import { CasoDto } from '../../../../shared/models/caso-dto';
 import { Salida } from '../../../../shared/models/salida';
 import { TipoSalidaEnum } from '../../../../shared/enums/tipo-salida-enum';
@@ -17,12 +16,13 @@ import { NotificacionService } from '../../../../services/notificacion/notificac
 @Component({
   selector: 'app-detalle-caso',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, MostrarSalidaComponent, ShowEscritosComponent],
+  imports: [CommonModule, FontAwesomeModule, ShowEscritosComponent],
   templateUrl: './detalle-caso.component.html',
   styleUrl: './detalle-caso.component.scss'
 })
 export class DetalleCasoComponent implements OnInit {
   faArrowLeft = faArrowLeft;
+  faFileLines = faFileLines;
   caso?: CasoDto;
   casoId!: string;
   loading: boolean = false;
@@ -131,6 +131,10 @@ export class DetalleCasoComponent implements OnInit {
 
   volver(): void {
     this.router.navigate(['/casos']);
+  }
+
+  generarOficio(): void {
+    this.router.navigate(['/oficio'], { queryParams: { casoId: this.casoId } });
   }
 
   getNotificacionesNoLeidas(): number {
