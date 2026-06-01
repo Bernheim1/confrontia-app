@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Oficio</title>
+  <style>
+    body { font-family: "Times New Roman", Times, serif; font-size: 14px; color: #111; line-height: 1.65; margin: 0; }
+    .documento { max-width: 820px; margin: 0 auto; padding: 12px 18px; }
+    .titulo { text-align: center; font-weight: 700; font-size: 22px; letter-spacing: 1px; margin: 0 0 28px; }
+    .fecha { text-align: right; margin-bottom: 28px; }
+    .destinatario { margin-bottom: 28px; white-space: pre-line; }
+    .cuerpo p { margin: 0 0 16px; text-align: justify; }
+    .firma { margin-top: 42px; }
+  </style>
+</head>
+<body>
+  <div class="documento">
+    <div class="titulo">OFICIO</div>
+    <div class="fecha">{{localidadFecha}}</div>
+
+    <div class="destinatario">{{destinatarioHtml}}</div>
+
+    <div class="cuerpo">
+      {{cuerpoOficioHtml}}
+    </div>
+
+    <div class="firma">Saludo a usted atentamente.-</div>
+  </div>
+</body>
+</html>

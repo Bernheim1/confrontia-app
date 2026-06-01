@@ -43,7 +43,11 @@
 
   <div *ngIf="this.step == 2">
     <div *ngFor="let oficio of oficios; let i = index" class="mb-6">
-      <app-mostrar-oficio [documento]="this.documentos[i]" [masivo]="oficios.length > 1"></app-mostrar-oficio>
+      <app-mostrar-oficio
+        (reingresar)="onReingresar()"
+        [documento]="this.documentos[i]"
+        [masivo]="oficios.length > 1">
+      </app-mostrar-oficio>
     </div>
   </div>
 </div>

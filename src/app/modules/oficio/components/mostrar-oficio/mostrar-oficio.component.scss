@@ -2,6 +2,101 @@
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+.preview-host {
+  color: #000;
+}
+
+.dark .preview-host {
+  color: #fff;
+}
+
+.preview {
+  padding: 12px;
+  font-family: "Times New Roman", serif;
+  font-size: 14px;
+  color: #000;
+  line-height: 1.3;
+}
+
+.preview table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.preview td,
+.preview th {
+  border: 1px solid #000 !important;
+  padding: 4px 6px;
+  vertical-align: top;
+  word-wrap: break-word;
+}
+
+.preview p {
+  margin: 2px 0;
+}
+
+.preview strong {
+  font-weight: bold;
+}
+
+.preview h1 {
+  font-size: 22px;
+  margin: 4px 0;
+}
+
+.preview h2 {
+  font-size: 18px;
+  margin: 4px 0;
+}
+
+.preview h3 {
+  font-size: 16px;
+  margin: 4px 0;
+}
+
+.viewer-root .preview {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 12px;
+}
+
+.viewer-root .preview table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.viewer-root .preview td,
+.viewer-root .preview th {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  white-space: normal;
+  vertical-align: top;
+  padding: 4px 6px;
+}
+
+.viewer-root .preview img,
+.viewer-root .preview iframe,
+.viewer-root .preview embed {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.viewer-root .preview [style*="width:"] {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.viewer-root .preview [width] {
+  width: auto !important;
+  max-width: 100% !important;
+}
+
 .btn-generar-flotante {
   position: fixed;
   bottom: 20px;
