@@ -45,6 +45,19 @@ interface TextoContenidoInfo {
   textoDespacho: string;
 }
 
+interface SegmentoCapitalInfo {
+  texto: string;
+  esPrioritario: boolean;
+}
+
+interface CandidatoMontoCapital {
+  literal: string;
+  numeroBruto: string;
+  valorNumerico: number;
+  score: number;
+  index: number;
+}
+
 interface JuzgadoCatalogEntry {
   juzgado: string;
   direccion?: string;
@@ -893,52 +906,23 @@ export class DespachoService {
 
   private extraerMontoCapital(texto: string): { montoCapitalTexto: string; montoCapitalNumerico: string } {
     if (!texto) return { montoCapitalTexto: 'MONTO CAPITAL', montoCapitalNumerico: '' };
-    const original = texto;
-    const normalizado = original
+    const originalCompact = texto.replace(/\s+/g, ' ').trim();
+    const normalizado = originalCompact
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ');
+      .toLowerCase();
+    const segmentos = this.obtenerSegmentosCapital(originalCompact, normalizado);
+    const candidatos = segmentos.flatMap(segmento => this.extraerCandidatosMontoCapital(segmento.texto, segmento.esPrioritario));
+    const mejorCandidato = this.seleccionarMejorCandidatoMontoCapital(candidatos);
 
-    // Ampliamos disparadores para encontrar mejor el inicio del segmento
-    let inicio = [
-      'por la suma reclamada',
-      'por la suma de $',
-      'por la suma de pesos ',
-      'por la suma',
-      'por las sumas',
-      'pesos '
-    ].map(k => normalizado.indexOf(k)).filter(i => i !== -1).sort((a,b)=>a-b)[0];
-    if (inicio === undefined) inicio = normalizado.indexOf('pesos ');
-    if (inicio === -1) inicio = 0;
+    let numeroBruto = mejorCandidato?.numeroBruto || '';
+    let literal = this.limpiarLiteralCapital(mejorCandidato?.literal || '');
 
-    const posConcepto = normalizado.indexOf('en concepto de capital', inicio);
-    const posIntereses = [normalizado.indexOf('con mas la suma', inicio), normalizado.indexOf('con más la suma', inicio)]
-      .filter(p => p !== -1).sort((a,b)=>a-b)[0];
-    let fin = posConcepto !== -1 ? posConcepto : (posIntereses !== undefined ? posIntereses : inicio + 400);
-    if (fin < inicio) fin = inicio + 400;
-
-    const originalCompact = original.replace(/\s+/g, ' ');
-    const segmento = originalCompact.slice(inicio, Math.min(fin + 100, originalCompact.length));
-
-    // Número monetario: opción A (desencadenada por “por la suma de ...”)
-    const matchPrimero = segmento.match(/por\s+la\s+suma\s+de\s+\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)/i);
-    // Opción B: paréntesis o inline
-    const numeroMatchParen = segmento.match(/\(\s*\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)\s*(?:[.\-–]{0,2})\s*\)/);
-    const inlineMatch = segmento.match(/\b\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)\b/);
-
-    let numeroBruto = matchPrimero?.[1] || numeroMatchParen?.[1] || inlineMatch?.[1] || '';
-
-    // Literal (para texto y posible conversión si no hay número)
-    let literal = '';
-    const regexLiteralPrincipal = /PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(|\s+EN\s+CONCEPTO|\s+CON\s+MAS|\s+CON\s+MÁS|$)/i;
-    const mLiteral = segmento.match(regexLiteralPrincipal);
-    if (mLiteral) {
-      literal = mLiteral[1];
-    } else {
-      const alt = /POR\s+LA\s+SUMA(?:\s+RECLAMADA)?\s+DE\s+PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(|\s+EN\s+CONCEPTO|$)/i.exec(segmento);
-      if (alt) literal = alt[1];
+    if (!literal) {
+      for (const segmento of segmentos) {
+        literal = this.extraerLiteralCapital(segmento.texto);
+        if (literal) break;
+      }
     }
-    literal = this.limpiarLiteralCapital(literal);
 
     // Construcción del texto
     let montoCapitalTexto = 'MONTO CAPITAL';
@@ -976,13 +960,199 @@ export class DespachoService {
     };
   }
 
+  private obtenerSegmentosCapital(originalCompact: string, normalizado: string): SegmentoCapitalInfo[] {
+    const segmentos: SegmentoCapitalInfo[] = [];
+    const agregados = new Set<string>();
+    const contextosPrioritarios = [
+      'librese mandamiento de ejecucion',
+      'importe del credito que se reclama',
+      'credito que se reclama en autos'
+    ];
+
+    for (const contexto of contextosPrioritarios) {
+      const index = normalizado.indexOf(contexto);
+      if (index === -1) continue;
+      const inicio = Math.max(0, index - 220);
+      const fin = Math.min(originalCompact.length, index + contexto.length + 260);
+      const segmento = this.recortarSegmentoCapital(originalCompact.slice(inicio, fin));
+      if (!segmento) continue;
+      const clave = `prioridad:${segmento}`;
+      if (!agregados.has(clave)) {
+        agregados.add(clave);
+        segmentos.push({ texto: segmento, esPrioritario: true });
+      }
+    }
+
+    let inicioFallback = [
+      'por la suma reclamada',
+      'por la suma de $',
+      'por la suma de pesos ',
+      'por la suma',
+      'por las sumas',
+      'pesos '
+    ].map(k => normalizado.indexOf(k)).filter(i => i !== -1).sort((a,b)=>a-b)[0];
+    if (inicioFallback === undefined) inicioFallback = normalizado.indexOf('pesos ');
+    if (inicioFallback === -1 || inicioFallback === undefined) inicioFallback = 0;
+
+    let finFallback = [
+      normalizado.indexOf('en concepto de capital', inicioFallback),
+      normalizado.indexOf('con mas la suma', inicioFallback),
+      normalizado.indexOf('con más la suma', inicioFallback),
+      normalizado.indexOf('con mas una suma', inicioFallback),
+      normalizado.indexOf('con más una suma', inicioFallback),
+      normalizado.indexOf('para responder a intereses', inicioFallback),
+      normalizado.indexOf('intereses y costas', inicioFallback)
+    ].filter(index => index !== -1).sort((a,b)=>a-b)[0];
+    if (finFallback === undefined || finFallback < inicioFallback) finFallback = inicioFallback + 420;
+
+    const fallback = this.recortarSegmentoCapital(
+      originalCompact.slice(inicioFallback, Math.min(finFallback + 120, originalCompact.length))
+    );
+    if (fallback) {
+      const clave = `fallback:${fallback}`;
+      if (!agregados.has(clave)) {
+        segmentos.push({ texto: fallback, esPrioritario: false });
+      }
+    }
+
+    if (!segmentos.length) {
+      segmentos.push({ texto: this.recortarSegmentoCapital(originalCompact.slice(0, 420)), esPrioritario: false });
+    }
+
+    return segmentos.filter(segmento => !!segmento.texto);
+  }
+
+  private recortarSegmentoCapital(segmento: string): string {
+    if (!segmento) return '';
+    const compacto = segmento.replace(/\s+/g, ' ').trim();
+    if (!compacto) return '';
+
+    const normalizado = compacto
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    const cortes = [
+      'con mas una suma',
+      'con más una suma',
+      'con mas la suma',
+      'con más la suma',
+      'para responder a intereses',
+      'intereses y costas',
+      'para responder intereses'
+    ];
+
+    let fin = compacto.length;
+    for (const corte of cortes) {
+      const index = normalizado.indexOf(corte);
+      if (index !== -1 && index < fin) fin = index;
+    }
+
+    return compacto.slice(0, fin).trim();
+  }
+
+  private extraerCandidatosMontoCapital(segmento: string, esPrioritario: boolean): CandidatoMontoCapital[] {
+    const candidatos: CandidatoMontoCapital[] = [];
+    const vistos = new Set<string>();
+    const patronPesosConParentesis = /PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)\s*\(\s*\$?\s*([\d]+(?:[.,]\d{3})*(?:[.,]\d{2})?)\s*(?:[.\-–]{0,2})\s*\)/gi;
+    const patronNumerico = /(?:por\s+la\s+suma(?:\s+reclamada)?\s+de\s+|importe\s+del\s+credito\s+que\s+se\s+reclama\s+en\s+autos\s*:?\s*|credito\s+que\s+se\s+reclama\s+en\s+autos\s*:?\s*)?\$\s*([\d]{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|[\d]{4,})/gi;
+    const patronParentesis = /\(\s*\$?\s*([\d]{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|[\d]{4,})\s*(?:[.\-–]{0,2})\s*\)/gi;
+
+    const registrar = (numeroBruto: string, index: number, baseScore: number, literal: string = '') => {
+      const clave = `${index}:${numeroBruto}:${literal}`;
+      if (!numeroBruto || vistos.has(clave)) return;
+      vistos.add(clave);
+
+      const valorNumerico = this.parseNumeroMonetario(numeroBruto);
+      if (!Number.isFinite(valorNumerico) || valorNumerico <= 0) return;
+
+      const contexto = segmento.slice(Math.max(0, index - 80), Math.min(segmento.length, index + 120));
+      const contextoNormalizado = contexto
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+      let score = baseScore + (esPrioritario ? 50 : 0);
+      if (/credito\s+que\s+se\s+reclama|importe\s+del\s+credito|capital/.test(contextoNormalizado)) score += 45;
+      if (/por\s+la\s+suma|mandamiento\s+de\s+ejecucion/.test(contextoNormalizado)) score += 20;
+      if (/tasa\s+de\s+justicia|tasa\b|justicia\b|bono\b|jus\b|ius\b|aporte\b|adicional\b|intereses\b|costas\b/.test(contextoNormalizado)) score -= 90;
+
+      candidatos.push({
+        literal: this.limpiarLiteralCapital(literal),
+        numeroBruto,
+        valorNumerico,
+        score,
+        index
+      });
+    };
+
+    for (const match of segmento.matchAll(patronPesosConParentesis)) {
+      registrar(match[2], match.index ?? 0, 130, match[1]);
+    }
+
+    for (const match of segmento.matchAll(patronNumerico)) {
+      registrar(match[1], match.index ?? 0, 70);
+    }
+
+    for (const match of segmento.matchAll(patronParentesis)) {
+      registrar(match[1], match.index ?? 0, 55);
+    }
+
+    return candidatos;
+  }
+
+  private seleccionarMejorCandidatoMontoCapital(candidatos: CandidatoMontoCapital[]): CandidatoMontoCapital | null {
+    if (!candidatos.length) return null;
+
+    return [...candidatos].sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (b.valorNumerico !== a.valorNumerico) return b.valorNumerico - a.valorNumerico;
+      return a.index - b.index;
+    })[0];
+  }
+
+  private extraerLiteralCapital(segmento: string): string {
+    if (!segmento) return '';
+    const regexLiteralPrincipal = /PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(|\s+EN\s+CONCEPTO|\s+CON\s+MAS|\s+CON\s+MÁS|$)/i;
+    const matchPrincipal = segmento.match(regexLiteralPrincipal);
+    if (matchPrincipal?.[1]) return this.limpiarLiteralCapital(matchPrincipal[1]);
+
+    const matchAlternativo = /POR\s+LA\s+SUMA(?:\s+RECLAMADA)?\s+DE\s+PESOS?\s+([A-ZÁÉÍÓÚÑa-záéíóúñ ,\.]+?)(?:\s+CON\s+[0-9]{1,3}\/[0-9]{1,3}|\s*\(|\s+EN\s+CONCEPTO|$)/i.exec(segmento);
+    return this.limpiarLiteralCapital(matchAlternativo?.[1] || '');
+  }
+
+  private parseNumeroMonetario(numeroBruto: string): number {
+    const limpio = (numeroBruto || '').replace(/[^\d.,]/g, '');
+    if (!limpio) return NaN;
+
+    const tienePunto = limpio.includes('.');
+    const tieneComa = limpio.includes(',');
+    let normalizado = limpio;
+
+    if (tienePunto && tieneComa) {
+      if (limpio.lastIndexOf(',') > limpio.lastIndexOf('.')) {
+        normalizado = limpio.replace(/\./g, '').replace(',', '.');
+      } else {
+        normalizado = limpio.replace(/,/g, '');
+      }
+    } else if (tieneComa) {
+      const decimales = limpio.length - limpio.lastIndexOf(',') - 1;
+      normalizado = decimales <= 2 ? limpio.replace(/\./g, '').replace(',', '.') : limpio.replace(/,/g, '');
+    } else if (tienePunto) {
+      const decimales = limpio.length - limpio.lastIndexOf('.') - 1;
+      normalizado = decimales <= 2 ? limpio : limpio.replace(/\./g, '');
+    }
+
+    return Number(normalizado);
+  }
+
   private limpiarLiteralCapital(raw: string): string {
     return (raw || '')
       .replace(/EN\s+CONCEPTO\s+DE\s+CAPITAL.*$/i, '')
       .replace(/CON\s+MAS\s+LA\s+SUMA.*$/i, '')
       .replace(/CON\s+MÁS\s+LA\s+SUMA.*$/i, '')
+      .replace(/CON\s+MAS\s+UNA\s+SUMA.*$/i, '')
+      .replace(/CON\s+MÁS\s+UNA\s+SUMA.*$/i, '')
       .replace(/QUE\s+SE\s+PRESUPUESTA.*$/i, '')
       .replace(/PARA\s+RESPONDER.*$/i, '')
+      .replace(/INTERESES\s+Y\s+COSTAS.*$/i, '')
       .replace(/[",;:]+$/g, '')
       .replace(/\s{2,}/g, ' ')
       .trim();
