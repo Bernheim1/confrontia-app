@@ -55,7 +55,7 @@ export class AuthService {
         if (AuthService.getStoredAccessToken()) {
             this._token = AuthService.getStoredAccessToken() ?? undefined;
 
-            if(this._token) {
+            if (this._token) {
                 this.loadUserFromToken(this._token);
                 this.switchLayout(true);
                 this.authenticatedSubject$.next(true);
@@ -102,23 +102,28 @@ export class AuthService {
         this.currentUserSubject$.next(undefined);
         this.switchLayout(false);
         this._router.navigate(['/login']).then(
-            () => {}
+            () => { }
         );
     }
 
     private loadUserFromToken(jwt: string): void {
-        const decoded: any = this._helper.decodeToken(jwt);
+        try {
+            const decoded: any = this._helper.decodeToken(jwt);
 
-        this._user = {
-            id: decoded?.userId,
-            username: decoded?.unique_name,
-            fullName: decoded?.name,
-            email: decoded?.email,
-            perfil: +decoded?.perfil 
-        };
+            this._user = {
+                id: decoded?.userId,
+                username: decoded?.unique_name,
+                fullName: decoded?.name,
+                email: decoded?.email,
+                perfil: +decoded?.perfil
+            };
 
-        this.currentUserSubject$.next(this._user);
-        console.log('🔑 User loaded: ', this._user);
+            this.currentUserSubject$.next(this._user);
+            console.log('🔑 User loaded: ', this._user);
+        }
+        catch {
+            this.logout();
+        }
     }
 
     private switchLayout(show: boolean): void {

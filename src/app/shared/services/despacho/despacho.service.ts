@@ -66,7 +66,7 @@ interface JuzgadoCatalogEntry {
 
 @Injectable({ providedIn: 'root' })
 export class DespachoService {
-  constructor(private monedaPipe: TextoMonedaANumeroPipe, private http: HttpClient) {}
+  constructor(private monedaPipe: TextoMonedaANumeroPipe, private http: HttpClient) { }
 
   private catalogo: JuzgadoCatalogEntry[] = [];
   private catalogoReady$ = new BehaviorSubject<boolean>(false);
@@ -131,7 +131,7 @@ export class DespachoService {
 
     const plantilla = PLANTILLAS[tipoKey]?.[subtipoKey] || {};
     console.log('  plantilla a aplicar:', plantilla);
-    
+
     const textoNormalizado = this.normalizarTexto(despachoTexto);
 
     let resultado = tipoKey === 'Mandamiento'
@@ -142,7 +142,7 @@ export class DespachoService {
     resultado = this.aplicarPlantilla(resultado, plantilla);
     console.log('  resultado DESPUÉS de aplicar plantilla:', JSON.parse(JSON.stringify(resultado)));
     console.log('  tipoDiligencia final:', resultado.expediente?.tipoDiligencia);
-    
+
     return resultado;
   }
 
@@ -159,6 +159,7 @@ export class DespachoService {
   }
 
   private generarCedula(texto: string, subtipoSalida: string): any {
+    debugger
     return {
       organo: this.extraerJuzgado(texto),
       expediente: this.extraerExpediente(texto),
@@ -201,7 +202,7 @@ export class DespachoService {
       juzgado: r.juzgado?.trim() || '',
       direccion: r.direccion?.trim() || ''
     }));
-    
+
     // Pre-procesar catálogo para mejor performance
     this.catalogoNormalizado.clear();
     this.catalogo.forEach(entry => {
@@ -212,14 +213,14 @@ export class DespachoService {
       this.catalogoNormalizado.set(entry.juzgado, { norm, num, zona, tokens });
     });
   }
-  
+
 
   usarCatalogoJuzgadosCSV(csvTexto: string) {
     if (!csvTexto) {
       console.warn('CSV vacío');
       return;
     }
-    
+
     const lineas = csvTexto
       .replace(/\r/g, '')
       .split('\n')
@@ -227,7 +228,7 @@ export class DespachoService {
       .filter(l => l && !l.startsWith('//'));
 
     const parsed: JuzgadoCatalogEntry[] = [];
-    
+
     for (const linea of lineas) {
       // Formato esperado: Juzgado..., "Dirección..."
       const match = linea.match(/^([^"]+),\s*"([^"]+)"$/);
@@ -263,7 +264,7 @@ export class DespachoService {
     // Formato esperado más común: "Juzgado:\nJUZGADO EN LO CIVIL Y COMERCIAL Nº10 - SAN MARTIN"
     let detectado = '';
     let labelFlag = false;
-    
+
     // Patrón mejorado: captura todo después de "JUZGADO:" hasta fin de línea o doble salto
     const prefijoMatch = texto.match(/JUZGADO:\s*\n?\s*(JUZGADO\s+[^\n]+?)(?:\n\n|\n(?=[A-Z][a-z]+:)|$)/i);
     if (prefijoMatch) {
@@ -299,10 +300,10 @@ export class DespachoService {
 
       for (const r of patrones) {
         const m = texto.match(r);
-        if (m) { 
+        if (m) {
           detectado = m[0];
           console.log('📋 Detectado sin prefijo:', detectado);
-          break; 
+          break;
         }
       }
     }
@@ -316,9 +317,9 @@ export class DespachoService {
     // Limpiar caracteres extra al final, colapsar espacios
     detectado = detectado
       .replace(/\s+/g, ' ')
-      .replace(/[.,;:]+\s*$/,'')
+      .replace(/[.,;:]+\s*$/, '')
       .trim();
-    
+
     // Capitalizar para presentación
     detectado = this.capitalizarFrase(detectado);
 
@@ -375,7 +376,7 @@ export class DespachoService {
   private extraerCiudadJuzgado(textoNorm: string): string | null {
     const zona = this.extraerZonaJuzgado(textoNorm);
     if (!zona) return null;
-    const toks = zona.split(' ').filter(t => !['de','del','la','el','los','las'].includes(t));
+    const toks = zona.split(' ').filter(t => !['de', 'del', 'la', 'el', 'los', 'las'].includes(t));
     return toks.length ? toks[toks.length - 1] : null;
   }
 
@@ -399,7 +400,7 @@ export class DespachoService {
     if (!zona) return [];
     return zona
       .split(' ')
-      .filter(t => t && !['de','del','la','el','los','las'].includes(t));
+      .filter(t => t && !['de', 'del', 'la', 'el', 'los', 'las'].includes(t));
   }
 
   private extraerPalabrasClaveJuzgado(textoNorm: string): string[] {
@@ -431,7 +432,7 @@ export class DespachoService {
     for (const entry of this.catalogo) {
       const cached = this.catalogoNormalizado.get(entry.juzgado);
       if (!cached) continue;
-      
+
       if (cached.norm === detNorm) {
         console.log('✅ Match EXACTO:', entry.juzgado);
         return entry;
@@ -452,7 +453,7 @@ export class DespachoService {
       if (!cached) continue;
 
       const { norm: catNorm, num: numCat, zona: zonaCat, tokens: zonaTokensCat } = cached;
-      
+
       let puntos = 0;
       let penalizaciones = 0;
       const detalles: string[] = [];
@@ -492,7 +493,7 @@ export class DespachoService {
         } else {
           const inter = zonaTokensDet.filter(t => zonaTokensCat.includes(t));
           const porcentajeCoincidencia = inter.length / Math.max(zonaTokensDet.length, zonaTokensCat.length);
-          
+
           if (porcentajeCoincidencia >= 0.66) { // Aumentado de 0.5
             const esPrefijo = zonaTokensDet.every((t, i) => zonaTokensCat[i] === t);
             if (esPrefijo && inter.length === zonaTokensDet.length) {
@@ -512,7 +513,7 @@ export class DespachoService {
             const baseDet = zonaTokensDet.slice(0, 2).join(' ');
             const baseCat = zonaTokensCat.slice(0, 2).join(' ');
             const distZona = this.calcularDistanciaTexto(baseDet, baseCat);
-            
+
             if (distZona <= 2) {
               puntos += 120; // Aumentado de 100
               detalles.push(`zona~tipeo(dist:${distZona})`);
@@ -550,7 +551,7 @@ export class DespachoService {
       // -------- CRITERIO 5: SIMILARIDAD GLOBAL --------
       const distTotal = this.calcularDistanciaTexto(detNorm, catNorm);
       const longitudMax = Math.max(detNorm.length, catNorm.length);
-      
+
       if (distTotal <= 2) {
         // Casi idéntico (errores mínimos)
         const similitud = 1 - (distTotal / longitudMax);
@@ -572,10 +573,10 @@ export class DespachoService {
 
       // -------- SCORING FINAL --------
       const puntosFinales = Math.max(0, puntos - penalizaciones);
-      
+
       if (puntosFinales > 0) {
-        candidatos.push({ 
-          entry, 
+        candidatos.push({
+          entry,
           puntos: puntosFinales,
           penalizaciones,
           detalles: [...detalles, `(${puntos}-${penalizaciones}=${puntosFinales})`]
@@ -590,7 +591,7 @@ export class DespachoService {
     }
 
     candidatos.sort((a, b) => b.puntos - a.puntos);
-    
+
     if (this.debugMode) {
       console.log('🏆 Top 5 candidatos:', candidatos.slice(0, 5).map(c => ({
         juzgado: c.entry.juzgado,
@@ -623,7 +624,7 @@ export class DespachoService {
     // -------- VALIDACIÓN DE UMBRAL --------
     const mejor = candidatos[0];
     const umbralMinimo = numDet ? 700 : 500; // Aumentado de 600/450
-    
+
     if (mejor.puntos < umbralMinimo) {
       console.warn(`⚠️ Mejor candidato con ${mejor.puntos} puntos (<${umbralMinimo}) - baja confianza`);
       // Retornar de todos modos si el margen es razonable
@@ -657,7 +658,7 @@ export class DespachoService {
     if (!b) return a.length;
 
     const matriz: number[][] = [];
-    
+
     for (let i = 0; i <= a.length; i++) {
       matriz[i] = [i];
     }
@@ -686,20 +687,21 @@ export class DespachoService {
     const numeroExpedienteMatch = texto.match(/(?:EXPEDIENTE\s*(?:N[º°]?)?|N[úu]mero)\s*[:\-]?\s*([A-Z]{2,}-\d{4,}-\d{4})/i)
       || texto.match(/EXPEDIENTE\s*[:\-]?\s*([A-Z]{2,}-\d{4,}-\d{4})/i)
       || texto.match(/Receptor[ií]a[\s-]*causa\s*[:\-]?\s*([A-Z]{2,}-\d{3,}-\d{4})/i)
-      || texto.match(/Expte\.?\s*(?:Interno)?\s*N[º°]?\s*[:\-]?\s*(\d{3,})/i)
+      || texto.match(/Expte\.?\s*(?:Interno)?\s*(?:N[º°]?\s*[:\-]?\s*)?(\d{3,})/i)
       || texto.match(/([A-Z]{2,}-\d{4,}-\d{4})/);
     const numeroExpediente = numeroExpedienteMatch ? numeroExpedienteMatch[1].trim() : '';
 
     const caratulaMatch =
       texto.match(/Car[áa]tula:\s*"?(.*?)"?\s*(?:Juzgado:|Número:|Receptor[ií]a|\n)/i) ||
-      texto.match(/AUTOS:"([^"]+)"/i) ||
+      texto.match(/Car[áa]tula:\s*"?([^"\n]+)/i) ||
+      texto.match(/AUTOS\s*:?\s*"([^"]+)"/i) ||
       texto.match(/^"([^"]+)"\s*$/m);
 
     let caratulaExpediente = caratulaMatch ? caratulaMatch[1].trim() : '';
     caratulaExpediente = caratulaExpediente.replace(/"\.$/, '').replace(/"/g, '');
 
     const copiasTraslado = /código QR|copias de traslado|traslado.*QR/i.test(texto);
-    
+
     // tipoDiligencia se dejará vacío aquí, se completará desde la plantilla
     const tipoDiligencia = '';
 
@@ -753,6 +755,7 @@ export class DespachoService {
         .replace(/^(SR\.?|SRA\.?|SRES\.?|SRAS\.?)\s+/i, '')
         .replace(/\b(DNI|CUIT|CUIL)\b.*$/i, '')
         .replace(/\bS\/.*$/i, '')
+        .replace(/\s+Y\s+OTR[OA]S?(?:\/[OA]S?)?$/i, '')
         .replace(/[",.;:]+$/g, '')
         .replace(/\s{2,}/g, ' ')
         .trim();
@@ -760,16 +763,19 @@ export class DespachoService {
     // PRIORIDAD 0: Carátula (si existe). Tomar texto entre C/ y S/
     // Ej: SANBERCON S.R.L. C/ LARRETAPE GABRIELA ILEANA S/ COBRO EJECUTIVO
     const caratulaLinea =
-      texto.match(/CAR[ÁA]TULA:\s*"?(.*?)(?:\n|$)/i);
+      (texto.match(/Car[áa]tula:\s*"?(.*?)"?\s*(?:Juzgado:|Número:|Receptor[ií]a|\n)/i) ||
+        texto.match(/Car[áa]tula:\s*"?([^"\n]+)/i) ||
+        texto.match(/AUTOS\s*:?\s*"([^"]+)"/i) ||
+        texto.match(/^"([^"]+)"\s*$/m));
     if (caratulaLinea) {
       const linea = caratulaLinea[1]
-        .replace(/"\s*$/,'')
-        .replace(/\s+/g,' ')
+        .replace(/"\s*$/, '')
+        .replace(/\s+/g, ' ')
         .trim()
         .toUpperCase();
 
       // Buscar segmento entre C/ y S/
-      const matchCS = linea.match(/C\/\s+([A-ZÁÉÍÓÚÑ .]+?)\s+S\//i);
+      const matchCS = linea.match(/C\/\s+([A-ZÁÉÍÓÚÑ /.]+?)\s+S\//i);
       if (matchCS) {
         const candidato = limpiar(matchCS[1]);
         if (candidato.length >= 3) return candidato;
@@ -835,6 +841,7 @@ export class DespachoService {
 
   // ---------------- Texto contenido ----------------
   private extraerTextoContenido(texto: string): TextoContenidoInfo {
+    debugger
     const requerido = this.extraerRequerido(texto);
     const { montoCapitalTexto, montoCapitalNumerico } = this.extraerMontoCapital(texto);
     const { montoInteresesTexto, montoInteresesNumerico } = this.extraerMontoIntereses(texto);
@@ -858,7 +865,7 @@ export class DespachoService {
    */
   private extraerTextoNotificacion(texto: string): string {
     if (!texto) return '';
-    
+
     // Buscar el inicio del texto real después de los campos del sistema
     // Patrones comunes de inicio:
     const patronesInicio = [
@@ -868,7 +875,7 @@ export class DespachoService {
     ];
 
     let textoLimpio = texto;
-    
+
     // Intentar encontrar dónde comienza el proveído real
     for (const patron of patronesInicio) {
       const match = texto.match(patron);
@@ -878,14 +885,14 @@ export class DespachoService {
         break;
       }
     }
-    
+
     // Si no encontramos patrones específicos, intentar otra estrategia:
     // Buscar después de "Juzgado:" y luego el primer párrafo que parece ser el proveído
     if (textoLimpio === texto) {
       const despuesJuzgado = texto.match(/Juzgado:[\s\S]*?\n\n([\s\S]+)/i);
       if (despuesJuzgado) {
         textoLimpio = despuesJuzgado[1].trim();
-        
+
         // Quitar líneas que parecen encabezados del sistema
         const lineas = textoLimpio.split('\n');
         let inicioReal = 0;
@@ -900,7 +907,7 @@ export class DespachoService {
         textoLimpio = lineas.slice(inicioReal).join('\n').trim();
       }
     }
-    
+
     return textoLimpio;
   }
 
@@ -931,7 +938,7 @@ export class DespachoService {
       montoCapitalTexto = `PESOS ${literal}`;
     } else if (numeroBruto) {
       // Si no hay literal pero sí número, construir literal desde el número
-      const numEntero = parseInt(numeroBruto.replace(/[^\d]/g,''), 10);
+      const numEntero = parseInt(numeroBruto.replace(/[^\d]/g, ''), 10);
       const literalAuto = this.numeroATextoGrande(numEntero);
       if (literalAuto) {
         montoCapitalTexto = `PESOS ${literalAuto.toUpperCase()}`;
@@ -945,9 +952,9 @@ export class DespachoService {
     let montoCapitalNumerico = '';
     if (numeroBruto) {
       const normalizadoNumero = numeroBruto
-        .replace(/[^\d.,]/g,'')
-        .replace(/\.(?=\d{3}(\D|$))/g,'')   // quita puntos de miles
-        .replace(/,(\d{2})$/,'.$1');        // coma decimal -> punto
+        .replace(/[^\d.,]/g, '')
+        .replace(/\.(?=\d{3}(\D|$))/g, '')   // quita puntos de miles
+        .replace(/,(\d{2})$/, '.$1');        // coma decimal -> punto
       montoCapitalNumerico = this.monedaPipe.transform(normalizadoNumero);
     } else if (literal) {
       const posible = this.monedaPipe.transform(literal);
@@ -990,7 +997,7 @@ export class DespachoService {
       'por la suma',
       'por las sumas',
       'pesos '
-    ].map(k => normalizado.indexOf(k)).filter(i => i !== -1).sort((a,b)=>a-b)[0];
+    ].map(k => normalizado.indexOf(k)).filter(i => i !== -1).sort((a, b) => a - b)[0];
     if (inicioFallback === undefined) inicioFallback = normalizado.indexOf('pesos ');
     if (inicioFallback === -1 || inicioFallback === undefined) inicioFallback = 0;
 
@@ -1002,7 +1009,7 @@ export class DespachoService {
       normalizado.indexOf('con más una suma', inicioFallback),
       normalizado.indexOf('para responder a intereses', inicioFallback),
       normalizado.indexOf('intereses y costas', inicioFallback)
-    ].filter(index => index !== -1).sort((a,b)=>a-b)[0];
+    ].filter(index => index !== -1).sort((a, b) => a - b)[0];
     if (finFallback === undefined || finFallback < inicioFallback) finFallback = inicioFallback + 420;
 
     const fallback = this.recortarSegmentoCapital(
@@ -1159,22 +1166,22 @@ export class DespachoService {
   }
 
   private numeroATexto(n: number): string {
-    const unidades = ['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve'];
-    const especiales = ['diez','once','doce','trece','catorce','quince','dieciseis','diecisiete','dieciocho','diecinueve'];
-    const decenas = ['','diez','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+    const unidades = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+    const especiales = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciseis', 'diecisiete', 'dieciocho', 'diecinueve'];
+    const decenas = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
     if (n < 10) return unidades[n];
-    if (n < 20) return especiales[n-10];
+    if (n < 20) return especiales[n - 10];
     if (n < 100) {
-      const d = Math.floor(n/10);
+      const d = Math.floor(n / 10);
       const u = n % 10;
       if (u === 0) return decenas[d];
       if (d === 2) return 'veinti' + unidades[u];
       return decenas[d] + ' y ' + unidades[u];
     }
     if (n < 1000) {
-      const c = Math.floor(n/100);
+      const c = Math.floor(n / 100);
       const resto = n % 100;
-      const cientos = ['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+      const cientos = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
       if (n === 100) return 'cien';
       return cientos[c] + (resto ? ' ' + this.numeroATexto(resto) : '');
     }
@@ -1185,9 +1192,9 @@ export class DespachoService {
     if (!texto) return { montoInteresesTexto: 'MONTO INTERESES', montoInteresesNumerico: '' };
     const original = texto;
     const normalizado = original
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .replace(/\s+/g,' ');
+      .replace(/\s+/g, ' ');
 
     let inicio = [
       'con mas la suma de pesos ',
@@ -1198,7 +1205,7 @@ export class DespachoService {
       'con más la suma',
       'con mas la de',
       'con más la de'
-    ].map(k => normalizado.indexOf(k)).filter(i => i !== -1).sort((a,b)=>a-b)[0];
+    ].map(k => normalizado.indexOf(k)).filter(i => i !== -1).sort((a, b) => a - b)[0];
 
     if (inicio === undefined) {
       const posInteresesPal = normalizado.indexOf('intereses');
@@ -1228,7 +1235,7 @@ export class DespachoService {
     }
     if (fin === -1 || fin < inicio) fin = inicio + 400;
 
-    const originalCompact = original.replace(/\s+/g,' ');
+    const originalCompact = original.replace(/\s+/g, ' ');
     const segmento = originalCompact.slice(inicio, Math.min(fin + 60, originalCompact.length));
 
     const numeroMatch = segmento.match(/\(\s*\$?\s*([\d]{1,3}(?:[.\,]\d{3})*(?:[.,]\d{2})?)\s*(?:[.\-–]{0,2})\s*\)/);
@@ -1239,9 +1246,9 @@ export class DespachoService {
     }
     let montoInteresesNumerico = numeroBruto ? this.monedaPipe.transform(
       numeroBruto
-        .replace(/[^\d.,]/g,'')
-        .replace(/\.(?=\d{3}(\D|$))/g,'')
-        .replace(/,(\d{2})$/,'.$1')
+        .replace(/[^\d.,]/g, '')
+        .replace(/\.(?=\d{3}(\D|$))/g, '')
+        .replace(/,(\d{2})$/, '.$1')
     ) : '';
 
     let literal = '';
@@ -1250,9 +1257,9 @@ export class DespachoService {
     const mLit = segmento.match(regexLiteral);
     if (mLit) {
       literal = mLit[1]
-        .replace(/\s{2,}/g,' ')
+        .replace(/\s{2,}/g, ' ')
         .trim()
-        .replace(/^(Y\s+)?/,'');
+        .replace(/^(Y\s+)?/, '');
     }
 
     literal = this.limpiarLiteralIntereses(literal);
@@ -1268,9 +1275,9 @@ export class DespachoService {
       // construir texto desde número si no se pudo extraer literal
       // Normalizar correctamente: quitar puntos de miles, convertir coma decimal a punto, tomar solo parte entera
       const numeroNormalizado = numeroBruto
-        .replace(/[^\d.,]/g,'')
-        .replace(/\.(?=\d{3}(\D|$))/g,'')   // quita puntos de miles
-        .replace(/,(\d{2})$/,'.$1');         // coma decimal -> punto
+        .replace(/[^\d.,]/g, '')
+        .replace(/\.(?=\d{3}(\D|$))/g, '')   // quita puntos de miles
+        .replace(/,(\d{2})$/, '.$1');         // coma decimal -> punto
       const numEntero = parseInt(numeroNormalizado.split('.')[0], 10);
       const literalAuto = this.numeroATextoGrande(numEntero);
       if (literalAuto) montoInteresesTexto = `PESOS ${literalAuto.toUpperCase()}`;
@@ -1285,7 +1292,7 @@ export class DespachoService {
     }
 
     return {
-      montoInteresesTexto: montoInteresesTexto.replace(/\s+/g,' ').trim(),
+      montoInteresesTexto: montoInteresesTexto.replace(/\s+/g, ' ').trim(),
       montoInteresesNumerico
     };
   }
@@ -1293,15 +1300,15 @@ export class DespachoService {
   // Extensión para números grandes (hasta millones)
   private numeroATextoGrande(n: number): string {
     if (n === 0) return 'cero';
-    const unidades = ['','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve'];
-    const especiales = ['diez','once','doce','trece','catorce','quince','dieciseis','diecisiete','dieciocho','diecinueve'];
-    const decenas = ['','diez','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
-    const centenas = ['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+    const unidades = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+    const especiales = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciseis', 'diecisiete', 'dieciocho', 'diecinueve'];
+    const decenas = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+    const centenas = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
 
     const toTextoMenor100 = (x: number): string => {
       if (x < 10) return unidades[x];
-      if (x < 20) return especiales[x-10];
-      const d = Math.floor(x/10), u = x%10;
+      if (x < 20) return especiales[x - 10];
+      const d = Math.floor(x / 10), u = x % 10;
       if (u === 0) return decenas[d];
       if (d === 2) return 'veinti' + unidades[u];
       return decenas[d] + ' y ' + unidades[u];
@@ -1309,7 +1316,7 @@ export class DespachoService {
     const toTextoMenor1000 = (x: number): string => {
       if (x === 100) return 'cien';
       if (x < 100) return toTextoMenor100(x);
-      const c = Math.floor(x/100);
+      const c = Math.floor(x / 100);
       const resto = x % 100;
       return centenas[c] + (resto ? ' ' + toTextoMenor100(resto) : '');
     };
@@ -1322,21 +1329,21 @@ export class DespachoService {
     if (millones) partes.push(millones === 1 ? 'un millón' : `${toTextoMenor1000(millones)} millones`);
     if (miles) partes.push(miles === 1 ? 'mil' : `${toTextoMenor1000(miles)} mil`);
     if (resto) partes.push(toTextoMenor1000(resto));
-    return partes.join(' ').replace(/\s+/g,' ').trim();
+    return partes.join(' ').replace(/\s+/g, ' ').trim();
   }
 
   private limpiarLiteralIntereses(raw: string): string {
     return (raw || '')
-      .replace(/para responder a intereses.*$/i,'')
-      .replace(/para responder intereses.*$/i,'')
-      .replace(/que se presupuesta.*$/i,'')
-      .replace(/para intereses.*$/i,'')
-      .replace(/para interes.*$/i,'')
-      .replace(/por intereses.*$/i,'')
-      .replace(/por interes.*$/i,'')
-      .replace(/en concepto de intereses.*$/i,'')
-      .replace(/[",;:]+$/g,'')
-      .replace(/\s{2,}/g,' ')
+      .replace(/para responder a intereses.*$/i, '')
+      .replace(/para responder intereses.*$/i, '')
+      .replace(/que se presupuesta.*$/i, '')
+      .replace(/para intereses.*$/i, '')
+      .replace(/para interes.*$/i, '')
+      .replace(/por intereses.*$/i, '')
+      .replace(/por interes.*$/i, '')
+      .replace(/en concepto de intereses.*$/i, '')
+      .replace(/[",;:]+$/g, '')
+      .replace(/\s{2,}/g, ' ')
       .trim();
   }
 
