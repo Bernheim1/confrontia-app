@@ -55,7 +55,7 @@
 
     <textarea
       [(ngModel)]="item.proveido"
-      (input)="errorIndex === i ? errorIndex = null : null"
+      (input)="onProveidoChange(i)"
       rows="16"
       placeholder="Escriba aquí el proveído…"
       class="w-full px-4 py-4
@@ -70,7 +70,22 @@
   </section>
 </div>
 
-<div *ngIf="!masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-xl rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+<div *ngIf="!masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-xl rounded-xl px-4 pt-4 pb-4 border border-gray-200 dark:border-gray-700">
+  <!-- Fila badge: colapsa cuando no hay detección -->
+  <div
+    [class.max-h-0]="!tipoAutoDetectado"
+    [class.max-h-6]="tipoAutoDetectado"
+    [class.opacity-0]="!tipoAutoDetectado"
+    [class.mb-1]="tipoAutoDetectado"
+    class="overflow-hidden flex items-center justify-center transition-all duration-200 ease-out">
+    <div
+      class="flex items-center gap-1.5"
+      title="Tipo detectado automáticamente desde el texto ingresado. Puede modificarlo.">
+      <span class="block w-1.5 h-1.5 rounded-full bg-primary-500 dark:bg-primary-400"></span>
+      <span class="text-[11px] font-medium text-gray-400 dark:text-gray-500 tracking-wide">Detectado automáticamente</span>
+    </div>
+  </div>
+  <!-- Fila controles -->
   <div class="flex items-center gap-3">
     <button
       (click)="addOficio()"
@@ -84,12 +99,12 @@
     <div class="h-10 w-px bg-gray-300 dark:bg-gray-600"></div>
 
     <div class="flex items-center gap-2 min-w-[520px]">
-      <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaSeleccionada()" class="w-52 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
+      <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaSeleccionada(); tipoAutoDetectado = false" class="w-52 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
         <option value="">Categoría</option>
         <option *ngFor="let categoria of categorias" [value]="categoria.code">{{ categoria.name }}</option>
       </select>
 
-      <select [(ngModel)]="tipoOficioCodigo" class="flex-1 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600" [disabled]="!categoriaSeleccionada">
+      <select [(ngModel)]="tipoOficioCodigo" (ngModelChange)="tipoAutoDetectado = false" class="flex-1 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600" [disabled]="!categoriaSeleccionada">
         <option value="">Tipo de oficio</option>
         <option *ngFor="let tipo of tiposDisponibles" [value]="tipo.code">{{ tipo.label }}</option>
       </select>
@@ -106,7 +121,22 @@
   </div>
 </div>
 
-<div *ngIf="masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-md dark:shadow-lg rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+<div *ngIf="masivo" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white dark:bg-gray-800 shadow-md dark:shadow-lg rounded-xl px-4 pt-4 pb-4 border border-gray-200 dark:border-gray-700">
+  <!-- Fila badge: colapsa cuando no hay detección -->
+  <div
+    [class.max-h-0]="!tipoAutoDetectado"
+    [class.max-h-6]="tipoAutoDetectado"
+    [class.opacity-0]="!tipoAutoDetectado"
+    [class.mb-1]="tipoAutoDetectado"
+    class="overflow-hidden flex items-center justify-center transition-all duration-200 ease-out">
+    <div
+      class="flex items-center gap-1.5"
+      title="Tipo detectado automáticamente desde el texto ingresado. Puede modificarlo.">
+      <span class="block w-1.5 h-1.5 rounded-full bg-primary-500 dark:bg-primary-400"></span>
+      <span class="text-[11px] font-medium text-gray-400 dark:text-gray-500 tracking-wide">Detectado automáticamente</span>
+    </div>
+  </div>
+  <!-- Fila controles -->
   <div class="flex items-center gap-3">
     <button
       (click)="addOficio()"
@@ -120,12 +150,12 @@
     <div class="h-10 w-px bg-gray-300 dark:bg-gray-600"></div>
 
     <div class="flex items-center gap-2 min-w-[520px]">
-      <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaSeleccionada()" class="w-52 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
+      <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaSeleccionada(); tipoAutoDetectado = false" class="w-52 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
         <option value="">Categoría</option>
         <option *ngFor="let categoria of categorias" [value]="categoria.code">{{ categoria.name }}</option>
       </select>
 
-      <select [(ngModel)]="tipoOficioCodigo" class="flex-1 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600" [disabled]="!categoriaSeleccionada">
+      <select [(ngModel)]="tipoOficioCodigo" (ngModelChange)="tipoAutoDetectado = false" class="flex-1 py-2 px-3 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600" [disabled]="!categoriaSeleccionada">
         <option value="">Tipo de oficio</option>
         <option *ngFor="let tipo of tiposDisponibles" [value]="tipo.code">{{ tipo.label }}</option>
       </select>

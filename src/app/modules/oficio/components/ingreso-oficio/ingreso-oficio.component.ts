@@ -4,6 +4,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { OFICIO_CATEGORIES, getOficioTypeByCode, getOficioTypesByCategory, OficioTypeConfig } from '../../models/oficio-catalog';
+import { OficioService } from '../../../../services/oficio/oficio.service';
 
 @Component({
   selector: 'app-ingreso-oficio',
@@ -22,10 +23,13 @@ export class IngresoOficioComponent {
   items: Array<{ proveido: string }> = [{ proveido: '' }];
   masivo = false;
   errorIndex: number | null = null;
+  tipoAutoDetectado = false;
   dropdownOpen = false;
   submenuOpen: string | null = null;
 
-  constructor(private toastr: ToastrService) {}
+  private detectionTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(private toastr: ToastrService, private oficioService: OficioService) {}
 
   onSubmit() {
     const emptyIndex = this.items.findIndex(item => !item.proveido || item.proveido.trim().length === 0);
@@ -56,6 +60,23 @@ export class IngresoOficioComponent {
     }
 
     this.oficioConfigurado.emit({ proveidos: this.items, tipoOficio });
+  }
+
+  onProveidoChange(i: number): void {
+    if (this.errorIndex === i) this.errorIndex = null;
+    if (this.detectionTimeout) clearTimeout(this.detectionTimeout);
+    this.detectionTimeout = setTimeout(() => this.detectarTipoDesdeProveido(), 400);
+  }
+
+  private detectarTipoDesdeProveido(): void {
+    const proveido = this.items.find(item => item.proveido?.trim())?.proveido ?? '';
+    if (!proveido.trim()) return;
+    const detected = this.oficioService.detectarTipo(proveido);
+    if (!detected) return;
+    this.categoriaSeleccionada = detected.categoryCode;
+    this.onCategoriaSeleccionada();
+    this.tipoOficioCodigo = detected.code;
+    this.tipoAutoDetectado = true;
   }
 
   onCategoriaSeleccionada() {

@@ -7,11 +7,16 @@ import { IngresoOficioComponent } from './components/ingreso-oficio/ingreso-ofic
 import { MostrarOficioComponent } from './components/mostrar-oficio/mostrar-oficio.component';
 import { SeleccionOficioComponent } from './components/seleccion-oficio/seleccion-oficio.component';
 import { OficioComponent } from './pages/oficio/oficio.component';
+import { AuthGuard } from '../../core/auth/guards/auth.guards';
+import { RolesGuard } from '../../core/auth/guards/roles.guard';
+import { Perfiles } from '../../services/user/contracts/perfiles-enum';
 
 const routes: Routes = [
   {
     path: '',
-    component: OficioComponent
+    component: OficioComponent,
+    canActivate: [AuthGuard, RolesGuard],
+    data: { allowedProfiles: [Perfiles.administrador] }
   }
 ];
 

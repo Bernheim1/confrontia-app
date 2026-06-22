@@ -162,7 +162,8 @@ export class MostrarOficioComponent implements OnInit, OnChanges, OnDestroy {
       resultaTexto: pick('resultaTexto'),
       considerandoTexto: pick('considerandoTexto'),
       inhibidoNombre: pick('inhibidoNombre', 'nombreRazonSocial', 'titular', 'personaNombre'),
-      inhibidoDocumento: pick('inhibidoDocumento', 'numeroDocumento', 'dni')
+      inhibidoDocumento: pick('inhibidoDocumento', 'numeroDocumento', 'dni'),
+      cpccHtml: this.buildCpccArticulos()
     };
   }
 
@@ -233,7 +234,35 @@ export class MostrarOficioComponent implements OnInit, OnChanges, OnDestroy {
       ].join('');
     }
 
-    return textoGeneradoHtml;
+    return this.buildCuerpoFormal(pick, textoGeneradoHtml);
+  }
+
+  private buildCuerpoFormal(
+    pick: (...keys: string[]) => string,
+    textoGeneradoHtml: string
+  ): string {
+    const caratula   = this.withFallback(pick('caratula', 'caratulaMateria', 'caratulaExpediente'));
+    const nroExp     = this.withFallback(pick('numeroExpediente', 'expedienteNumero'));
+    const juzgado    = this.withFallback(pick('juzgado', 'fueroNumero', 'juzgadoInterviniente', 'juzgadoTribunal'));
+    const juez       = this.withFallback(pick('juez', 'juezNombre', 'drJuez'));
+    const secretario = pick('secretario', 'secretarioNombre', 'secretaria', 'drSecretario');
+    const ubicacion  = this.withFallback(pick('ubicacionJuzgado', 'direccionJuzgado', 'direccion'));
+
+    const secretarioStr = secretario
+      ? `, Secretar&iacute;a a cargo de ${secretario}`
+      : '';
+
+    const apertura = `<p>Me dirijo a Ud. en los autos caratulados &ldquo;${caratula}&rdquo;, Expte. N&deg; ${nroExp}, que tramitan por ante el ${juzgado}, a cargo de ${juez}${secretarioStr}, con asiento en ${ubicacion}.</p>`;
+    const cierre   = `<p>Se hace saber que el presente oficio deber&aacute; ser contestado dentro del plazo previsto por el art. 396 del CPCC, bajo apercibimiento de lo dispuesto por el art. 397 del mismo cuerpo legal.</p>`;
+
+    return [apertura, textoGeneradoHtml, cierre].join('\n');
+  }
+
+  private buildCpccArticulos(): string {
+    return [
+      '<p style="font-size:12px;margin-top:8px;">&ldquo;ART&Iacute;CULO 396: <em>Recaudos y plazos para la contestaci&oacute;n.</em> Las oficinas p&uacute;blicas no podr&aacute;n establecer recaudos o requisitos para los oficios sin previa aprobaci&oacute;n por el Poder Ejecutivo, ni otros aranceles que los que determinen las leyes, decretos u ordenanzas. Deber&aacute;n contestar el pedido de informes o remitir el expediente dentro de veinte (20) d&iacute;as h&aacute;biles y las entidades privadas dentro de diez (10) d&iacute;as h&aacute;biles, salvo que la providencia que lo haya ordenado hubiere fijado otro plazo en raz&oacute;n de la naturaleza del juicio o de circunstancias especiales.&rdquo;</p>',
+      '<p style="font-size:12px;margin-top:4px;">*ART&Iacute;CULO 397: &ldquo;<em>Retardo.</em> Si por circunstancias atendibles el requerimiento no pudiere ser cumplido dentro del plazo, se deber&aacute; informar al Juzgado, antes del vencimiento de aqu&eacute;l, sobre las causas y la fecha en que se cumplir&aacute;. Si el Juez advirtiere que determinada repartici&oacute;n p&uacute;blica, sin causa justificada, no cumple reiteradamente el deber de contestar oportunamente los informes, deber&aacute; poner el hecho en conocimiento del Ministerio de Gobierno, a los efectos que correspondan, sin perjuicio de las otras medidas a que hubiere lugar. A las entidades privadas que sin causa justificada no contestaren oportunamente se les impondr&aacute; multa de un valor equivalente a dos (2) Jus por cada d&iacute;a de retardo. La apelaci&oacute;n que se dedujere contra la respectiva resoluci&oacute;n tramitar&aacute; en expediente por separado.&rdquo;</p>'
+    ].join('');
   }
 
   private withFallback(value: string): string {

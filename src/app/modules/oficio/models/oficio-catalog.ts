@@ -24,6 +24,14 @@ const commonCaseFields: OficioFieldConfig[] = [
   { key: 'numeroExpediente', label: 'Número de expediente', type: 'text', required: true, section: 'Expediente' }
 ];
 
+const commonJuzgadoFields: OficioFieldConfig[] = [
+  { key: 'localidadFecha', label: 'Localidad', type: 'text', required: true, section: 'Juzgado emisor' },
+  { key: 'juzgado', label: 'Juzgado', type: 'text', required: true, section: 'Juzgado emisor' },
+  { key: 'juez', label: 'Juez/a a cargo', type: 'text', required: true, section: 'Juzgado emisor' },
+  { key: 'secretario', label: 'Secretario/a', type: 'text', required: false, section: 'Juzgado emisor' },
+  { key: 'ubicacionJuzgado', label: 'Domicilio del juzgado', type: 'text', required: false, section: 'Juzgado emisor' }
+];
+
 export const OFICIO_TYPES: OficioTypeConfig[] = [
   {
     code: 'OMN-1',
@@ -452,7 +460,12 @@ export const OFICIO_CATEGORIES = Array.from(
 );
 
 export function getOficioTypeByCode(code?: string | null): OficioTypeConfig | undefined {
-  return OFICIO_TYPES.find(item => item.code === code);
+  const tipo = OFICIO_TYPES.find(item => item.code === code);
+  if (!tipo) return undefined;
+  const existingKeys = new Set(tipo.fields.map(f => f.key));
+  const extraCaseFields = commonCaseFields.filter(f => !existingKeys.has(f.key));
+  const extraJuzgadoFields = commonJuzgadoFields.filter(f => !existingKeys.has(f.key) && !extraCaseFields.some(c => c.key === f.key));
+  return { ...tipo, fields: [...tipo.fields, ...extraCaseFields, ...extraJuzgadoFields] };
 }
 
 export function getOficioTypesByCategory(categoryCode?: string | null): OficioTypeConfig[] {

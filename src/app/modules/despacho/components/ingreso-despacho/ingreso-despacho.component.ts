@@ -5,6 +5,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TipoCedulaEnum, TipoCedulaTexto, TipoMandamientoEnum, TipoMandamientoTexto, TipoSalidaEnum, TipoSalidaTexto } from '../../../../shared/enums/tipo-salida-enum';
+import { detectarTipoSalida } from '../../../../shared/helpers/tipo-salida-detector';
 
 
 @Component({
@@ -28,6 +29,8 @@ export class IngresoDespachoComponent {
   items : any[] = [{primerDespacho: ''}];
   masivo : boolean = false;
   errorIndex: number | null = null;
+  tipoAutoDetectado = false;
+  private detectionTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private toastr: ToastrService) 
   {
@@ -65,6 +68,7 @@ export class IngresoDespachoComponent {
   }
 
   seleccionTipoSalida(tipo: number, subtipo: number) {
+    this.tipoAutoDetectado = false;
     if (tipo === 0) { // Cédula
       this.tipoSalida = TipoSalidaEnum.Cedula;
       this.subtipoSalida = subtipo;
@@ -117,6 +121,26 @@ export class IngresoDespachoComponent {
       this.toastr.error('No puede agregar más de 10 despachos a la vez.', 'Límite alcanzado');
     }
 
+  }
+
+  onDespachoChange(i: number): void {
+    if (this.errorIndex === i) this.errorIndex = null;
+    if (this.detectionTimeout) clearTimeout(this.detectionTimeout);
+    this.detectionTimeout = setTimeout(() => this.detectarTipoDesdeDespacho(), 500);
+  }
+
+  private detectarTipoDesdeDespacho(): void {
+    const texto = this.items.find(item => item.primerDespacho?.trim())?.primerDespacho ?? '';
+    if (!texto.trim()) return;
+    const detectado = detectarTipoSalida(texto);
+    if (!detectado.autoDetectado) return;
+    this.tipoSalida = detectado.tipoSalida;
+    this.subtipoSalida = detectado.subtipoSalida;
+    this.textoSalida = TipoSalidaTexto[detectado.tipoSalida] + ' - ' +
+      (detectado.tipoSalida === TipoSalidaEnum.Cedula
+        ? TipoCedulaTexto[detectado.subtipoSalida as TipoCedulaEnum]
+        : TipoMandamientoTexto[detectado.subtipoSalida as TipoMandamientoEnum]);
+    this.tipoAutoDetectado = true;
   }
 
   deteleDespacho(index: number) {
